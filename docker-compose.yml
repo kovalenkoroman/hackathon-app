@@ -1,34 +1,37 @@
 version: '3.9'
 
 services:
-  app:
+  backend:
     build: ./backend
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/hackathon
+      DATABASE_URL: postgres://postgres:postgres@db:5432/chatapp
+      SESSION_SECRET: dev_secret_change_in_production
+      PORT: 3000
+      UPLOAD_DIR: /app/uploads
+      MAX_FILE_SIZE_BYTES: 20971520
+      MAX_IMAGE_SIZE_BYTES: 3145728
       NODE_ENV: development
     depends_on:
       db:
         condition: service_healthy
     volumes:
-      - ./backend:/app
-      - /app/node_modules
+      - uploads:/app/uploads
 
   frontend:
     build: ./frontend
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "5173:80"
+    depends_on:
+      - backend
 
   db:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: hackathon
+      POSTGRES_DB: chatapp
     ports:
       - "5432:5432"
     volumes:
@@ -42,3 +45,4 @@ services:
 
 volumes:
   pgdata:
+  uploads:
