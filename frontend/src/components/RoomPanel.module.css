@@ -1,0 +1,177 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.panel h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.description {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0 0 1rem;
+  font-style: italic;
+}
+
+.info {
+  background: #f5f5f5;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.info p {
+  margin: 0.3rem 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.6rem;
+  background: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.btn:hover {
+  background: #0052a3;
+}
+
+.memberList {
+  flex: 1;
+}
+
+.memberList h3 {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.member {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem;
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.memberInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.username {
+  font-weight: 500;
+  color: #333;
+}
+
+.role {
+  font-size: 0.75rem;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.memberActions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.iconBtn {
+  padding: 0.3rem 0.5rem;
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.iconBtn:hover {
+  background: #efefef;
+}
+
+/* Modals */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 400px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modalContent h3 {
+  margin: 0 0 1rem;
+  color: #333;
+}
+
+.modalContent p {
+  margin: 0 0 1.5rem;
+  color: #666;
+}
+
+.primaryBtn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.primaryBtn:hover {
+  background: #0052a3;
+}
+
+.secondaryBtn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.secondaryBtn:hover {
+  background: #e0e0e0;
+}

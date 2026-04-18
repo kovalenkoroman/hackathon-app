@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import * as authApi from './api/auth';
 import wsClient from './ws/client';
+import MainLayout from './components/MainLayout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -12,32 +13,11 @@ import Sessions from './pages/Sessions';
 import Friends from './pages/Friends';
 import DMChat from './pages/DMChat';
 
-function Home({ user, onLogout, wsState, presence }) {
-  const getPresenceIcon = (status) => {
-    switch (status) {
-      case 'online':
-        return '●';
-      case 'afk':
-        return '◐';
-      case 'offline':
-        return '○';
-      default:
-        return '○';
-    }
-  };
-
+function Home() {
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Online Chat Server</h1>
-      <p>Welcome, {user.username}!</p>
-      <p>WebSocket status: {wsState}</p>
-      <p>Presence: {getPresenceIcon(presence)} {presence}</p>
-      <nav style={{ marginBottom: '2rem' }}>
-        <a href="/catalog" style={{ marginRight: '1rem' }}>Browse Rooms</a>
-        <a href="/friends" style={{ marginRight: '1rem' }}>Friends</a>
-        <a href="/sessions" style={{ marginRight: '1rem' }}>Sessions</a>
-      </nav>
-      <button onClick={onLogout}>Logout</button>
+    <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <h1>Welcome to Chat!</h1>
+      <p>Select a room from the sidebar or browse public rooms to get started.</p>
     </div>
   );
 }
@@ -114,6 +94,16 @@ export default function App() {
     return <div style={{ padding: '2rem' }}>Loading...</div>;
   }
 
+  const ProtectedLayout = ({ children }) => (
+    user ? (
+      <MainLayout user={user} onLogout={handleLogout} wsState={wsState} presence={presence}>
+        {children}
+      </MainLayout>
+    ) : (
+      <Navigate to="/login" />
+    )
+  );
+
   return (
     <BrowserRouter>
       <Routes>
@@ -121,7 +111,9 @@ export default function App() {
           path="/"
           element={
             user ? (
-              <Home user={user} onLogout={handleLogout} wsState={wsState} presence={presence} />
+              <MainLayout user={user} onLogout={handleLogout} wsState={wsState} presence={presence}>
+                <Home />
+              </MainLayout>
             ) : (
               <Navigate to="/login" />
             )
@@ -132,27 +124,27 @@ export default function App() {
         <Route path="/forgot-password" element={user ? <Navigate to="/" /> : <ForgotPassword />} />
         <Route
           path="/catalog"
-          element={user ? <RoomCatalog /> : <Navigate to="/login" />}
+          element={user ? <ProtectedLayout><RoomCatalog /></ProtectedLayout> : <Navigate to="/login" />}
         />
         <Route
           path="/rooms/:roomId"
-          element={user ? <RoomChat user={user} /> : <Navigate to="/login" />}
+          element={user ? <ProtectedLayout><RoomChat user={user} /></ProtectedLayout> : <Navigate to="/login" />}
         />
         <Route
           path="/rooms/:roomId/manage"
-          element={user ? <RoomDetail user={user} /> : <Navigate to="/login" />}
+          element={user ? <ProtectedLayout><RoomDetail user={user} /></ProtectedLayout> : <Navigate to="/login" />}
         />
         <Route
           path="/sessions"
-          element={user ? <Sessions /> : <Navigate to="/login" />}
+          element={user ? <ProtectedLayout><Sessions /></ProtectedLayout> : <Navigate to="/login" />}
         />
         <Route
           path="/friends"
-          element={user ? <Friends user={user} /> : <Navigate to="/login" />}
+          element={user ? <ProtectedLayout><Friends user={user} /></ProtectedLayout> : <Navigate to="/login" />}
         />
         <Route
           path="/dm/:userId"
-          element={user ? <DMChat user={user} /> : <Navigate to="/login" />}
+          element={user ? <ProtectedLayout><DMChat user={user} /></ProtectedLayout> : <Navigate to="/login" />}
         />
       </Routes>
     </BrowserRouter>

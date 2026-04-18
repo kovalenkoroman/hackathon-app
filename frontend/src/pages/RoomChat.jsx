@@ -1,19 +1,20 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import * as messagesApi from '../api/messages';
 import * as roomsApi from '../api/rooms';
+import MessageList from '../components/MessageList';
+import MessageComposer from '../components/MessageComposer';
+import RoomPanel from '../components/RoomPanel';
 import styles from './RoomChat.module.css';
 
 export default function RoomChat({ user }) {
   const { roomId } = useParams();
   const [room, setRoom] = useState(null);
+  const [members, setMembers] = useState([]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [content, setContent] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
-  const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
 
   useEffect(() => {
     loadRoomAndMessages();
@@ -25,6 +26,7 @@ export default function RoomChat({ user }) {
     try {
       const roomData = await roomsApi.getRoomDetail(roomId);
       setRoom(roomData);
+      setMembers(roomData.members || []);
 
       const messagesData = await messagesApi.getMessages(roomId, null, 50);
       setMessages(messagesData);
@@ -35,26 +37,24 @@ export default function RoomChat({ user }) {
     }
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!content.trim()) return;
-
+  const handleSend = async (msgData) => {
     setError('');
     try {
-      const newMessage = await messagesApi.sendMessage(roomId, content, replyingTo?.id);
+      const newMessage = await messagesApi.sendMessage(roomId, msgData.content, msgData.replyToId);
       setMessages([...messages, newMessage]);
-      setContent('');
       setReplyingTo(null);
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (messages.length === 0) return;
+    try {
+      const olderMessages = await messagesApi.getMessages(roomId, messages[0].id, 50);
+      setMessages([...olderMessages, ...messages]);
+    } catch (err) {
+      console.error('Failed to load more messages:', err);
     }
   };
 
@@ -68,83 +68,85 @@ export default function RoomChat({ user }) {
     }
   };
 
+  const handleBan = async (userId) => {
+    if (!window.confirm('Ban this member from the room?')) return;
+    try {
+      await fetch(`/api/v1/rooms/${roomId}/members/${userId}/ban`, { method: 'POST' });
+      setMembers(members.filter(m => m.user_id !== userId));
+    } catch (err) {
+      setError('Failed to ban member');
+    }
+  };
+
+  const handleRemove = async (userId) => {
+    try {
+      await fetch(`/api/v1/rooms/${roomId}/members/${userId}`, { method: 'DELETE' });
+      setMembers(members.filter(m => m.user_id !== userId));
+    } catch (err) {
+      setError('Failed to remove member');
+    }
+  };
+
+  const handlePromote = async (userId) => {
+    try {
+      await fetch(`/api/v1/rooms/${roomId}/admins/${userId}`, { method: 'POST' });
+      const updatedMembers = members.map(m =>
+        m.user_id === userId ? { ...m, role: 'admin' } : m
+      );
+      setMembers(updatedMembers);
+    } catch (err) {
+      setError('Failed to promote member');
+    }
+  };
+
+  const handleDemote = async (userId) => {
+    try {
+      await fetch(`/api/v1/rooms/${roomId}/admins/${userId}`, { method: 'DELETE' });
+      const updatedMembers = members.map(m =>
+        m.user_id === userId ? { ...m, role: 'member' } : m
+      );
+      setMembers(updatedMembers);
+    } catch (err) {
+      setError('Failed to demote member');
+    }
+  };
+
   if (loading) return <div className={styles.container}><p>Loading...</p></div>;
   if (!room) return <div className={styles.container}><p>Room not found</p></div>;
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h1>{room.name}</h1>
-        <p className={styles.meta}>{room.members?.length || 0} members</p>
-      </div>
-
       {error && <div className={styles.error}>{error}</div>}
 
-      <div className={styles.messageList}>
-        {messages.length === 0 ? (
-          <p className={styles.empty}>No messages yet. Start the conversation!</p>
-        ) : (
-          messages.map((msg) => (
-            <div key={msg.id} className={styles.messageItem}>
-              <div className={styles.messageHeader}>
-                <span className={styles.username}>{msg.username}</span>
-                <span className={styles.timestamp}>
-                  {new Date(msg.created_at).toLocaleTimeString()}
-                </span>
-              </div>
-              <p className={styles.messageContent}>{msg.content}</p>
-              {msg.edited && <span className={styles.edited}>(edited)</span>}
-              {msg.user_id === user?.id && (
-                <div className={styles.actions}>
-                  <button
-                    className={styles.replyBtn}
-                    onClick={() => setReplyingTo(msg)}
-                  >
-                    Reply
-                  </button>
-                  <button
-                    className={styles.deleteBtn}
-                    onClick={() => handleDelete(msg.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              )}
-            </div>
-          ))
-        )}
-        <div ref={messagesEndRef} />
-      </div>
+      <MessageList
+        messages={messages}
+        loading={false}
+        onLoadMore={handleLoadMore}
+        onReply={setReplyingTo}
+        onDelete={handleDelete}
+        currentUserId={user?.id}
+      />
 
-      <form className={styles.composeArea} onSubmit={handleSend}>
-        {replyingTo && (
-          <div className={styles.replyContext}>
-            <p>Replying to {replyingTo.username}: {replyingTo.content}</p>
-            <button
-              type="button"
-              className={styles.cancelReply}
-              onClick={() => setReplyingTo(null)}
-            >
-              ×
-            </button>
-          </div>
-        )}
-        <div className={styles.inputContainer}>
-          <textarea
-            ref={inputRef}
-            placeholder="Type a message..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && e.ctrlKey) handleSend(e);
-            }}
-            className={styles.input}
-          />
-          <button type="submit" className={styles.sendBtn}>
-            Send
-          </button>
-        </div>
-      </form>
+      <MessageComposer
+        onSend={handleSend}
+        replyTo={replyingTo}
+        onClearReply={() => setReplyingTo(null)}
+      />
+
+      {/* Render room info in right sidebar */}
+      <div style={{ display: 'none' }} id="room-info">
+        <RoomPanel
+          room={room}
+          members={members}
+          user={user}
+          onInvite={() => {}}
+          onManage={() => {}}
+          onBan={handleBan}
+          onRemove={handleRemove}
+          onPromote={handlePromote}
+          onDemote={handleDemote}
+        />
+      </div>
     </div>
   );
 }
