@@ -113,7 +113,7 @@ export default function RoomPanel({ room, members, user, onInvite, onManage, onB
           </button>
         )}
         {!isOwner && (
-          <button onClick={handleLeave} className={styles.actionLink} style={{ color: '#d32f2f' }}>
+          <button onClick={handleLeave} className={styles.actionLink}>
             👋 Leave room
           </button>
         )}
