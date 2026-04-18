@@ -1,13 +1,26 @@
 import { useState } from 'react';
 import styles from './RoomPanel.module.css';
 
-export default function RoomPanel({ room, members, user, onInvite, onManage, onBan, onRemove, onPromote, onDemote }) {
+export default function RoomPanel({ room, members, user, onInvite, onManage, onBan, onRemove, onPromote, onDemote, onLeave }) {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteUsername, setInviteUsername] = useState('');
 
   const isOwner = room && user && room.owner_id === user.id;
   const isMemberAdmin = members?.find(m => m.user_id === user?.id)?.role === 'admin';
   const canManage = isOwner || isMemberAdmin;
+
+  const handleLeave = async () => {
+    if (!confirm('Are you sure you want to leave this room?')) return;
+    try {
+      await fetch(`/api/v1/rooms/${room.id}/leave`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      if (onLeave) onLeave();
+    } catch (err) {
+      alert('Failed to leave room');
+    }
+  };
 
   const handleInvite = async () => {
     if (!inviteUsername.trim()) return;
@@ -97,6 +110,11 @@ export default function RoomPanel({ room, members, user, onInvite, onManage, onB
         {canManage && (
           <button onClick={onManage} className={styles.actionLink}>
             ⚙️ Manage room
+          </button>
+        )}
+        {!isOwner && (
+          <button onClick={handleLeave} className={styles.actionLink} style={{ color: '#d32f2f' }}>
+            👋 Leave room
           </button>
         )}
       </div>

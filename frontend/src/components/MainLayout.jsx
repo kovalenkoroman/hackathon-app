@@ -221,6 +221,7 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                 onRemove={() => {}}
                 onPromote={() => {}}
                 onDemote={() => {}}
+                onLeave={() => navigate('/')}
               />
             ) : (
               <div style={{ padding: '1rem', color: '#999', fontSize: '0.9rem' }}>

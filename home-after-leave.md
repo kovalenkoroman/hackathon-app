@@ -1,0 +1,60 @@
+- generic [ref=e106]:
+  - navigation [ref=e107]:
+    - generic [ref=e108]: 💬 Chat
+    - generic [ref=e109]:
+      - link "Public Rooms" [ref=e110] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e111] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e112] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e113] [cursor=pointer]:
+        - /url: /sessions
+      - generic [ref=e115] [cursor=pointer]: rkovalenko ▼
+    - button "Sign out" [ref=e116] [cursor=pointer]
+  - generic [ref=e117]:
+    - complementary [ref=e118]:
+      - generic [ref=e119]:
+        - textbox "Search" [ref=e121]
+        - generic [ref=e122]:
+          - heading "ROOMS" [level=3] [ref=e123]
+          - generic [ref=e124]:
+            - generic [ref=e125] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e126]:
+              - generic "Navigate Test Room" [ref=e127] [cursor=pointer]
+              - generic "Test Create Room" [ref=e128] [cursor=pointer]
+              - generic "Priority 3 Test Room" [ref=e129] [cursor=pointer]
+              - generic "My updated room" [ref=e130] [cursor=pointer]
+              - generic "General Discussion" [ref=e131] [cursor=pointer]
+              - generic "Test Room" [ref=e132] [cursor=pointer]
+            - generic [ref=e133] [cursor=pointer]: ▼ Private Rooms
+            - generic [ref=e134]:
+              - generic "Roma 2" [ref=e135] [cursor=pointer]
+              - generic "Room 2" [ref=e136] [cursor=pointer]
+        - generic [ref=e137]:
+          - heading "CONTACTS" [level=3] [ref=e138]
+          - generic "bob2bob2" [ref=e140] [cursor=pointer]
+        - button "[Create room]" [ref=e141] [cursor=pointer]
+      - button "◀" [ref=e142] [cursor=pointer]
+    - main [ref=e143]:
+      - generic [ref=e144]:
+        - heading "Welcome to Chat!" [level=1] [ref=e145]
+        - paragraph [ref=e146]: Select a room from the sidebar or browse public rooms to get started.
+    - complementary [ref=e147]:
+      - generic [ref=e149]:
+        - heading "Room info" [level=2] [ref=e150]
+        - generic [ref=e151]:
+          - generic [ref=e152]:
+            - generic [ref=e153]: "Type:"
+            - generic [ref=e154]: Public
+          - generic [ref=e155]:
+            - generic [ref=e156]: "Owner:"
+            - generic [ref=e157]: testuser4
+        - generic [ref=e158]:
+          - heading "Members (2)" [level=3] [ref=e159]
+          - generic [ref=e160]:
+            - generic [ref=e161]: rkovalenko
+            - generic [ref=e162]: bob2bob2
+        - generic [ref=e163]:
+          - button "📨 Invite user" [ref=e164] [cursor=pointer]
+          - button "👋 Leave room" [ref=e165] [cursor=pointer]

@@ -1,0 +1,91 @@
+- generic [ref=e228]:
+  - navigation [ref=e229]:
+    - generic [ref=e230]: 💬 Chat
+    - generic [ref=e231]:
+      - link "Public Rooms" [ref=e232] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e233] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e234] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e235] [cursor=pointer]:
+        - /url: /sessions
+      - generic [ref=e237] [cursor=pointer]: rkovalenko ▼
+    - button "Sign out" [ref=e238] [cursor=pointer]
+  - generic [ref=e239]:
+    - complementary [ref=e240]:
+      - generic [ref=e241]:
+        - textbox "Search" [ref=e243]
+        - generic [ref=e244]:
+          - heading "ROOMS" [level=3] [ref=e245]
+          - generic [ref=e246]:
+            - generic [ref=e247] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e248]:
+              - generic "Navigate Test Room" [ref=e249] [cursor=pointer]
+              - generic "Test Create Room" [ref=e250] [cursor=pointer]
+              - generic "Priority 3 Test Room" [ref=e251] [cursor=pointer]
+              - generic "My updated room" [ref=e252] [cursor=pointer]
+              - generic "General Discussion" [ref=e253] [cursor=pointer]
+              - generic "Test Room" [ref=e254] [cursor=pointer]
+            - generic [ref=e255] [cursor=pointer]: ▼ Private Rooms
+            - generic [ref=e256]:
+              - generic "Roma 2" [ref=e257] [cursor=pointer]
+              - generic "Room 2" [ref=e258] [cursor=pointer]
+        - generic [ref=e259]:
+          - heading "CONTACTS" [level=3] [ref=e260]
+          - generic "bob2bob2" [ref=e262] [cursor=pointer]
+        - button "[Create room]" [ref=e263] [cursor=pointer]
+      - button "◀" [ref=e264] [cursor=pointer]
+    - main [ref=e265]:
+      - generic [ref=e266]:
+        - generic [ref=e267]:
+          - heading "Priority 3 Test Room" [level=2] [ref=e268]
+          - paragraph [ref=e269]: Testing rooms feature
+        - generic [ref=e270]:
+          - generic [ref=e272]:
+            - generic [ref=e273]:
+              - strong [ref=e274]: rkovalenko
+              - generic [ref=e275]: 16:58
+            - generic [ref=e276]: hi
+            - generic [ref=e277]:
+              - button "↩️ Reply" [ref=e278] [cursor=pointer]
+              - button "🗑️ Delete" [ref=e279] [cursor=pointer]
+          - generic [ref=e281]:
+            - generic [ref=e282]:
+              - strong [ref=e283]: testuser4
+              - generic [ref=e284]: 14:15
+            - generic [ref=e285]: "1111"
+            - button "↩️ Reply" [ref=e287] [cursor=pointer]
+          - generic [ref=e289]:
+            - generic [ref=e290]:
+              - strong [ref=e291]: testuser4
+              - generic [ref=e292]: 14:15
+            - generic [ref=e293]: This is a test message with emoji! 🎉
+            - button "↩️ Reply" [ref=e295] [cursor=pointer]
+          - generic [ref=e297]:
+            - generic [ref=e298]:
+              - strong [ref=e299]: testuser4
+              - generic [ref=e300]: 13:58
+            - generic [ref=e301]: Test message for Priority 3
+            - button "↩️ Reply" [ref=e303] [cursor=pointer]
+        - generic [ref=e305]:
+          - button "😀" [ref=e307] [cursor=pointer]
+          - button "📎" [ref=e308] [cursor=pointer]
+          - textbox "message input" [ref=e309]
+          - button "Send" [disabled] [ref=e310]
+    - complementary [ref=e311]:
+      - generic [ref=e313]:
+        - heading "Room info" [level=2] [ref=e314]
+        - generic [ref=e315]:
+          - generic [ref=e316]:
+            - generic [ref=e317]: "Type:"
+            - generic [ref=e318]: Public
+          - generic [ref=e319]:
+            - generic [ref=e320]: "Owner:"
+            - generic [ref=e321]: testuser4
+        - generic [ref=e322]:
+          - heading "Members (2)" [level=3] [ref=e323]
+          - generic [ref=e324]:
+            - generic [ref=e325]: rkovalenko
+            - generic [ref=e326]: bob2bob2
+        - button "📨 Invite user" [ref=e328] [cursor=pointer]
