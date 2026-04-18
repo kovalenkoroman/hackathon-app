@@ -4,18 +4,18 @@ Generated from `requirements.md`. Update checkboxes as features are completed.
 
 ---
 
-## Phase 1: Foundation (target: ~1 hour)
+## Phase 1: Foundation (target: ~1 hour) ✅ DONE
 
 Goal: `docker compose up` boots the app with a working DB and a blank frontend.
 
-- [ ] Initialize backend: `npm init`, install `express`, `ws`, `pg`, `bcrypt`, `multer`, `uuid`, `cookie-parser`
-- [ ] Initialize frontend: `npm create vite@latest` with React template
-- [ ] Write `docker-compose.yml` — app + postgres + uploads volume
-- [ ] Write `Dockerfile` for backend (node:20-alpine) and frontend (node:20-alpine + nginx)
-- [ ] Write `.env.example` with all required vars
-- [ ] Write migration `001_init.sql` — full schema (users, sessions, rooms, room_members, room_bans, friendships, user_bans, messages, personal_dialogs, attachments)
-- [ ] Wire backend entry point: HTTP server + WebSocket server on same port
-- [ ] Verify cold start: `docker compose up --build` → app responds on :3000
+- [x] Initialize backend: `npm init`, install `express`, `ws`, `pg`, `bcrypt`, `multer`, `uuid`, `cookie-parser`
+- [x] Initialize frontend: `npm create vite@latest` with React template
+- [x] Write `docker-compose.yml` — app + postgres + uploads volume
+- [x] Write `Dockerfile` for backend (node:20-alpine) and frontend (node:20-alpine + nginx)
+- [x] Write `.env.example` with all required vars
+- [x] Write migration `001_init.sql` — full schema (users, sessions, rooms, room_members, room_bans, friendships, user_bans, messages, personal_dialogs, attachments)
+- [x] Wire backend entry point: HTTP server + WebSocket server on same port
+- [x] Verify cold start: `docker compose up --build` → app responds on :3000
 
 ---
 
