@@ -21,20 +21,18 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
   const fetchRooms = async () => {
     try {
       setLoading(true);
-      // Fetch public rooms
-      const publicRes = await fetch('/api/v1/rooms?visibility=public', { credentials: 'include' });
-      if (publicRes.ok) {
-        const publicData = await publicRes.json();
-        setPublicRooms(publicData.data || []);
-      }
+      // Fetch only user's rooms (rooms the user is a member of or owns)
+      const userRoomsRes = await fetch('/api/v1/rooms/mine', { credentials: 'include' });
+      if (userRoomsRes.ok) {
+        const userRoomsData = await userRoomsRes.json();
+        const allUserRooms = userRoomsData.data || [];
 
-      // Fetch user's private rooms (filters to only private ones)
-      const privateRes = await fetch('/api/v1/rooms/mine', { credentials: 'include' });
-      if (privateRes.ok) {
-        const privateData = await privateRes.json();
-        // Filter to only show private rooms (visibility: 'private')
-        const onlyPrivate = (privateData.data || []).filter(room => room.visibility === 'private');
-        setPrivateRooms(onlyPrivate);
+        // Separate into public and private
+        const publicUserRooms = allUserRooms.filter(room => room.visibility === 'public');
+        const privateUserRooms = allUserRooms.filter(room => room.visibility === 'private');
+
+        setPublicRooms(publicUserRooms);
+        setPrivateRooms(privateUserRooms);
       }
     } catch (error) {
       console.error('Failed to fetch rooms:', error);

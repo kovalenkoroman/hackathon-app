@@ -1,0 +1,88 @@
+- generic [ref=e4]:
+  - navigation [ref=e5]:
+    - generic [ref=e6]: 💬 Chat
+    - generic [ref=e7]:
+      - link "Public Rooms" [ref=e8] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e9] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e10] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e11] [cursor=pointer]:
+        - /url: /sessions
+      - generic [ref=e13] [cursor=pointer]: rkovalenko ▼
+    - button "Sign out" [ref=e14] [cursor=pointer]
+  - generic [ref=e15]:
+    - complementary [ref=e16]:
+      - generic [ref=e17]:
+        - textbox "Search" [ref=e19]
+        - generic [ref=e20]:
+          - heading "ROOMS" [level=3] [ref=e21]
+          - generic [ref=e22]:
+            - generic [ref=e23] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e24]:
+              - generic "Navigate Test Room" [ref=e25] [cursor=pointer]
+              - generic "Test Create Room" [ref=e26] [cursor=pointer]
+              - generic "General Discussion" [ref=e27] [cursor=pointer]
+              - generic "Test Room" [ref=e28] [cursor=pointer]
+              - generic "My updated room" [ref=e29] [cursor=pointer]
+            - generic [ref=e30] [cursor=pointer]: ▼ Private Rooms
+            - generic [ref=e31]:
+              - generic "Roma 2" [ref=e32] [cursor=pointer]
+              - generic "Room 2" [ref=e33] [cursor=pointer]
+        - generic [ref=e34]:
+          - heading "CONTACTS" [level=3] [ref=e35]
+          - generic "bob2bob2" [ref=e37] [cursor=pointer]
+        - button "[Create room]" [ref=e38] [cursor=pointer]
+      - button "◀" [ref=e39] [cursor=pointer]
+    - main [ref=e40]:
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - heading "Public Rooms" [level=2] [ref=e44]
+            - button "+ Create Room" [active] [ref=e45] [cursor=pointer]
+          - textbox "Search rooms..." [ref=e46]
+          - generic [ref=e47]:
+            - generic [ref=e48] [cursor=pointer]:
+              - heading "Navigate Test Room" [level=3] [ref=e49]
+              - paragraph [ref=e50]: Should navigate on create
+              - paragraph [ref=e51]: "Members: 1"
+              - button "Join" [ref=e52]
+            - generic [ref=e53] [cursor=pointer]:
+              - heading "Test Create Room" [level=3] [ref=e54]
+              - paragraph [ref=e55]: Testing create room navigation
+              - paragraph [ref=e56]: "Members: 1"
+              - button "Join" [ref=e57]
+            - generic [ref=e58] [cursor=pointer]:
+              - heading "Priority 3 Test Room" [level=3] [ref=e59]
+              - paragraph [ref=e60]: Testing rooms feature
+              - paragraph [ref=e61]: "Members: 2"
+              - button "Join" [ref=e62]
+            - generic [ref=e63] [cursor=pointer]:
+              - heading "My updated room" [level=3] [ref=e64]
+              - paragraph [ref=e65]: New description for the room - verify it updates on main page
+              - paragraph [ref=e66]: "Members: 1"
+              - button "Join" [ref=e67]
+            - generic [ref=e68] [cursor=pointer]:
+              - heading "General Discussion" [level=3] [ref=e69]
+              - paragraph [ref=e70]: A general discussion room for all topics
+              - paragraph [ref=e71]: "Members: 3"
+              - button "Join" [ref=e72]
+            - generic [ref=e73] [cursor=pointer]:
+              - heading "Test Room" [level=3] [ref=e74]
+              - paragraph [ref=e75]: A test room
+              - paragraph [ref=e76]: "Members: 4"
+              - button "Join" [ref=e77]
+        - generic [ref=e82]:
+          - heading "Create Room" [level=2] [ref=e83]
+          - generic [ref=e84]:
+            - textbox "Room name" [ref=e86]
+            - textbox "Description (optional)" [ref=e88]
+            - combobox [ref=e90]:
+              - option "Public" [selected]
+              - option "Private"
+            - generic [ref=e91]:
+              - button "Cancel" [ref=e92] [cursor=pointer]
+              - button "Create" [ref=e93] [cursor=pointer]
+    - complementary [ref=e78]:
+      - generic [ref=e80]: Select a room to view details
