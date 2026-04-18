@@ -1,83 +1,33 @@
 .composer {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  border-top: 1px solid #ddd;
-  background: #fafafa;
-}
-
-.replyIndicator {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  gap: 0.5rem;
   padding: 0.75rem;
-  background: #e3f2fd;
-  border-left: 3px solid #0066cc;
-  border-radius: 4px;
+  border-top: 1px solid #ccc;
+  background: #fff;
 }
 
-.replyContent {
-  flex: 1;
-}
-
-.replyContent strong {
-  font-size: 0.85rem;
-  color: #0066cc;
-}
-
-.replyContent p {
-  margin: 0.3rem 0 0;
-  font-size: 0.85rem;
-  color: #666;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.clearReply {
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  background: transparent;
-  border: none;
-  color: #0066cc;
-  cursor: pointer;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.clearReply:hover {
-  color: #0052a3;
-}
-
-.inputGroup {
-  display: flex;
-  gap: 0.75rem;
-  align-items: flex-end;
-}
-
-.buttonGroup {
+/* Wireframe-style single row input */
+.inputRow {
   display: flex;
   gap: 0.5rem;
-  position: relative;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .toolBtn {
-  padding: 0.6rem;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 0.4rem 0.5rem;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 2px;
   cursor: pointer;
-  font-size: 1rem;
-  width: 40px;
-  height: 40px;
+  font-size: 0.9rem;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  flex-shrink: 0;
 }
 
 .toolBtn:hover:not(:disabled) {
@@ -89,6 +39,7 @@
   cursor: not-allowed;
 }
 
+/* Emoji Picker */
 .emojiPickerWrapper {
   position: relative;
 }
@@ -98,24 +49,24 @@
   bottom: 100%;
   left: 0;
   background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
   padding: 0.5rem;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.25rem;
+  gap: 0.3rem;
   margin-bottom: 0.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 100;
 }
 
 .emojiBtn {
-  padding: 0.4rem;
+  padding: 0.3rem;
   background: transparent;
   border: none;
   cursor: pointer;
-  font-size: 1.2rem;
-  border-radius: 3px;
+  font-size: 1.1rem;
+  border-radius: 2px;
   transition: background 0.2s;
 }
 
@@ -123,22 +74,53 @@
   background: #f0f0f0;
 }
 
+/* Reply Tag */
+.replyTag {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.5rem;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  font-size: 0.8rem;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.replyClose {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+.replyClose:hover {
+  color: #333;
+}
+
+/* Input Field */
 .input {
   flex: 1;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 0.9rem;
   font-family: inherit;
-  resize: none;
-  min-height: 40px;
-  max-height: 120px;
+  min-width: 150px;
+  height: 32px;
 }
 
 .input:focus {
   outline: none;
   border-color: #0066cc;
-  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
 }
 
 .input:disabled {
@@ -146,24 +128,50 @@
   cursor: not-allowed;
 }
 
+/* Send Button */
 .sendBtn {
-  padding: 0.75rem 1.5rem;
-  background: #0066cc;
-  color: white;
-  border: none;
-  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 2px;
   cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.9rem;
   white-space: nowrap;
-  min-width: 80px;
+  flex-shrink: 0;
 }
 
 .sendBtn:hover:not(:disabled) {
-  background: #0052a3;
+  background: #f0f0f0;
 }
 
 .sendBtn:disabled {
   opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Expanded multiline mode */
+.expandedInput {
+  margin-top: 0.5rem;
+}
+
+.textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+  max-height: 150px;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #0066cc;
+}
+
+.textarea:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
