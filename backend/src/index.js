@@ -8,6 +8,7 @@ import pool from './db/index.js';
 import authRoutes from './routes/auth.js';
 import roomsRoutes from './routes/rooms.js';
 import messagesRoutes from './routes/messages.js';
+import friendsRoutes from './routes/friends.js';
 import { authMiddleware } from './middleware/auth.js';
 import * as presenceService from './ws/presence.js';
 import { handleAuth, handlePing } from './ws/handlers/auth.js';
@@ -34,6 +35,9 @@ app.use('/api/v1/rooms', roomsRoutes);
 
 // Messages routes
 app.use('/api/v1', messagesRoutes);
+
+// Friends routes
+app.use('/api/v1/friends', friendsRoutes);
 
 // WebSocket connection handler
 wss.on('connection', (ws) => {

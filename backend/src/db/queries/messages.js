@@ -1,11 +1,15 @@
 import pool from '../index.js';
 
-export async function createMessage(roomId, userId, content, replyToId = null) {
+export async function createMessage(roomOrDialogId, userId, content, replyToId = null, isDialog = false) {
   const result = await pool.query(
-    `INSERT INTO messages (room_id, user_id, content, reply_to_id)
-     VALUES ($1, $2, $3, $4)
-     RETURNING *`,
-    [roomId, userId, content, replyToId]
+    isDialog
+      ? `INSERT INTO messages (dialog_id, user_id, content, reply_to_id)
+         VALUES ($1, $2, $3, $4)
+         RETURNING *`
+      : `INSERT INTO messages (room_id, user_id, content, reply_to_id)
+         VALUES ($1, $2, $3, $4)
+         RETURNING *`,
+    [roomOrDialogId, userId, content, replyToId]
   );
   return result.rows[0];
 }
