@@ -160,7 +160,7 @@ export default function Friends({ user }) {
                     <span className={styles.email}>{friend.email}</span>
                   </div>
                   <div className={styles.actions}>
-                    <button onClick={() => handleMessage(friend.id)} className={styles.primary}>
+                    <button onClick={() => handleMessage(friend.friend_id || friend.id)} className={styles.primary}>
                       Message
                     </button>
                     <button onClick={() => handleRemove(friend.id)} className={styles.secondary}>

@@ -30,11 +30,15 @@ export default function DMChat({ user }) {
       // Get other user info
       const userRes = await fetch(`/api/v1/friends`);
       const friendsList = await userRes.json();
-      const friend = friendsList.data?.find((f) => f.id === parseInt(userId));
+      // Find friend by friend_id (actual user ID), not by friendship id
+      const friend = friendsList.data?.find((f) => f.friend_id === parseInt(userId) || f.id === parseInt(userId));
       setOtherUser(friend || { id: userId, username: 'User' });
 
+      // Determine the actual user ID for the dialog
+      const actualUserId = friend?.friend_id || friend?.id || userId;
+
       // Get messages
-      const msgRes = await fetch(`/api/v1/friends/dialogs/${userId}/messages`);
+      const msgRes = await fetch(`/api/v1/friends/dialogs/${actualUserId}/messages`);
       const json = await msgRes.json();
       setMessages(json.data || []);
     } catch (err) {
@@ -50,7 +54,13 @@ export default function DMChat({ user }) {
     if (!content.trim()) return;
 
     try {
-      const res = await fetch(`/api/v1/friends/dialogs/${userId}/messages`, {
+      // Get the actual user ID from the friends list (in case userId is friendship ID)
+      const friendsRes = await fetch(`/api/v1/friends`);
+      const friendsData = await friendsRes.json();
+      const friend = friendsData.data?.find((f) => f.friend_id === parseInt(userId) || f.id === parseInt(userId));
+      const actualUserId = friend?.friend_id || friend?.id || userId;
+
+      const res = await fetch(`/api/v1/friends/dialogs/${actualUserId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: content.trim() })
