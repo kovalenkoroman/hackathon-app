@@ -3,8 +3,6 @@ version: '3.9'
 services:
   backend:
     build: ./backend
-    ports:
-      - "3000:3000"
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/chatapp
       SESSION_SECRET: dev_secret_change_in_production
@@ -22,7 +20,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "5173:80"
+      - "3000:80"
     depends_on:
       - backend
 

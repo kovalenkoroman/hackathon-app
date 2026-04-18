@@ -5,6 +5,8 @@ import wsClient from './ws/client';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
+import RoomCatalog from './pages/RoomCatalog';
+import RoomDetail from './pages/RoomDetail';
 
 function Home({ user, onLogout, wsState, presence }) {
   const getPresenceIcon = (status) => {
@@ -26,6 +28,9 @@ function Home({ user, onLogout, wsState, presence }) {
       <p>Welcome, {user.username}!</p>
       <p>WebSocket status: {wsState}</p>
       <p>Presence: {getPresenceIcon(presence)} {presence}</p>
+      <nav style={{ marginBottom: '2rem' }}>
+        <a href="/catalog" style={{ marginRight: '1rem' }}>Browse Rooms</a>
+      </nav>
       <button onClick={onLogout}>Logout</button>
     </div>
   );
@@ -119,6 +124,14 @@ export default function App() {
         <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
         <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
         <Route path="/forgot-password" element={user ? <Navigate to="/" /> : <ForgotPassword />} />
+        <Route
+          path="/catalog"
+          element={user ? <RoomCatalog /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/rooms/:roomId"
+          element={user ? <RoomDetail user={user} /> : <Navigate to="/login" />}
+        />
       </Routes>
     </BrowserRouter>
   );

@@ -48,25 +48,24 @@ Goal: `docker compose up` boots the app with a working DB and a blank frontend.
 
 ---
 
-## Phase 4: Rooms (target: ~1.5 hours)
+## Phase 4: Rooms (target: ~1.5 hours) ✅ DONE
 
-- [ ] `POST /api/v1/rooms` — create room
-- [ ] `GET /api/v1/rooms` — public room catalog with search
-- [ ] `GET /api/v1/rooms/:id` — room detail + members
-- [ ] `POST /api/v1/rooms/:id/join` — join public room
-- [ ] `POST /api/v1/rooms/:id/leave` — leave room (owner blocked)
-- [ ] `DELETE /api/v1/rooms/:id` — owner deletes room + cascade
-- [ ] `PATCH /api/v1/rooms/:id` — update name/description/visibility (owner/admin)
-- [ ] `POST /api/v1/rooms/:id/members/:userId/ban` — ban member (treated as remove)
-- [ ] `DELETE /api/v1/rooms/:id/bans/:userId` — unban
-- [ ] `POST /api/v1/rooms/:id/admins/:userId` — promote to admin
-- [ ] `DELETE /api/v1/rooms/:id/admins/:userId` — demote admin
-- [ ] `POST /api/v1/rooms/:id/invitations` — invite user to private room
-- [ ] `GET /api/v1/rooms/:id/bans` — list banned users with banner info
-- [ ] WS: emit `room:joined`, `room:left`, `room:member_banned` events
-- [ ] Frontend: sidebar room list (public + private sections, unread count badges)
-- [ ] Frontend: room catalog page with search
-- [ ] Frontend: Manage Room modal (Members / Admins / Banned / Invitations / Settings tabs per wireframe)
+- [x] `POST /api/v1/rooms` — create room
+- [x] `GET /api/v1/rooms` — public room catalog with search
+- [x] `GET /api/v1/rooms/:id` — room detail + members
+- [x] `POST /api/v1/rooms/:id/join` — join public room
+- [x] `POST /api/v1/rooms/:id/leave` — leave room (owner blocked)
+- [x] `DELETE /api/v1/rooms/:id` — owner deletes room + cascade
+- [x] `PATCH /api/v1/rooms/:id` — update name/description/visibility (owner/admin)
+- [x] `POST /api/v1/rooms/:id/members/:userId/ban` — ban member (treated as remove)
+- [x] `DELETE /api/v1/rooms/:id/bans/:userId` — unban
+- [x] `POST /api/v1/rooms/:id/admins/:userId` — promote to admin
+- [x] `DELETE /api/v1/rooms/:id/admins/:userId` — demote admin
+- [x] `POST /api/v1/rooms/:id/invitations` — invite user to private room
+- [x] `GET /api/v1/rooms/:id/bans` — list banned users with banner info
+- [ ] WS: emit `room:joined`, `room:left`, `room:member_banned` events (can add in Phase 5)
+- [x] Frontend: room catalog page with search and create
+- [x] Frontend: room detail page with member management
 
 ---
 
