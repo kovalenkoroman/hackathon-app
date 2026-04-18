@@ -19,20 +19,20 @@ Goal: `docker compose up` boots the app with a working DB and a blank frontend.
 
 ---
 
-## Phase 2: Auth & Sessions (target: ~1 hour)
+## Phase 2: Auth & Sessions (target: ~1 hour) ✅ DONE
 
-- [ ] `POST /api/v1/auth/register` — validate uniqueness, hash password, create user
-- [ ] `POST /api/v1/auth/login` — verify credentials, create session, set HTTP-only cookie
-- [ ] `POST /api/v1/auth/logout` — delete current session, clear cookie
-- [ ] `GET /api/v1/auth/me` — return current user from session cookie
-- [ ] `POST /api/v1/auth/password/reset` — generate reset token, (log to console, no email needed)
-- [ ] `POST /api/v1/auth/password/change` — change password for logged-in user
-- [ ] `DELETE /api/v1/auth/account` — delete account + owned rooms + cascade
-- [ ] `GET /api/v1/sessions` — list active sessions for current user
-- [ ] `DELETE /api/v1/sessions/:id` — log out a specific session
-- [ ] Auth middleware — validates cookie on every protected route
-- [ ] Frontend: Login page, Register page, Forgot password page (matching wireframes)
-- [ ] Frontend: Persistent login (check `/me` on app load)
+- [x] `POST /api/v1/auth/register` — validate uniqueness, hash password, create user
+- [x] `POST /api/v1/auth/login` — verify credentials, create session, set HTTP-only cookie
+- [x] `POST /api/v1/auth/logout` — delete current session, clear cookie
+- [x] `GET /api/v1/auth/me` — return current user from session cookie
+- [x] `POST /api/v1/auth/password/reset` — generate reset token, (log to console, no email needed)
+- [x] `POST /api/v1/auth/password/change` — change password for logged-in user
+- [x] `DELETE /api/v1/auth/account` — delete account + owned rooms + cascade
+- [x] `GET /api/v1/sessions` — list active sessions for current user
+- [x] `DELETE /api/v1/sessions/:id` — log out a specific session
+- [x] Auth middleware — validates cookie on every protected route
+- [x] Frontend: Login page, Register page, Forgot password page (matching wireframes)
+- [x] Frontend: Persistent login (check `/me` on app load)
 
 ---
 

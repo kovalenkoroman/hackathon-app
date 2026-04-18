@@ -43,6 +43,7 @@ Stack chosen: Node.js + Express + WebSocket (`ws`) + PostgreSQL + React (Vite)
 | Pre-event | Developer | Raw `pg` queries, no ORM | Keeps schema explicit and agent-readable; easier to debug |
 | Pre-event | Developer | HTTP-only session cookie for auth | Simpler than JWT for multi-session management; matches requirements |
 | 11:50 | Agent | Phase 1 complete: backend/frontend scaffolds, migrations, docker setup working | Cold-start test passed; all 10 DB tables created; API health check responding; React app served via nginx |
+| 12:04 | Agent | Phase 2 complete: Full auth system (9 endpoints, auth middleware, 3 pages, persistent login) | Registration, login, logout all working end-to-end; session cookies set correctly; persistent login verified in browser |
 
 ---
 

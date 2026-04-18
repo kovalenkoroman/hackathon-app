@@ -4,6 +4,8 @@ import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import cookieParser from 'cookie-parser';
 import pool from './db/index.js';
+import authRoutes from './routes/auth.js';
+import { authMiddleware } from './middleware/auth.js';
 
 const app = express();
 const server = createServer(app);
@@ -18,6 +20,9 @@ app.use(cookieParser());
 app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'ok' });
 });
+
+// Auth routes
+app.use('/api/v1/auth', authRoutes);
 
 // WebSocket connection handler
 wss.on('connection', (ws) => {
