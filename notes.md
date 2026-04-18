@@ -44,6 +44,7 @@ Stack chosen: Node.js + Express + WebSocket (`ws`) + PostgreSQL + React (Vite)
 | Pre-event | Developer | HTTP-only session cookie for auth | Simpler than JWT for multi-session management; matches requirements |
 | 11:50 | Agent | Phase 1 complete: backend/frontend scaffolds, migrations, docker setup working | Cold-start test passed; all 10 DB tables created; API health check responding; React app served via nginx |
 | 12:04 | Agent | Phase 2 complete: Full auth system (9 endpoints, auth middleware, 3 pages, persistent login) | Registration, login, logout all working end-to-end; session cookies set correctly; persistent login verified in browser |
+| 12:10 | Agent | Phase 3 complete: WebSocket & Presence infrastructure (server, client, broadcast helpers, AFK detection) | WS server with auth, presence mgmt with online/AFK/offline states, broadcast helpers for room/user/friends, frontend client with auto-reconnect & heartbeat, presence indicators (●/◐/○) in UI |
 
 ---
 

@@ -36,15 +36,15 @@ Goal: `docker compose up` boots the app with a working DB and a blank frontend.
 
 ---
 
-## Phase 3: WebSocket & Presence (target: ~45 min)
+## Phase 3: WebSocket & Presence (target: ~45 min) ✅ DONE
 
-- [ ] WS server setup: accept connections, require `auth` event with session token
-- [ ] Track connections per user per tab in memory Map
-- [ ] Presence manager: emit `presence:update` to relevant users on connect/disconnect/AFK
-- [ ] AFK detection: client pings every 30s; server marks AFK after 60s silence
-- [ ] Broadcast helpers: `broadcastToRoom(roomId, event)`, `broadcastToUser(userId, event)`, `broadcastToFriends(userId, event)`
-- [ ] Frontend WS client: auto-reconnect with exponential backoff
-- [ ] Frontend: show ●/◐/○ presence indicators in sidebar and member list
+- [x] WS server setup: accept connections, require `auth` event with session token
+- [x] Track connections per user per tab in memory Map
+- [x] Presence manager: emit `presence:update` to relevant users on connect/disconnect/AFK
+- [x] AFK detection: client pings every 30s; server marks AFK after 60s silence
+- [x] Broadcast helpers: `broadcastToRoom(roomId, event)`, `broadcastToUser(userId, event)`, `broadcastToFriends(userId, event)`
+- [x] Frontend WS client: auto-reconnect with exponential backoff
+- [x] Frontend: show ●/◐/○ presence indicators in sidebar and member list
 
 ---
 

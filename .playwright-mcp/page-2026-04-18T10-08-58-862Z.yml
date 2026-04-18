@@ -1,0 +1,6 @@
+- generic [ref=e3]:
+  - heading "Online Chat Server" [level=1] [ref=e4]
+  - paragraph [ref=e5]: Welcome, bob!
+  - paragraph [ref=e6]: "WebSocket status: disconnected"
+  - paragraph [ref=e7]: "Presence: ○ offline"
+  - button "Logout" [ref=e8] [cursor=pointer]

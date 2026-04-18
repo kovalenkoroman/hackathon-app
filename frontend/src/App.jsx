@@ -1,15 +1,31 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import * as authApi from './api/auth';
+import wsClient from './ws/client';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 
-function Home({ user, onLogout }) {
+function Home({ user, onLogout, wsState, presence }) {
+  const getPresenceIcon = (status) => {
+    switch (status) {
+      case 'online':
+        return '●';
+      case 'afk':
+        return '◐';
+      case 'offline':
+        return '○';
+      default:
+        return '○';
+    }
+  };
+
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Online Chat Server</h1>
       <p>Welcome, {user.username}!</p>
+      <p>WebSocket status: {wsState}</p>
+      <p>Presence: {getPresenceIcon(presence)} {presence}</p>
       <button onClick={onLogout}>Logout</button>
     </div>
   );
@@ -18,12 +34,38 @@ function Home({ user, onLogout }) {
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [wsState, setWsState] = useState('disconnected');
+  const [presence, setPresence] = useState('offline');
 
   useEffect(() => {
     const checkSession = async () => {
       try {
         const currentUser = await authApi.getMe();
         setUser(currentUser);
+
+        // Try to connect WebSocket if authenticated
+        if (currentUser) {
+          try {
+            const token = document.cookie
+              .split('; ')
+              .find((row) => row.startsWith('sessionToken='))
+              ?.split('=')[1];
+
+            if (token) {
+              await wsClient.connect(token, setWsState);
+              setPresence('online');
+
+              // Listen for presence updates
+              wsClient.on('presence:update', (payload) => {
+                if (payload.userId === currentUser.id) {
+                  setPresence(payload.status);
+                }
+              });
+            }
+          } catch (wsError) {
+            console.error('WebSocket connection failed:', wsError);
+          }
+        }
       } catch (error) {
         setUser(null);
       } finally {
@@ -32,12 +74,18 @@ export default function App() {
     };
 
     checkSession();
+
+    return () => {
+      wsClient.disconnect();
+    };
   }, []);
 
   const handleLogout = async () => {
     try {
+      wsClient.disconnect();
       await authApi.logout();
       setUser(null);
+      setPresence('offline');
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -52,7 +100,13 @@ export default function App() {
       <Routes>
         <Route
           path="/"
-          element={user ? <Home user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}
+          element={
+            user ? (
+              <Home user={user} onLogout={handleLogout} wsState={wsState} presence={presence} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
         />
         <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
         <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
