@@ -46,12 +46,16 @@ export default function App() {
         // Try to connect WebSocket if authenticated
         if (currentUser) {
           try {
-            const token = document.cookie
-              .split('; ')
-              .find((row) => row.startsWith('sessionToken='))
-              ?.split('=')[1];
+            // Extract token from cookies
+            const cookies = document.cookie.split('; ');
+            const tokenCookie = cookies.find((row) => row.startsWith('sessionToken='));
+            const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+
+            console.log('Session token found:', !!token);
+            console.log('Cookies:', cookies);
 
             if (token) {
+              console.log('Attempting WebSocket connection with token...');
               await wsClient.connect(token, setWsState);
               setPresence('online');
 
@@ -61,9 +65,13 @@ export default function App() {
                   setPresence(payload.status);
                 }
               });
+            } else {
+              console.warn('No session token found in cookies');
+              setWsState('disconnected');
             }
           } catch (wsError) {
             console.error('WebSocket connection failed:', wsError);
+            setWsState('disconnected');
           }
         }
       } catch (error) {

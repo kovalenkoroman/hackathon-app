@@ -14,6 +14,8 @@ class WSClient {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const url = `${protocol}//${window.location.host}/ws`;
 
+    console.log('WebSocket connecting to:', url);
+
     return new Promise((resolve, reject) => {
       try {
         this.ws = new WebSocket(url);
