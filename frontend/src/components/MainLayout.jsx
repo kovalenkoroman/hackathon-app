@@ -1,12 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import RoomPanel from './RoomPanel';
+import ManageRoomModal from './ManageRoomModal';
+import { RoomContext } from '../RoomContext';
 import styles from './MainLayout.module.css';
 
 export default function MainLayout({ user, onLogout, wsState, presence, children }) {
   const navigate = useNavigate();
+  const { roomInfo, roomMembers } = useContext(RoomContext);
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
-  const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [publicRooms, setPublicRooms] = useState([]);
+  const [privateRooms, setPrivateRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showManageModal, setShowManageModal] = useState(false);
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        setLoading(true);
+        // Fetch public rooms
+        const publicRes = await fetch('/api/v1/rooms?visibility=public', { credentials: 'include' });
+        if (publicRes.ok) {
+          const publicData = await publicRes.json();
+          setPublicRooms(publicData.data || []);
+        }
+
+        // Fetch user's private rooms (filters to only private ones)
+        const privateRes = await fetch('/api/v1/rooms/mine', { credentials: 'include' });
+        if (privateRes.ok) {
+          const privateData = await privateRes.json();
+          // Filter to only show private rooms (visibility: 'private')
+          const onlyPrivate = (privateData.data || []).filter(room => room.visibility === 'private');
+          setPrivateRooms(onlyPrivate);
+        }
+      } catch (error) {
+        console.error('Failed to fetch rooms:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRooms();
+  }, []);
 
   const getPresenceIcon = (status) => {
     switch (status) {
@@ -19,6 +55,10 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
       default:
         return '○';
     }
+  };
+
+  const handleRoomClick = (roomId) => {
+    navigate(`/rooms/${roomId}`);
   };
 
   return (
@@ -61,11 +101,42 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
               <div className={styles.sidebarSection}>
                 <h3 className={styles.sectionTitle}>ROOMS</h3>
                 <div className={styles.roomsSection}>
-                  <div className={styles.categoryHeader}>▶ Public Rooms</div>
+                  <div className={styles.categoryHeader}>▼ Public Rooms</div>
                   <div className={styles.roomList} id="room-list">
-                    {/* Populated by child components */}
+                    {loading ? (
+                      <div style={{ fontSize: '0.8rem', color: '#999', padding: '0.5rem' }}>Loading...</div>
+                    ) : publicRooms.length > 0 ? (
+                      publicRooms.map((room) => (
+                        <div
+                          key={room.id}
+                          onClick={() => handleRoomClick(room.id)}
+                          className={styles.roomItem}
+                          title={room.name}
+                        >
+                          {room.name}
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ fontSize: '0.8rem', color: '#999', padding: '0.5rem' }}>No public rooms</div>
+                    )}
                   </div>
-                  <div className={styles.categoryHeader}>▶ Private Rooms</div>
+                  <div className={styles.categoryHeader}>▼ Private Rooms</div>
+                  <div className={styles.roomList}>
+                    {privateRooms.length > 0 ? (
+                      privateRooms.map((room) => (
+                        <div
+                          key={room.id}
+                          onClick={() => handleRoomClick(room.id)}
+                          className={styles.roomItem}
+                          title={room.name}
+                        >
+                          {room.name}
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ fontSize: '0.8rem', color: '#999', padding: '0.5rem' }}>No private rooms</div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -98,22 +169,38 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
         </main>
 
         {/* Right Sidebar - Room Context & Members */}
-        <aside className={`${styles.rightSidebar} ${!rightSidebarOpen ? styles.collapsed : ''}`}>
-          {rightSidebarOpen && (
-            <div className={styles.sidebarContent}>
-              <div id="room-info">
-                {/* Populated by room detail component */}
+        <aside className={styles.rightSidebar}>
+          <div className={styles.sidebarContent}>
+            {roomInfo ? (
+              <RoomPanel
+                room={roomInfo}
+                members={roomMembers}
+                user={user}
+                onInvite={() => {}}
+                onManage={() => setShowManageModal(true)}
+                onBan={() => {}}
+                onRemove={() => {}}
+                onPromote={() => {}}
+                onDemote={() => {}}
+              />
+            ) : (
+              <div style={{ padding: '1rem', color: '#999', fontSize: '0.9rem' }}>
+                Select a room to view details
               </div>
-            </div>
-          )}
-          <button
-            className={styles.toggleBtn}
-            onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
-            title="Toggle sidebar"
-          >
-            {rightSidebarOpen ? '▶' : '◀'}
-          </button>
+            )}
+          </div>
         </aside>
+
+        {/* Manage Room Modal */}
+        {showManageModal && roomInfo && (
+          <ManageRoomModal
+            room={roomInfo}
+            members={roomMembers}
+            user={user}
+            onClose={() => setShowManageModal(false)}
+            onMembersChanged={() => {}}
+          />
+        )}
       </div>
     </div>
   );
