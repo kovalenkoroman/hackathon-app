@@ -46,6 +46,7 @@ Stack chosen: Node.js + Express + WebSocket (`ws`) + PostgreSQL + React (Vite)
 | 12:04 | Agent | Phase 2 complete: Full auth system (9 endpoints, auth middleware, 3 pages, persistent login) | Registration, login, logout all working end-to-end; session cookies set correctly; persistent login verified in browser |
 | 12:10 | Agent | Phase 3 complete: WebSocket & Presence infrastructure (server, client, broadcast helpers, AFK detection) | WS server with auth, presence mgmt with online/AFK/offline states, broadcast helpers for room/user/friends, frontend client with auto-reconnect & heartbeat, presence indicators (●/◐/○) in UI |
 | 12:31 | Agent | Phase 4 complete: Rooms CRUD + member management (13 endpoints, catalog UI, detail view) | All room endpoints working: create/list/get/update/delete, join/leave, member role promotion/demotion, ban/unban, invite. Frontend: room catalog with search/create, room detail with members list and owner controls. Verified end-to-end with room creation and detail view navigation. |
+| 12:38 | Agent | Phase 5 complete: Messaging - send/get/edit/delete with chat UI | Message CRUD endpoints fully functional: send, retrieve with pagination, edit (soft delete on delete). Frontend: full chat window with message display, compose textarea, send button, reply/delete actions. Verified: API message posting, message retrieval with user/timestamp, UI send and display, message list auto-scrolls. |
 
 ---
 

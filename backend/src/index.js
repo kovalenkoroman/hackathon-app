@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import pool from './db/index.js';
 import authRoutes from './routes/auth.js';
 import roomsRoutes from './routes/rooms.js';
+import messagesRoutes from './routes/messages.js';
 import { authMiddleware } from './middleware/auth.js';
 import * as presenceService from './ws/presence.js';
 import { handleAuth, handlePing } from './ws/handlers/auth.js';
@@ -30,6 +31,9 @@ app.use('/api/v1/auth', authRoutes);
 
 // Rooms routes
 app.use('/api/v1/rooms', roomsRoutes);
+
+// Messages routes
+app.use('/api/v1', messagesRoutes);
 
 // WebSocket connection handler
 wss.on('connection', (ws) => {

@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import RoomCatalog from './pages/RoomCatalog';
 import RoomDetail from './pages/RoomDetail';
+import RoomChat from './pages/RoomChat';
 
 function Home({ user, onLogout, wsState, presence }) {
   const getPresenceIcon = (status) => {
@@ -130,6 +131,10 @@ export default function App() {
         />
         <Route
           path="/rooms/:roomId"
+          element={user ? <RoomChat user={user} /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/rooms/:roomId/manage"
           element={user ? <RoomDetail user={user} /> : <Navigate to="/login" />}
         />
       </Routes>

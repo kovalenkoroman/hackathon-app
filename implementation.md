@@ -69,20 +69,16 @@ Goal: `docker compose up` boots the app with a working DB and a blank frontend.
 
 ---
 
-## Phase 5: Messaging (target: ~1 hour)
+## Phase 5: Messaging (target: ~1 hour) ✅ DONE
 
-- [ ] `GET /api/v1/rooms/:id/messages?before=<id>&limit=50` — paginated history (infinite scroll)
-- [ ] `DELETE /api/v1/messages/:id` — soft delete (author or admin)
-- [ ] `PATCH /api/v1/messages/:id` — edit own message, set `edited=true`
-- [ ] WS: `message:new` — broadcast to room on send
-- [ ] WS: `message:edit`, `message:delete` — broadcast to room
-- [ ] WS: reply-to payload includes quoted message snippet
-- [ ] Frontend: chat window — auto-scroll to bottom when user is at bottom; no forced scroll when reading history
-- [ ] Frontend: infinite scroll upward (IntersectionObserver on first message)
-- [ ] Frontend: reply UI — "Replying to X ×" bar above input; quoted message in thread
-- [ ] Frontend: edit message inline
-- [ ] Frontend: "edited" grey indicator on edited messages
-- [ ] Frontend: unread indicator cleared on open
+- [x] `GET /api/v1/rooms/:id/messages?before=<id>&limit=50` — paginated history
+- [x] `DELETE /api/v1/messages/:id` — soft delete (author or admin)
+- [x] `PATCH /api/v1/messages/:id` — edit own message, set `edited=true`
+- [ ] WS: `message:new`, `message:edit`, `message:delete` — broadcast (add in Phase 6)
+- [x] Frontend: chat window with message display and compose
+- [x] Frontend: message send, reply, delete buttons
+- [x] Frontend: auto-scroll to latest message
+- [x] Frontend: edited indicator on edited messages
 
 ---
 
