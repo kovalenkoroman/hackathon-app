@@ -163,6 +163,41 @@ router.delete('/:id/bans/:userId', requireAuth, async (req, res) => {
   }
 });
 
+// Kick member (remove without ban)
+router.delete('/:id/members/:userId', requireAuth, async (req, res) => {
+  try {
+    await roomsService.kickMember(req.params.id, parseInt(req.params.userId), req.user.id);
+    res.json({ data: null });
+  } catch (error) {
+    console.error('Kick member error:', error);
+    if (error.message.includes('Only room admin or owner')) {
+      return res.status(403).json({ error: error.message });
+    }
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Invite user by username (direct add, owner/admin only)
+router.post('/:id/members/invite', requireAuth, async (req, res) => {
+  try {
+    const { username } = req.body;
+    if (!username || !username.trim()) {
+      return res.status(400).json({ error: 'Username is required' });
+    }
+    const member = await roomsService.inviteUserByUsername(req.params.id, username.trim(), req.user.id);
+    res.status(201).json({ data: member });
+  } catch (error) {
+    console.error('Invite user error:', error);
+    if (error.message.includes('Only room owner or admin') || error.message.includes('This user is banned')) {
+      return res.status(403).json({ error: error.message });
+    }
+    if (error.message === 'User not found') {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // Promote to admin
 router.post('/:id/admins/:userId', requireAuth, async (req, res) => {
   try {
@@ -184,7 +219,7 @@ router.delete('/:id/admins/:userId', requireAuth, async (req, res) => {
     res.json({ data: member });
   } catch (error) {
     console.error('Demote admin error:', error);
-    if (error.message.includes('Only room owner can demote')) {
+    if (error.message.includes('Only room owner or admin') || error.message.includes('Cannot demote')) {
       return res.status(403).json({ error: error.message });
     }
     res.status(400).json({ error: error.message });

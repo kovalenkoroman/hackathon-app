@@ -1,0 +1,61 @@
+- generic [ref=e292]:
+  - navigation [ref=e293]:
+    - generic [ref=e294]: 💬 Chat
+    - generic [ref=e295]:
+      - link "Public Rooms" [ref=e296] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e297] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e298] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e299] [cursor=pointer]:
+        - /url: /sessions
+      - generic [ref=e301] [cursor=pointer]: rkovalenko ▼
+    - button "Sign out" [ref=e302] [cursor=pointer]
+  - generic [ref=e303]:
+    - complementary [ref=e304]:
+      - generic [ref=e305]:
+        - textbox "Search" [ref=e307]
+        - generic [ref=e308]:
+          - heading "ROOMS" [level=3] [ref=e309]
+          - generic [ref=e310]:
+            - generic [ref=e311] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e312]:
+              - generic "Priority 3 Test Room" [ref=e313] [cursor=pointer]
+              - generic "Room 2" [ref=e314] [cursor=pointer]
+              - generic "General Discussion" [ref=e315] [cursor=pointer]
+              - generic "Test Room" [ref=e316] [cursor=pointer]
+            - generic [ref=e317] [cursor=pointer]: ▼ Private Rooms
+            - generic "My own room" [ref=e319] [cursor=pointer]
+        - heading "CONTACTS" [level=3] [ref=e321]
+        - button "[Create room]" [ref=e322] [cursor=pointer]
+      - button "◀" [ref=e323] [cursor=pointer]
+    - main [ref=e324]:
+      - generic [ref=e325]:
+        - generic [ref=e326]:
+          - heading "General Discussion" [level=2] [ref=e327]
+          - paragraph [ref=e328]: A general discussion room for all topics
+        - paragraph [ref=e330]: No messages yet. Start the conversation!
+        - generic [ref=e332]:
+          - button "😀" [ref=e334] [cursor=pointer]
+          - button "📎" [ref=e335] [cursor=pointer]
+          - textbox "message input" [ref=e336]
+          - button "Send" [disabled] [ref=e337]
+    - complementary [ref=e338]:
+      - generic [ref=e340]:
+        - heading "Room info" [level=2] [ref=e341]
+        - generic [ref=e342]:
+          - generic [ref=e343]:
+            - generic [ref=e344]: "Type:"
+            - generic [ref=e345]: Public
+          - generic [ref=e346]:
+            - generic [ref=e347]: "Owner:"
+            - generic [ref=e348]: testuser
+        - generic [ref=e349]:
+          - heading "Members (2)" [level=3] [ref=e350]
+          - generic [ref=e351]:
+            - generic [ref=e352]:
+              - text: testuser
+              - generic [ref=e353]: owner
+            - generic [ref=e354]: rkovalenko
+        - button "📨 Invite user" [ref=e356] [cursor=pointer]

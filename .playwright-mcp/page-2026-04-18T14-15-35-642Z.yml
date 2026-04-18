@@ -1,0 +1,83 @@
+- generic [ref=e44]:
+  - navigation [ref=e45]:
+    - generic [ref=e46]: 💬 Chat
+    - generic [ref=e47]:
+      - link "Public Rooms" [ref=e48] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e49] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e50] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e51] [cursor=pointer]:
+        - /url: /sessions
+      - generic [ref=e53] [cursor=pointer]: rkovalenko ▼
+    - button "Sign out" [ref=e54] [cursor=pointer]
+  - generic [ref=e55]:
+    - complementary [ref=e56]:
+      - generic [ref=e57]:
+        - textbox "Search" [ref=e59]
+        - generic [ref=e60]:
+          - heading "ROOMS" [level=3] [ref=e61]
+          - generic [ref=e62]:
+            - generic [ref=e63] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e64]:
+              - generic "Bob2 Room" [ref=e65] [cursor=pointer]
+              - generic "Priority 3 Test Room" [ref=e66] [cursor=pointer]
+              - generic "Room 2" [ref=e67] [cursor=pointer]
+              - generic "General Discussion" [ref=e68] [cursor=pointer]
+              - generic "Test Room" [ref=e69] [cursor=pointer]
+            - generic [ref=e70] [cursor=pointer]: ▼ Private Rooms
+            - generic "My own room" [ref=e72] [cursor=pointer]
+        - heading "CONTACTS" [level=3] [ref=e74]
+        - button "[Create room]" [ref=e75] [cursor=pointer]
+      - button "◀" [ref=e76] [cursor=pointer]
+    - main [ref=e77]:
+      - generic [ref=e78]:
+        - generic [ref=e79]:
+          - heading "My own room" [level=2] [ref=e80]
+          - paragraph [ref=e81]: I've created it by myself.
+        - paragraph [ref=e83]: No messages yet. Start the conversation!
+        - generic [ref=e85]:
+          - button "😀" [ref=e87] [cursor=pointer]
+          - button "📎" [ref=e88] [cursor=pointer]
+          - textbox "message input" [ref=e89]
+          - button "Send" [disabled] [ref=e90]
+    - complementary [ref=e91]:
+      - generic [ref=e93]:
+        - heading "Room info" [level=2] [ref=e94]
+        - generic [ref=e95]:
+          - generic [ref=e96]:
+            - generic [ref=e97]: "Type:"
+            - generic [ref=e98]: Private
+          - generic [ref=e99]:
+            - generic [ref=e100]: "Owner:"
+            - generic [ref=e101]: rkovalenko
+        - generic [ref=e102]:
+          - heading "Members (1)" [level=3] [ref=e103]
+          - generic [ref=e105]:
+            - text: rkovalenko
+            - generic [ref=e106]: owner
+        - generic [ref=e107]:
+          - button "📨 Invite user" [ref=e108] [cursor=pointer]
+          - button "⚙️ Manage room" [active] [ref=e109] [cursor=pointer]
+    - generic [ref=e111]:
+      - generic [ref=e112]:
+        - 'heading "Manage Room: #My own room" [level=2] [ref=e113]'
+        - button "✕" [ref=e114] [cursor=pointer]
+      - generic [ref=e115]:
+        - button "Members" [ref=e116] [cursor=pointer]
+        - button "Admins" [ref=e117] [cursor=pointer]
+        - button "Banned users" [ref=e118] [cursor=pointer]
+        - button "Invitations" [ref=e119] [cursor=pointer]
+        - button "Settings" [ref=e120] [cursor=pointer]
+      - generic [ref=e122]:
+        - textbox "Search member" [ref=e124]
+        - generic [ref=e125]:
+          - generic [ref=e126]: Username
+          - generic [ref=e127]: Status
+          - generic [ref=e128]: Role
+          - generic [ref=e129]: Actions
+          - generic [ref=e130]: rkovalenko
+          - generic [ref=e132]: ○ offline
+          - generic [ref=e133]: owner
+          - generic [ref=e135]: —

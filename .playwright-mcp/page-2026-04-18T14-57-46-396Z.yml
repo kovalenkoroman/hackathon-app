@@ -1,0 +1,57 @@
+- generic [ref=e45]:
+  - navigation [ref=e46]:
+    - generic [ref=e47]: 💬 Chat
+    - generic [ref=e48]:
+      - link "Public Rooms" [ref=e49] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e50] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e51] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e52] [cursor=pointer]:
+        - /url: /sessions
+      - generic [ref=e54] [cursor=pointer]: rkovalenko ▼
+    - button "Sign out" [ref=e55] [cursor=pointer]
+  - generic [ref=e56]:
+    - complementary [ref=e57]:
+      - generic [ref=e58]:
+        - textbox "Search" [ref=e60]
+        - generic [ref=e61]:
+          - heading "ROOMS" [level=3] [ref=e62]
+          - generic [ref=e63]:
+            - generic [ref=e64] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e65]:
+              - generic "Priority 3 Test Room" [ref=e66] [cursor=pointer]
+              - generic "My updated room" [ref=e67] [cursor=pointer]
+              - generic "General Discussion" [ref=e68] [cursor=pointer]
+              - generic "Test Room" [ref=e69] [cursor=pointer]
+            - generic [ref=e70] [cursor=pointer]: ▼ Private Rooms
+            - generic "Room 2" [ref=e72] [cursor=pointer]
+        - generic [ref=e73]:
+          - heading "CONTACTS" [level=3] [ref=e74]
+          - generic "bob2bob2" [ref=e76] [cursor=pointer]
+        - button "[Create room]" [ref=e77] [cursor=pointer]
+      - button "◀" [ref=e78] [cursor=pointer]
+    - main [ref=e79]:
+      - generic [ref=e80]:
+        - generic [ref=e81]:
+          - button "← Back" [ref=e82] [cursor=pointer]
+          - heading "Chat with bob2bob2" [level=1] [ref=e83]
+        - generic [ref=e84]:
+          - generic [ref=e85]:
+            - generic [ref=e86]: rkovalenko
+            - generic [ref=e87]: hi!
+            - generic [ref=e88]: 15:34:22
+          - generic [ref=e89]:
+            - generic [ref=e90]: rkovalenko
+            - generic [ref=e91]: This is a test message from the browser!
+            - generic [ref=e92]: 15:36:51
+          - generic [ref=e93]:
+            - generic [ref=e94]: bob2bob2
+            - generic [ref=e95]: Hi roman
+            - generic [ref=e96]: 16:02:08
+        - generic [ref=e97]:
+          - textbox "Type your message... (Ctrl+Enter to send)" [ref=e98]
+          - button "Send" [ref=e99] [cursor=pointer]
+    - complementary [ref=e100]:
+      - generic [ref=e102]: Select a room to view details

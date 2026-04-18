@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import React from 'react';
 import styles from './ManageRoomModal.module.css';
 
-export default function ManageRoomModal({ room, members, user, onClose, onMembersChanged }) {
+export default function ManageRoomModal({ room, members, user, presence, onClose, onMembersChanged }) {
   const [tab, setTab] = useState('members');
   const [bannedUsers, setBannedUsers] = useState([]);
   const [inviteLink, setInviteLink] = useState('');
@@ -10,6 +11,9 @@ export default function ManageRoomModal({ room, members, user, onClose, onMember
   const [settingsVis, setSettingsVis] = useState(room.visibility);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [memberSearch, setMemberSearch] = useState('');
+  const [inviteUsername, setInviteUsername] = useState('');
+  const [inviteSuccess, setInviteSuccess] = useState('');
 
   const isOwner = room.owner_id === user.id;
   const isMemberAdmin = members?.find(m => m.user_id === user.id)?.role === 'admin';
@@ -89,6 +93,23 @@ export default function ManageRoomModal({ room, members, user, onClose, onMember
     }
   };
 
+  const handleKick = async (userId) => {
+    try {
+      const res = await fetch(`/api/v1/rooms/${room.id}/members/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (res.ok) {
+        onMembersChanged();
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to remove member');
+      }
+    } catch (err) {
+      setError('Failed to remove member');
+    }
+  };
+
   const handleUnban = async (userId) => {
     try {
       const res = await fetch(`/api/v1/rooms/${room.id}/bans/${userId}`, {
@@ -133,6 +154,34 @@ export default function ManageRoomModal({ room, members, user, onClose, onMember
     navigator.clipboard.writeText(inviteLink);
   };
 
+  const handleSendInvite = async () => {
+    const trimmed = inviteUsername.trim();
+    if (!trimmed) return;
+    try {
+      setLoading(true);
+      setError('');
+      setInviteSuccess('');
+      const res = await fetch(`/api/v1/rooms/${room.id}/members/invite`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username: trimmed })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setInviteUsername('');
+        setInviteSuccess(`${trimmed} has been added to the room.`);
+        onMembersChanged();
+      } else {
+        setError(data.error || 'Failed to invite user');
+      }
+    } catch (err) {
+      setError('Failed to invite user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSaveSettings = async () => {
     try {
       setLoading(true);
@@ -154,6 +203,7 @@ export default function ManageRoomModal({ room, members, user, onClose, onMember
 
       if (res.ok) {
         setError('');
+        await onMembersChanged();
         onClose();
       } else {
         const data = await res.json();
@@ -190,6 +240,12 @@ export default function ManageRoomModal({ room, members, user, onClose, onMember
       setLoading(false);
     }
   };
+
+  const getStatusLabel = (userId) => presence?.[userId] || 'offline';
+
+  const filteredMembers = members?.filter(m =>
+    m.username.toLowerCase().includes(memberSearch.toLowerCase())
+  ) || [];
 
   const admins = members?.filter(m => m.role === 'admin') || [];
   const regularMembers = members?.filter(m => m.role === 'member') || [];
@@ -245,46 +301,63 @@ export default function ManageRoomModal({ room, members, user, onClose, onMember
           {/* Members Tab */}
           {tab === 'members' && (
             <div>
-              <h3>All Members ({members?.length || 0})</h3>
-              {members?.length === 0 ? (
-                <p className={styles.emptyState}>No members in this room</p>
-              ) : (
-                members.map(member => (
-                  <div key={member.user_id} className={styles.memberRow}>
-                    <span className={styles.memberName}>{member.username}</span>
-                    {member.role !== 'member' && <span className={styles.roleTag}>{member.role}</span>}
-                    <div className={styles.buttonGroup}>
-                      {isOwner && member.role === 'member' && (
-                        <button
-                          onClick={() => handlePromote(member.user_id)}
-                          className={styles.actionBtn}
-                          disabled={loading}
-                        >
-                          Promote
-                        </button>
-                      )}
-                      {isOwner && member.role === 'admin' && (
-                        <button
-                          onClick={() => handleDemote(member.user_id)}
-                          className={styles.actionBtn}
-                          disabled={loading}
-                        >
-                          Demote
-                        </button>
-                      )}
-                      {canManage && member.user_id !== user.id && member.role !== 'owner' && (
-                        <button
-                          onClick={() => handleBan(member.user_id)}
-                          className={`${styles.actionBtn} ${styles.dangerBtn}`}
-                          disabled={loading}
-                        >
-                          Ban
-                        </button>
-                      )}
-                    </div>
+              {/* Search bar */}
+              <div className={styles.searchBar}>
+                <input
+                  type="text"
+                  placeholder="Search member"
+                  value={memberSearch}
+                  onChange={(e) => setMemberSearch(e.target.value)}
+                  className={styles.searchInput}
+                />
+              </div>
+
+              {/* Table */}
+              <div className={styles.membersTable}>
+                {/* Header */}
+                <div className={styles.tableHeader}>Username</div>
+                <div className={styles.tableHeader}>Status</div>
+                <div className={styles.tableHeader}>Role</div>
+                <div className={styles.tableHeader}>Actions</div>
+
+                {/* Rows */}
+                {filteredMembers.length === 0 ? (
+                  <div style={{ gridColumn: '1 / -1' }} className={styles.emptyState}>
+                    {memberSearch ? 'No members match your search' : 'No members in this room'}
                   </div>
-                ))
-              )}
+                ) : filteredMembers.map(member => {
+                  const status = getStatusLabel(member.user_id);
+                  return (
+                    <React.Fragment key={member.user_id}>
+                      <div className={styles.memberName}>{member.username}</div>
+                      <div>
+                        <span className={`${styles.statusBadge} ${styles[`status_${status}`]}`}>
+                          {status === 'online' ? '●' : status === 'afk' ? '◐' : '○'} {status}
+                        </span>
+                      </div>
+                      <div>
+                        <span className={styles.roleTag}>{member.role}</span>
+                      </div>
+                      <div className={styles.buttonGroup}>
+                        {member.role === 'owner' && <span className={styles.noActions}>—</span>}
+                        {member.role === 'admin' && member.user_id !== user.id && isOwner && (
+                          <>
+                            <button onClick={() => handleDemote(member.user_id)} className={styles.actionBtn} disabled={loading}>Remove admin</button>
+                            <button onClick={() => handleBan(member.user_id)} className={`${styles.actionBtn} ${styles.dangerBtn}`} disabled={loading}>Ban</button>
+                          </>
+                        )}
+                        {member.role === 'member' && canManage && (
+                          <>
+                            {isOwner && <button onClick={() => handlePromote(member.user_id)} className={styles.actionBtn} disabled={loading}>Make admin</button>}
+                            <button onClick={() => handleBan(member.user_id)} className={`${styles.actionBtn} ${styles.dangerBtn}`} disabled={loading}>Ban</button>
+                            <button onClick={() => handleKick(member.user_id)} className={`${styles.actionBtn} ${styles.dangerBtn}`} disabled={loading}>Remove from room</button>
+                          </>
+                        )}
+                      </div>
+                    </React.Fragment>
+                  );
+                })}
+              </div>
             </div>
           )}
 
@@ -325,7 +398,7 @@ export default function ManageRoomModal({ room, members, user, onClose, onMember
                 <p className={styles.emptyState}>No banned users</p>
               ) : (
                 bannedUsers.map(ban => (
-                  <div key={ban.id} className={styles.memberRow}>
+                  <div key={ban.user_id} className={styles.memberRow}>
                     <span className={styles.memberName}>{ban.username}</span>
                     <span style={{ fontSize: '0.8rem', color: '#999' }}>
                       {new Date(ban.created_at).toLocaleDateString()}
@@ -333,7 +406,7 @@ export default function ManageRoomModal({ room, members, user, onClose, onMember
                     <div className={styles.buttonGroup}>
                       {canManage && (
                         <button
-                          onClick={() => handleUnban(ban.id)}
+                          onClick={() => handleUnban(ban.user_id)}
                           className={styles.actionBtn}
                           disabled={loading}
                         >
@@ -350,20 +423,33 @@ export default function ManageRoomModal({ room, members, user, onClose, onMember
           {/* Invitations Tab */}
           {tab === 'invitations' && (
             <div>
-              <h3>Room Invitations</h3>
-              <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>
-                Generate a one-time invitation link to invite users to this room.
-              </p>
-              <button onClick={handleGenerateInvite} className={styles.primaryBtn} disabled={loading}>
-                {loading ? 'Generating...' : 'Generate Invitation Link'}
-              </button>
-              {inviteLink && (
-                <>
-                  <div className={styles.inviteLink}>{inviteLink}</div>
-                  <button onClick={handleCopyInvite} className={styles.copyBtn}>
-                    📋 Copy to clipboard
-                  </button>
-                </>
+              <h3>Invite by username</h3>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '1rem' }}>
+                <input
+                  type="text"
+                  value={inviteUsername}
+                  onChange={(e) => {
+                    setInviteUsername(e.target.value);
+                    setInviteSuccess('');
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && !loading && handleSendInvite()}
+                  placeholder="Enter username"
+                  className={styles.searchInput}
+                  style={{ flex: 1 }}
+                  disabled={loading}
+                />
+                <button
+                  onClick={handleSendInvite}
+                  className={styles.primaryBtn}
+                  disabled={loading || !inviteUsername.trim()}
+                >
+                  {loading ? 'Sending...' : 'Send invite'}
+                </button>
+              </div>
+              {inviteSuccess && (
+                <p style={{ color: '#2a9d2a', fontSize: '0.9rem', marginTop: '0.75rem' }}>
+                  {inviteSuccess}
+                </p>
               )}
             </div>
           )}
@@ -371,8 +457,6 @@ export default function ManageRoomModal({ room, members, user, onClose, onMember
           {/* Settings Tab */}
           {tab === 'settings' && canManage && (
             <div>
-              <h3>Room Settings</h3>
-
               <div className={styles.field}>
                 <label>Room Name</label>
                 <input
@@ -403,9 +487,6 @@ export default function ManageRoomModal({ room, members, user, onClose, onMember
               <div className={styles.formActions}>
                 <button onClick={handleSaveSettings} className={styles.primaryBtn} disabled={loading}>
                   {loading ? 'Saving...' : 'Save changes'}
-                </button>
-                <button onClick={onClose} className={styles.secondaryBtn}>
-                  Cancel
                 </button>
               </div>
 

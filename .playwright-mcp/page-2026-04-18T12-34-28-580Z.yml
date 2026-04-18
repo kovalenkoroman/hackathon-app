@@ -1,0 +1,15 @@
+- generic [ref=e54]:
+  - heading "Login" [level=1] [ref=e55]
+  - generic [ref=e56]:
+    - generic [ref=e57]:
+      - generic [ref=e58]: Email
+      - textbox "Email" [ref=e59]
+    - generic [ref=e60]:
+      - generic [ref=e61]: Password
+      - textbox "Password" [ref=e62]
+    - button "Login" [ref=e63] [cursor=pointer]
+  - generic [ref=e64]:
+    - link "Create account" [ref=e65] [cursor=pointer]:
+      - /url: /register
+    - link "Forgot password?" [ref=e66] [cursor=pointer]:
+      - /url: /forgot-password

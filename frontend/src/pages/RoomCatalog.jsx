@@ -34,11 +34,11 @@ export default function RoomCatalog() {
     e.preventDefault();
     setError('');
     try {
-      await roomsApi.createRoom(createName, createDesc, createVis);
+      const newRoom = await roomsApi.createRoom(createName, createDesc, createVis);
       setCreateName('');
       setCreateDesc('');
       setCreateVis('public');
-      await loadRooms();
+      navigate(`/rooms/${newRoom.id}`);
     } catch (err) {
       setError(err.message);
     }

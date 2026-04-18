@@ -3,46 +3,59 @@ import { useNavigate } from 'react-router-dom';
 import RoomPanel from './RoomPanel';
 import ManageRoomModal from './ManageRoomModal';
 import { RoomContext } from '../RoomContext';
+import * as roomsApi from '../api/rooms';
+import * as friendsApi from '../api/friends';
 import styles from './MainLayout.module.css';
 
 export default function MainLayout({ user, onLogout, wsState, presence, children }) {
   const navigate = useNavigate();
-  const { roomInfo, roomMembers } = useContext(RoomContext);
+  const { roomInfo, roomMembers, setRoomInfo, setRoomMembers } = useContext(RoomContext);
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [publicRooms, setPublicRooms] = useState([]);
   const [privateRooms, setPrivateRooms] = useState([]);
+  const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showManageModal, setShowManageModal] = useState(false);
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        setLoading(true);
-        // Fetch public rooms
-        const publicRes = await fetch('/api/v1/rooms?visibility=public', { credentials: 'include' });
-        if (publicRes.ok) {
-          const publicData = await publicRes.json();
-          setPublicRooms(publicData.data || []);
-        }
-
-        // Fetch user's private rooms (filters to only private ones)
-        const privateRes = await fetch('/api/v1/rooms/mine', { credentials: 'include' });
-        if (privateRes.ok) {
-          const privateData = await privateRes.json();
-          // Filter to only show private rooms (visibility: 'private')
-          const onlyPrivate = (privateData.data || []).filter(room => room.visibility === 'private');
-          setPrivateRooms(onlyPrivate);
-        }
-      } catch (error) {
-        console.error('Failed to fetch rooms:', error);
-      } finally {
-        setLoading(false);
+  const fetchRooms = async () => {
+    try {
+      setLoading(true);
+      // Fetch public rooms
+      const publicRes = await fetch('/api/v1/rooms?visibility=public', { credentials: 'include' });
+      if (publicRes.ok) {
+        const publicData = await publicRes.json();
+        setPublicRooms(publicData.data || []);
       }
-    };
 
+      // Fetch user's private rooms (filters to only private ones)
+      const privateRes = await fetch('/api/v1/rooms/mine', { credentials: 'include' });
+      if (privateRes.ok) {
+        const privateData = await privateRes.json();
+        // Filter to only show private rooms (visibility: 'private')
+        const onlyPrivate = (privateData.data || []).filter(room => room.visibility === 'private');
+        setPrivateRooms(onlyPrivate);
+      }
+    } catch (error) {
+      console.error('Failed to fetch rooms:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchRooms();
+    fetchContacts();
   }, []);
+
+  const fetchContacts = async () => {
+    try {
+      const data = await friendsApi.getFriends();
+      setContacts(data);
+    } catch (error) {
+      console.error('Failed to fetch contacts:', error);
+    }
+  };
 
   const getPresenceIcon = (status) => {
     switch (status) {
@@ -59,6 +72,19 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
 
   const handleRoomClick = (roomId) => {
     navigate(`/rooms/${roomId}`);
+  };
+
+  const handleMembersChanged = async () => {
+    if (!roomInfo) return;
+    try {
+      const updated = await roomsApi.getRoomDetail(roomInfo.id);
+      setRoomInfo(updated);
+      setRoomMembers(updated.members || []);
+      // Refresh room lists in case visibility changed
+      await fetchRooms();
+    } catch (error) {
+      console.error('Failed to refresh room data:', error);
+    }
   };
 
   return (
@@ -144,7 +170,20 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
               <div className={styles.sidebarSection}>
                 <h3 className={styles.sectionTitle}>CONTACTS</h3>
                 <div className={styles.contactList} id="contact-list">
-                  {/* Populated by child components */}
+                  {contacts.length > 0 ? (
+                    contacts.map((contact) => (
+                      <div
+                        key={contact.friend_id}
+                        onClick={() => navigate(`/dm/${contact.friend_id}`)}
+                        className={styles.contactItem}
+                        title={contact.username}
+                      >
+                        {contact.username}
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ fontSize: '0.8rem', color: '#999', padding: '0.5rem' }}>No contacts</div>
+                  )}
                 </div>
               </div>
 
@@ -197,8 +236,9 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
             room={roomInfo}
             members={roomMembers}
             user={user}
+            presence={presence}
             onClose={() => setShowManageModal(false)}
-            onMembersChanged={() => {}}
+            onMembersChanged={handleMembersChanged}
           />
         )}
       </div>

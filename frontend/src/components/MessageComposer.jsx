@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import styles from './MessageComposer.module.css';
 
 const EMOJIS = [
@@ -11,18 +11,23 @@ const EMOJIS = [
 export default function MessageComposer({ onSend, replyTo, onClearReply, disabled = false }) {
   const [content, setContent] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
 
   const handleSend = (e) => {
     e.preventDefault();
+    // Content is required; file is optional
     if (!content.trim()) return;
 
     const msg = {
       content: content.trim(),
-      replyToId: replyTo?.id || null
+      replyToId: replyTo?.id || null,
+      file: selectedFile
     };
 
     onSend(msg);
     setContent('');
+    setSelectedFile(null);
     onClearReply?.();
     setShowEmojiPicker(false);
   };
@@ -34,6 +39,24 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, disable
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       handleSend(e);
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const handleAttachClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const clearFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -77,9 +100,16 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, disable
           className={styles.toolBtn}
           title="Attach file"
           disabled={disabled}
+          onClick={handleAttachClick}
         >
           📎
         </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          onChange={handleFileSelect}
+          style={{ display: 'none' }}
+        />
 
         {/* Reply indicator inline */}
         {replyTo && (
@@ -90,6 +120,21 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, disable
               onClick={onClearReply}
               className={styles.replyClose}
               title="Clear reply"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {/* File attachment indicator */}
+        {selectedFile && (
+          <div className={styles.fileTag}>
+            📎 {selectedFile.name}
+            <button
+              type="button"
+              onClick={clearFile}
+              className={styles.fileClear}
+              title="Remove file"
             >
               ×
             </button>

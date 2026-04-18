@@ -1,0 +1,44 @@
+- generic [ref=e4]:
+  - navigation [ref=e5]:
+    - generic [ref=e6]: 💬 Chat
+    - generic [ref=e7]:
+      - link "Public Rooms" [ref=e8] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e9] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e10] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e11] [cursor=pointer]:
+        - /url: /sessions
+      - generic [ref=e13] [cursor=pointer]: rkovalenko ▼
+    - button "Sign out" [ref=e14] [cursor=pointer]
+  - generic [ref=e15]:
+    - complementary [ref=e16]:
+      - generic [ref=e17]:
+        - textbox "Search" [ref=e19]
+        - generic [ref=e20]:
+          - heading "ROOMS" [level=3] [ref=e21]
+          - generic [ref=e22]:
+            - generic [ref=e23] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e24]:
+              - generic "Navigate Test Room" [ref=e25] [cursor=pointer]
+              - generic "Test Create Room" [ref=e26] [cursor=pointer]
+              - generic "Priority 3 Test Room" [ref=e27] [cursor=pointer]
+              - generic "My updated room" [ref=e28] [cursor=pointer]
+              - generic "General Discussion" [ref=e29] [cursor=pointer]
+              - generic "Test Room" [ref=e30] [cursor=pointer]
+            - generic [ref=e31] [cursor=pointer]: ▼ Private Rooms
+            - generic [ref=e32]:
+              - generic "Roma 2" [ref=e33] [cursor=pointer]
+              - generic "Room 2" [ref=e34] [cursor=pointer]
+        - generic [ref=e35]:
+          - heading "CONTACTS" [level=3] [ref=e36]
+          - generic "bob2bob2" [ref=e38] [cursor=pointer]
+        - button "[Create room]" [ref=e39] [cursor=pointer]
+      - button "◀" [ref=e40] [cursor=pointer]
+    - main [ref=e41]:
+      - generic [ref=e42]:
+        - heading "Welcome to Chat!" [level=1] [ref=e43]
+        - paragraph [ref=e44]: Select a room from the sidebar or browse public rooms to get started.
+    - complementary [ref=e45]:
+      - generic [ref=e47]: Select a room to view details

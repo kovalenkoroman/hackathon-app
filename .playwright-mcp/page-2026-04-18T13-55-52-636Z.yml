@@ -1,0 +1,68 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]: 💬 Chat
+    - generic [ref=e6]:
+      - link "Public Rooms" [ref=e7] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e8] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e9] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e10] [cursor=pointer]:
+        - /url: /sessions
+      - generic [ref=e12] [cursor=pointer]: rkovalenko ▼
+    - button "Sign out" [ref=e13] [cursor=pointer]
+  - generic [ref=e14]:
+    - complementary [ref=e15]:
+      - generic [ref=e16]:
+        - textbox "Search" [ref=e18]
+        - generic [ref=e19]:
+          - heading "ROOMS" [level=3] [ref=e20]
+          - generic [ref=e21]:
+            - generic [ref=e22] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e23]:
+              - generic "Priority 3 Test Room" [ref=e24] [cursor=pointer]
+              - generic "Room 2" [ref=e25] [cursor=pointer]
+              - generic "General Discussion" [ref=e26] [cursor=pointer]
+              - generic "Test Room" [ref=e27] [cursor=pointer]
+            - generic [ref=e28] [cursor=pointer]: ▼ Private Rooms
+            - generic "My own room" [ref=e30] [cursor=pointer]
+        - heading "CONTACTS" [level=3] [ref=e32]
+        - button "[Create room]" [ref=e33] [cursor=pointer]
+      - button "◀" [ref=e34] [cursor=pointer]
+    - main [ref=e35]:
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - heading "Create Room" [level=2] [ref=e38]
+          - generic [ref=e39]:
+            - textbox "Room name" [ref=e40]
+            - textbox "Description (optional)" [ref=e41]
+            - combobox [ref=e42]:
+              - option "Public" [selected]
+              - option "Private"
+            - button "Create" [ref=e43] [cursor=pointer]
+        - generic [ref=e44]:
+          - heading "Public Rooms" [level=2] [ref=e45]
+          - textbox "Search rooms..." [ref=e46]
+          - generic [ref=e47]:
+            - generic [ref=e48] [cursor=pointer]:
+              - heading "Priority 3 Test Room" [level=3] [ref=e49]
+              - paragraph [ref=e50]: Testing rooms feature
+              - paragraph [ref=e51]: "Members: 2"
+              - button "Join" [ref=e52]
+            - generic [ref=e53] [cursor=pointer]:
+              - heading "Room 2" [level=3] [ref=e54]
+              - paragraph [ref=e55]: "Members: 1"
+              - button "Join" [ref=e56]
+            - generic [ref=e57] [cursor=pointer]:
+              - heading "General Discussion" [level=3] [ref=e58]
+              - paragraph [ref=e59]: A general discussion room for all topics
+              - paragraph [ref=e60]: "Members: 2"
+              - button "Join" [ref=e61]
+            - generic [ref=e62] [cursor=pointer]:
+              - heading "Test Room" [level=3] [ref=e63]
+              - paragraph [ref=e64]: A test room
+              - paragraph [ref=e65]: "Members: 3"
+              - button "Join" [ref=e66]
+    - complementary [ref=e67]:
+      - generic [ref=e69]: Select a room to view details

@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
+import { unlink } from 'fs/promises';
 import * as userQueries from '../db/queries/users.js';
 import * as sessionQueries from '../db/queries/sessions.js';
 import * as passwordResetQueries from '../db/queries/password_reset.js';
@@ -78,10 +79,22 @@ export async function deleteAccount(userId) {
   try {
     await client.query('BEGIN');
 
+    // Get all attachments in rooms owned by this user before deleting messages
+    const attachmentsResult = await client.query(
+      `SELECT a.filename FROM attachments a
+       JOIN messages m ON a.message_id = m.id
+       WHERE m.room_id IN (SELECT id FROM rooms WHERE owner_id = $1)`,
+      [userId]
+    );
+
+    // Delete from database first (with cascade)
     await client.query('DELETE FROM room_members WHERE room_id IN (SELECT id FROM rooms WHERE owner_id = $1)', [userId]);
     await client.query('DELETE FROM room_bans WHERE room_id IN (SELECT id FROM rooms WHERE owner_id = $1)', [userId]);
     await client.query('DELETE FROM messages WHERE room_id IN (SELECT id FROM rooms WHERE owner_id = $1)', [userId]);
     await client.query('DELETE FROM rooms WHERE owner_id = $1', [userId]);
+
+    // Remove user from other rooms
+    await client.query('DELETE FROM room_members WHERE user_id = $1', [userId]);
 
     await client.query('DELETE FROM sessions WHERE user_id = $1', [userId]);
     await client.query('DELETE FROM friendships WHERE requester_id = $1 OR addressee_id = $1', [userId]);
@@ -89,6 +102,16 @@ export async function deleteAccount(userId) {
     await client.query('DELETE FROM users WHERE id = $1', [userId]);
 
     await client.query('COMMIT');
+
+    // Delete files from disk after successful commit
+    for (const row of attachmentsResult.rows) {
+      try {
+        await unlink(`/app/uploads/${row.filename}`);
+      } catch (err) {
+        console.error(`Error deleting file ${row.filename}:`, err);
+        // Continue even if file deletion fails
+      }
+    }
   } catch (e) {
     await client.query('ROLLBACK');
     throw e;

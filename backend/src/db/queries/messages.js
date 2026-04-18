@@ -1,4 +1,5 @@
 import pool from '../index.js';
+import * as attachmentQueries from './attachments.js';
 
 export async function createMessage(roomOrDialogId, userId, content, replyToId = null, isDialog = false) {
   const result = await pool.query(
@@ -73,4 +74,12 @@ export async function getMessageReplyContext(replyToId) {
     [replyToId]
   );
   return result.rows[0];
+}
+
+export async function getMessageWithAttachments(messageId) {
+  const message = await findMessageById(messageId);
+  if (!message) return null;
+
+  const attachments = await attachmentQueries.getMessageAttachments(messageId);
+  return { ...message, attachments };
 }

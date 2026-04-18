@@ -42,50 +42,63 @@ export default function RoomPanel({ room, members, user, onInvite, onManage, onB
 
   if (!room) return null;
 
+  const ownerMember = members?.find(m => m.role === 'owner');
+  const adminMembers = members?.filter(m => m.role === 'admin') || [];
+  const regularMembers = members?.filter(m => m.role === 'member') || [];
+
   return (
     <div className={styles.panel}>
-      <h2>{room.name}</h2>
-      <p className={styles.description}>{room.description || 'No description'}</p>
-      <div className={styles.info}>
-        <p><strong>Visibility:</strong> {room.visibility}</p>
-        <p><strong>Owner:</strong> {members?.find(m => m.role === 'owner')?.username || 'Unknown'}</p>
-        <p><strong>Members:</strong> {members?.length || 0}</p>
+      <h2 className={styles.roomTitle}>Room info</h2>
+
+      <div className={styles.infoSection}>
+        <div className={styles.infoItem}>
+          <span className={styles.label}>Type:</span>
+          <span className={styles.value}>{room.visibility === 'public' ? 'Public' : 'Private'}</span>
+        </div>
+
+        <div className={styles.infoItem}>
+          <span className={styles.label}>Owner:</span>
+          <span className={styles.value}>{ownerMember?.username || 'Unknown'}</span>
+        </div>
       </div>
 
-      {canManage && (
-        <div className={styles.actions}>
-          <button onClick={() => setShowInviteModal(true)} className={styles.btn}>
-            📨 Invite
-          </button>
-          <button onClick={onManage} className={styles.btn}>
-            ⚙️ Manage
-          </button>
+      {adminMembers.length > 0 && (
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Admins ({adminMembers.length})</h3>
+          <div className={styles.list}>
+            {adminMembers.map(admin => (
+              <div key={admin.user_id} className={styles.listItem}>
+                {admin.username}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      <div className={styles.memberList}>
-        <h3>Members ({members?.length})</h3>
-        {members?.map(member => (
-          <div key={member.user_id} className={styles.member}>
-            <div className={styles.memberInfo}>
-              <span className={styles.username}>{member.username}</span>
-              <span className={styles.role}>{member.role}</span>
-            </div>
-            {canManage && member.user_id !== user?.id && (
-              <div className={styles.memberActions}>
-                {isOwner && member.role === 'member' && (
-                  <>
-                    <button onClick={() => onPromote(member.user_id)} className={styles.iconBtn}>⬆️</button>
-                    <button onClick={() => onBan(member.user_id)} className={styles.iconBtn}>🚫</button>
-                  </>
-                )}
-                {isOwner && member.role === 'admin' && (
-                  <button onClick={() => onDemote(member.user_id)} className={styles.iconBtn}>⬇️</button>
-                )}
+      <div className={styles.section}>
+        <h3 className={styles.sectionTitle}>Members ({regularMembers.length})</h3>
+        <div className={styles.list}>
+          {regularMembers.length > 0 ? (
+            regularMembers.map(member => (
+              <div key={member.user_id} className={styles.listItem}>
+                {member.username}
               </div>
-            )}
-          </div>
-        ))}
+            ))
+          ) : (
+            <div style={{ fontSize: '0.85rem', color: '#999', padding: '0.5rem' }}>No regular members</div>
+          )}
+        </div>
+      </div>
+
+      <div className={styles.actions}>
+        <button onClick={() => setShowInviteModal(true)} className={styles.actionLink}>
+          📨 Invite user
+        </button>
+        {canManage && (
+          <button onClick={onManage} className={styles.actionLink}>
+            ⚙️ Manage room
+          </button>
+        )}
       </div>
 
       {/* Invite Modal */}

@@ -1,0 +1,47 @@
+- generic [ref=e260]:
+  - navigation [ref=e261]:
+    - generic [ref=e262]: 💬 Chat
+    - generic [ref=e263]:
+      - link "Public Rooms" [ref=e264] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e265] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e266] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e267] [cursor=pointer]:
+        - /url: /sessions
+      - generic [ref=e269] [cursor=pointer]: rkovalenko ▼
+    - button "Sign out" [ref=e270] [cursor=pointer]
+  - generic [ref=e271]:
+    - complementary [ref=e272]:
+      - generic [ref=e273]:
+        - textbox "Search" [ref=e275]
+        - generic [ref=e276]:
+          - heading "ROOMS" [level=3] [ref=e277]
+          - generic [ref=e278]:
+            - generic [ref=e279] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e280]:
+              - generic "Priority 3 Test Room" [ref=e281] [cursor=pointer]
+              - generic "Room 2" [ref=e282] [cursor=pointer]
+              - generic "General Discussion" [ref=e283] [cursor=pointer]
+              - generic "Test Room" [ref=e284] [cursor=pointer]
+            - generic [ref=e285] [cursor=pointer]: ▼ Private Rooms
+            - generic [ref=e286]:
+              - generic "Priority 3 Test Room" [ref=e287] [cursor=pointer]
+              - generic "General Discussion" [ref=e288] [cursor=pointer]
+              - generic "Test Room" [ref=e289] [cursor=pointer]
+              - generic "Room 2" [ref=e290] [cursor=pointer]
+              - generic "My own room" [ref=e291] [cursor=pointer]
+        - heading "CONTACTS" [level=3] [ref=e293]
+        - button "[Create room]" [ref=e294] [cursor=pointer]
+      - button "◀" [ref=e295] [cursor=pointer]
+    - main [ref=e296]:
+      - generic [ref=e297]:
+        - paragraph [ref=e299]: No messages yet. Start the conversation!
+        - generic [ref=e301]:
+          - button "😀" [ref=e303] [cursor=pointer]
+          - button "📎" [ref=e304] [cursor=pointer]
+          - textbox "message input" [ref=e305]
+          - button "Send" [disabled] [ref=e306]
+    - complementary [ref=e307]:
+      - button "▶" [ref=e309] [cursor=pointer]

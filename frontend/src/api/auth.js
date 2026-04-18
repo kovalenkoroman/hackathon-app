@@ -64,6 +64,17 @@ export async function resetPassword(email) {
   return json.data;
 }
 
+export async function confirmPasswordReset(token, newPassword) {
+  const res = await fetch('/api/v1/auth/password-reset/confirm', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, newPassword }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error);
+  return json.data;
+}
+
 export async function deleteAccount() {
   const res = await fetch('/api/v1/auth/account', {
     method: 'DELETE',

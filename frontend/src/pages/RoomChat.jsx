@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
+import { RoomContext } from '../RoomContext';
 import * as messagesApi from '../api/messages';
 import * as roomsApi from '../api/rooms';
 import MessageList from '../components/MessageList';
@@ -9,6 +10,7 @@ import styles from './RoomChat.module.css';
 
 export default function RoomChat({ user }) {
   const { roomId } = useParams();
+  const { roomInfo, setRoomInfo, setRoomMembers } = useContext(RoomContext);
   const [room, setRoom] = useState(null);
   const [members, setMembers] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -20,6 +22,13 @@ export default function RoomChat({ user }) {
     loadRoomAndMessages();
   }, [roomId]);
 
+  useEffect(() => {
+    if (roomInfo && roomInfo.id === parseInt(roomId)) {
+      setRoom(roomInfo);
+      setMembers(roomInfo.members || []);
+    }
+  }, [roomInfo, roomId]);
+
   const loadRoomAndMessages = async () => {
     setLoading(true);
     setError('');
@@ -27,6 +36,8 @@ export default function RoomChat({ user }) {
       const roomData = await roomsApi.getRoomDetail(roomId);
       setRoom(roomData);
       setMembers(roomData.members || []);
+      setRoomInfo(roomData);
+      setRoomMembers(roomData.members || []);
 
       const messagesData = await messagesApi.getMessages(roomId, null, 50);
       setMessages(messagesData);
@@ -43,6 +54,24 @@ export default function RoomChat({ user }) {
       const newMessage = await messagesApi.sendMessage(roomId, msgData.content, msgData.replyToId);
       setMessages([...messages, newMessage]);
       setReplyingTo(null);
+
+      // Upload file if provided
+      if (msgData.file) {
+        const formData = new FormData();
+        formData.append('file', msgData.file);
+        formData.append('messageId', newMessage.id);
+
+        try {
+          await fetch('/api/v1/files/upload', {
+            method: 'POST',
+            body: formData
+          });
+        } catch (err) {
+          console.error('File upload failed:', err);
+          // File upload failed but message was sent, so just show a warning
+          setError('Message sent, but file upload failed');
+        }
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -114,12 +143,21 @@ export default function RoomChat({ user }) {
   if (loading) return <div className={styles.container}><p>Loading...</p></div>;
   if (!room) return <div className={styles.container}><p>Room not found</p></div>;
 
+  // Reverse messages to show newer ones first
+  const reversedMessages = [...messages].reverse();
+
   return (
     <div className={styles.container}>
+      {/* Room Header */}
+      <div className={styles.roomHeader}>
+        <h2 className={styles.roomTitle}>{room.name}</h2>
+        {room.description && <p className={styles.roomDescription}>{room.description}</p>}
+      </div>
+
       {error && <div className={styles.error}>{error}</div>}
 
       <MessageList
-        messages={messages}
+        messages={reversedMessages}
         loading={false}
         onLoadMore={handleLoadMore}
         onReply={setReplyingTo}
@@ -133,20 +171,8 @@ export default function RoomChat({ user }) {
         onClearReply={() => setReplyingTo(null)}
       />
 
-      {/* Render room info in right sidebar */}
-      <div style={{ display: 'none' }} id="room-info">
-        <RoomPanel
-          room={room}
-          members={members}
-          user={user}
-          onInvite={() => {}}
-          onManage={() => {}}
-          onBan={handleBan}
-          onRemove={handleRemove}
-          onPromote={handlePromote}
-          onDemote={handleDemote}
-        />
-      </div>
+      {/* Pass room info to MainLayout via props */}
+      <input type="hidden" id="room-info" data-room={JSON.stringify(room)} />
     </div>
   );
 }

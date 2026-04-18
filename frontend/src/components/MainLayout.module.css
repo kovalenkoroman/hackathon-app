@@ -56,17 +56,19 @@
 }
 
 .logoutBtn {
-  padding: 0.4rem 0.8rem;
-  background: #fff;
-  border: 1px solid #ccc;
+  background: none;
+  border: none;
+  color: #000;
   cursor: pointer;
-  font-size: 0.9rem;
-  border-radius: 2px;
-  white-space: nowrap;
+  font-size: 0.95rem;
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+  font-family: inherit;
 }
 
 .logoutBtn:hover {
-  background: #f5f5f5;
+  color: #666;
 }
 
 /* Main 3-column layout */
@@ -147,6 +149,7 @@
   margin-left: 0.5rem;
 }
 
+.roomItem,
 .roomList a,
 .contactList a,
 .roomList div,
@@ -158,13 +161,15 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: background 0.15s;
 }
 
+.roomItem:hover,
 .roomList a:hover,
 .contactList a:hover,
 .roomList div:hover,
 .contactList div:hover {
-  background: #f0f0f0;
+  background: #e8e8e8;
   border-radius: 2px;
 }
 
@@ -208,22 +213,12 @@
 
 /* Right Sidebar */
 .rightSidebar {
-  width: 240px;
+  width: 280px;
   background: #f9f9f9;
   border-left: 1px solid #ccc;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  position: relative;
-  transition: width 0.3s ease;
-}
-
-.rightSidebar.collapsed {
-  width: 0;
-}
-
-.rightSidebar.collapsed .sidebarContent {
-  display: none;
 }
 
 .rightSidebar .toggleBtn {
