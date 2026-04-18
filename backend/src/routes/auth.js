@@ -14,8 +14,11 @@ router.post('/register', async (req, res) => {
     }
 
     const user = await authService.register(email, username, password);
-    res.json({ data: user });
+    res.status(201).json({ data: user });
   } catch (error) {
+    if (error.message.includes('already in use')) {
+      return res.status(409).json({ error: error.message });
+    }
     res.status(400).json({ error: error.message });
   }
 });
@@ -44,6 +47,9 @@ router.post('/login', async (req, res) => {
 
     res.json({ data: result.user });
   } catch (error) {
+    if (error.message === 'Invalid credentials') {
+      return res.status(401).json({ error: error.message });
+    }
     res.status(400).json({ error: error.message });
   }
 });
@@ -52,7 +58,7 @@ router.post('/logout', authMiddleware, requireAuth, async (req, res) => {
   try {
     await authService.logout(req.session.id);
     res.clearCookie('sessionToken');
-    res.json({ data: { message: 'Logged out successfully' } });
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -114,6 +120,7 @@ router.get('/sessions', authMiddleware, requireAuth, async (req, res) => {
       userAgent: s.user_agent,
       createdAt: s.created_at,
       expiresAt: s.expires_at,
+      lastSeen: s.last_seen,
     }));
     res.json({ data });
   } catch (error) {
@@ -130,7 +137,66 @@ router.delete('/sessions/:id', authMiddleware, requireAuth, async (req, res) => 
     }
 
     await sessionQueries.deleteSessionById(parseInt(req.params.id));
-    res.json({ data: { message: 'Session deleted' } });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.patch('/users/me', authMiddleware, requireAuth, async (req, res) => {
+  try {
+    const { username, email } = req.body;
+
+    if (!username && !email) {
+      return res.status(400).json({ error: 'At least one field is required' });
+    }
+
+    const fields = {};
+    if (username) fields.username = username;
+    if (email) fields.email = email;
+
+    const user = await authService.updateUser(req.user.id, fields);
+    res.json({ data: user });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.post('/password-reset', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const result = await authService.requestPasswordReset(email);
+    res.json({ data: { token: result.token } });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.post('/password-reset/confirm', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({ error: 'Token and new password are required' });
+    }
+
+    await authService.confirmPasswordReset(token, newPassword);
+    res.json({ data: { message: 'Password reset successfully' } });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.delete('/sessions', authMiddleware, requireAuth, async (req, res) => {
+  try {
+    await authService.logoutAll(req.user.id);
+    res.clearCookie('sessionToken');
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

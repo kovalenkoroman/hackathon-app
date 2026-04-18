@@ -1,0 +1,11 @@
+- generic [ref=e3]:
+  - heading "Friends" [level=1] [ref=e4]
+  - generic [ref=e5]:
+    - button "Friends List" [ref=e6] [cursor=pointer]
+    - button "Pending Requests" [ref=e7] [cursor=pointer]
+    - button "Find Users" [ref=e8] [cursor=pointer]
+  - generic [ref=e9]:
+    - heading "Your Friends" [level=2] [ref=e10]
+    - paragraph [ref=e11]: No friends yet. Send a friend request!
+  - link "← Back to home" [ref=e13] [cursor=pointer]:
+    - /url: /

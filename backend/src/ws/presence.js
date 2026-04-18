@@ -11,9 +11,11 @@ export function addConnection(userId, tabId, ws) {
   if (!connections.has(userId)) {
     connections.set(userId, new Map());
   }
+  const now = Date.now();
   connections.get(userId).set(tabId, {
     ws,
-    lastPing: Date.now(),
+    lastPing: now,
+    lastAcceptedPing: now,
   });
 
   updatePresence(userId, 'online');
@@ -31,14 +33,34 @@ export function removeConnection(userId, tabId) {
   }
 }
 
-export function updatePing(userId, tabId) {
+const PING_DEBOUNCE_MS = 5000; // Only process one ping per 5 seconds per tab
+
+export async function updatePing(userId, tabId) {
   if (connections.has(userId)) {
     const tab = connections.get(userId).get(tabId);
     if (tab) {
-      tab.lastPing = Date.now();
+      const now = Date.now();
+      // Debounce: skip if less than 5s since last accepted ping
+      if (now - tab.lastAcceptedPing < PING_DEBOUNCE_MS) {
+        return;
+      }
+
+      tab.lastPing = now;
+      tab.lastAcceptedPing = now;
+
       const currentStatus = presence.get(userId)?.status || 'offline';
       if (currentStatus === 'afk') {
-        updatePresence(userId, 'online');
+        const change = updatePresence(userId, 'online');
+        if (change) {
+          broadcastToUser(userId, {
+            type: 'presence:update',
+            payload: { userId, status: 'online' },
+          });
+          // Notify friends and room members of recovery from AFK
+          const broadcast = await import('./broadcast.js');
+          await broadcast.broadcastPresenceToFriends(userId);
+          await broadcast.broadcastPresenceToRoomMembers(userId);
+        }
       }
     }
   }
@@ -86,23 +108,29 @@ export function broadcastToUserExcept(userId, tabId, event) {
 }
 
 // Check for AFK connections periodically
-export function checkAFKStatus() {
+export async function checkAFKStatus() {
   const now = Date.now();
 
-  connections.forEach((tabs, userId) => {
-    tabs.forEach((tab) => {
+  for (const [userId, tabs] of connections) {
+    for (const tab of tabs.values()) {
       if (now - tab.lastPing > AFK_TIMEOUT) {
         const currentStatus = presence.get(userId)?.status;
         if (currentStatus === 'online') {
-          updatePresence(userId, 'afk');
-          broadcastToUser(userId, {
-            type: 'presence:update',
-            payload: { userId, status: 'afk' },
-          });
+          const change = updatePresence(userId, 'afk');
+          if (change) {
+            broadcastToUser(userId, {
+              type: 'presence:update',
+              payload: { userId, status: 'afk' },
+            });
+            // Notify friends and room members of AFK status
+            const broadcast = await import('./broadcast.js');
+            await broadcast.broadcastPresenceToFriends(userId);
+            await broadcast.broadcastPresenceToRoomMembers(userId);
+          }
         }
       }
-    });
-  });
+    }
+  }
 }
 
 // Start AFK check interval

@@ -51,7 +51,7 @@ wss.on('connection', (ws) => {
       if (type === 'auth' && !ws.userId) {
         await handleAuth(ws, payload, tabId);
       } else if (type === 'ping' && ws.userId) {
-        handlePing(ws);
+        await handlePing(ws);
         ws.send(JSON.stringify({ type: 'pong' }));
       } else if (!ws.userId) {
         ws.send(JSON.stringify({ type: 'error', payload: { error: 'Not authenticated' } }));
@@ -65,11 +65,12 @@ wss.on('connection', (ws) => {
   ws.on('close', async () => {
     if (ws.userId) {
       presenceService.removeConnection(ws.userId, ws.tabId);
-      const presenceChange = presenceService.getPresence(ws.userId);
-      if (presenceChange) {
-        // Notify friends of status change
-        const broadcast = (await import('./ws/broadcast.js')).default;
-        // Not awaiting to avoid blocking
+      const currentPresence = presenceService.getPresence(ws.userId);
+      // If user is now offline (no tabs left), notify friends and room members
+      if (currentPresence.status === 'offline') {
+        const broadcast = await import('./ws/broadcast.js');
+        await broadcast.broadcastPresenceToFriends(ws.userId);
+        await broadcast.broadcastPresenceToRoomMembers(ws.userId);
       }
     }
   });

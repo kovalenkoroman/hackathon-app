@@ -8,6 +8,9 @@ import ForgotPassword from './pages/ForgotPassword';
 import RoomCatalog from './pages/RoomCatalog';
 import RoomDetail from './pages/RoomDetail';
 import RoomChat from './pages/RoomChat';
+import Sessions from './pages/Sessions';
+import Friends from './pages/Friends';
+import DMChat from './pages/DMChat';
 
 function Home({ user, onLogout, wsState, presence }) {
   const getPresenceIcon = (status) => {
@@ -31,6 +34,8 @@ function Home({ user, onLogout, wsState, presence }) {
       <p>Presence: {getPresenceIcon(presence)} {presence}</p>
       <nav style={{ marginBottom: '2rem' }}>
         <a href="/catalog" style={{ marginRight: '1rem' }}>Browse Rooms</a>
+        <a href="/friends" style={{ marginRight: '1rem' }}>Friends</a>
+        <a href="/sessions" style={{ marginRight: '1rem' }}>Sessions</a>
       </nav>
       <button onClick={onLogout}>Logout</button>
     </div>
@@ -136,6 +141,18 @@ export default function App() {
         <Route
           path="/rooms/:roomId/manage"
           element={user ? <RoomDetail user={user} /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/sessions"
+          element={user ? <Sessions /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/friends"
+          element={user ? <Friends user={user} /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/dm/:userId"
+          element={user ? <DMChat user={user} /> : <Navigate to="/login" />}
         />
       </Routes>
     </BrowserRouter>

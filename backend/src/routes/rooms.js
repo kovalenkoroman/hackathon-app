@@ -1,6 +1,8 @@
 import express from 'express';
+import crypto from 'crypto';
 import * as roomsService from '../services/rooms.js';
 import * as roomQueries from '../db/queries/rooms.js';
+import * as messagesService from '../services/messages.js';
 import { authMiddleware, requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -36,6 +38,17 @@ router.get('/', requireAuth, async (req, res) => {
   }
 });
 
+// Get user's rooms
+router.get('/mine', requireAuth, async (req, res) => {
+  try {
+    const rooms = await roomQueries.getUserRooms(req.user.id);
+    res.json({ data: rooms });
+  } catch (error) {
+    console.error('Get user rooms error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Get room detail with members
 router.get('/:id', requireAuth, async (req, res) => {
   try {
@@ -57,6 +70,9 @@ router.post('/:id/join', requireAuth, async (req, res) => {
     res.json({ data: member });
   } catch (error) {
     console.error('Join room error:', error);
+    if (error.message.includes('Cannot join private room') || error.message.includes('You are banned')) {
+      return res.status(403).json({ error: error.message });
+    }
     res.status(400).json({ error: error.message });
   }
 });
@@ -68,6 +84,9 @@ router.post('/:id/leave', requireAuth, async (req, res) => {
     res.json({ data: null });
   } catch (error) {
     console.error('Leave room error:', error);
+    if (error.message.includes('Room owner cannot leave')) {
+      return res.status(403).json({ error: error.message });
+    }
     res.status(400).json({ error: error.message });
   }
 });
@@ -79,6 +98,9 @@ router.delete('/:id', requireAuth, async (req, res) => {
     res.json({ data: null });
   } catch (error) {
     console.error('Delete room error:', error);
+    if (error.message.includes('Only room owner can delete')) {
+      return res.status(403).json({ error: error.message });
+    }
     res.status(400).json({ error: error.message });
   }
 });
@@ -120,6 +142,9 @@ router.post('/:id/members/:userId/ban', requireAuth, async (req, res) => {
     res.json({ data: null });
   } catch (error) {
     console.error('Ban member error:', error);
+    if (error.message.includes('Only room admin or owner can ban')) {
+      return res.status(403).json({ error: error.message });
+    }
     res.status(400).json({ error: error.message });
   }
 });
@@ -131,6 +156,9 @@ router.delete('/:id/bans/:userId', requireAuth, async (req, res) => {
     res.json({ data: null });
   } catch (error) {
     console.error('Unban member error:', error);
+    if (error.message.includes('Only room admin or owner can unban')) {
+      return res.status(403).json({ error: error.message });
+    }
     res.status(400).json({ error: error.message });
   }
 });
@@ -142,6 +170,9 @@ router.post('/:id/admins/:userId', requireAuth, async (req, res) => {
     res.json({ data: member });
   } catch (error) {
     console.error('Promote admin error:', error);
+    if (error.message.includes('Only room owner can promote')) {
+      return res.status(403).json({ error: error.message });
+    }
     res.status(400).json({ error: error.message });
   }
 });
@@ -153,32 +184,40 @@ router.delete('/:id/admins/:userId', requireAuth, async (req, res) => {
     res.json({ data: member });
   } catch (error) {
     console.error('Demote admin error:', error);
+    if (error.message.includes('Only room owner can demote')) {
+      return res.status(403).json({ error: error.message });
+    }
     res.status(400).json({ error: error.message });
   }
 });
 
-// Invite user to private room
+// Create invitation to private room
 router.post('/:id/invitations', requireAuth, async (req, res) => {
   try {
-    const { userId } = req.body;
-    if (!userId) return res.status(400).json({ error: 'User ID is required' });
-
-    const room = await roomQueries.findRoomById(req.params.id);
-    if (!room) return res.status(404).json({ error: 'Room not found' });
-
-    const member = await roomQueries.getRoomMember(req.params.id, req.user.id);
-    if (!member || (member.role !== 'owner' && member.role !== 'admin')) {
-      return res.status(403).json({ error: 'Only room admin or owner can invite' });
-    }
-
-    const existing = await roomQueries.getRoomMember(req.params.id, userId);
-    if (existing) return res.status(400).json({ error: 'User is already a room member' });
-
-    const newMember = await roomQueries.addRoomMember(req.params.id, userId, 'member');
-    res.status(201).json({ data: newMember });
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    const invitation = await roomsService.createInvitation(req.params.id, req.user.id, token, expiresAt);
+    res.status(201).json({ data: { token: invitation.token } });
   } catch (error) {
-    console.error('Invite user error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Create invitation error:', error);
+    if (error.message.includes('Only room owner or admin')) {
+      return res.status(403).json({ error: error.message });
+    }
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Accept invitation to join room
+router.post('/invitations/:token/accept', requireAuth, async (req, res) => {
+  try {
+    const member = await roomsService.acceptInvitation(req.params.token, req.user.id);
+    res.json({ data: member });
+  } catch (error) {
+    console.error('Accept invitation error:', error);
+    if (error.message.includes('You are banned')) {
+      return res.status(403).json({ error: error.message });
+    }
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -193,6 +232,40 @@ router.get('/:id/bans', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Get bans error:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get room messages (paginated)
+router.get('/:roomId/messages', requireAuth, async (req, res) => {
+  try {
+    const { before, limit = 50 } = req.query;
+    const messages = await messagesService.getMessageHistory(
+      req.params.roomId,
+      req.user.id,
+      before ? parseInt(before) : null,
+      parseInt(limit)
+    );
+    res.json({ data: messages });
+  } catch (error) {
+    console.error('Get messages error:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Send message
+router.post('/:roomId/messages', requireAuth, async (req, res) => {
+  try {
+    const { content, replyToId } = req.body;
+    const message = await messagesService.sendMessage(
+      parseInt(req.params.roomId),
+      req.user.id,
+      content,
+      replyToId ? parseInt(replyToId) : null
+    );
+    res.status(201).json({ data: message });
+  } catch (error) {
+    console.error('Send message error:', error);
+    res.status(400).json({ error: error.message });
   }
 });
 

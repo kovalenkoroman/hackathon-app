@@ -1,4 +1,5 @@
 import * as presenceService from './presence.js';
+import * as roomQueries from '../db/queries/rooms.js';
 import pool from '../db/index.js';
 
 export async function broadcastToRoom(roomId, event, exceptUserId = null) {
@@ -42,4 +43,21 @@ export async function broadcastPresenceToFriends(userId) {
   };
 
   await broadcastToFriends(userId, event);
+}
+
+export async function broadcastPresenceToRoomMembers(userId) {
+  const presence = presenceService.getPresence(userId);
+
+  const event = {
+    type: 'presence:update',
+    payload: {
+      userId,
+      status: presence.status,
+    },
+  };
+
+  const rooms = await roomQueries.getUserRooms(userId);
+  for (const room of rooms) {
+    await broadcastToRoom(room.id, event, userId);
+  }
 }

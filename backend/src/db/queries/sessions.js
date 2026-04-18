@@ -51,3 +51,15 @@ export async function deleteSessionByToken(token) {
 export async function deleteExpiredSessions() {
   await pool.query('DELETE FROM sessions WHERE expires_at <= NOW()');
 }
+
+export async function updateSessionLastSeen(sessionId) {
+  const result = await pool.query(
+    'UPDATE sessions SET last_seen = NOW() WHERE id = $1 RETURNING *',
+    [sessionId]
+  );
+  return result.rows[0];
+}
+
+export async function deleteAllSessionsByUserId(userId) {
+  await pool.query('DELETE FROM sessions WHERE user_id = $1', [userId]);
+}

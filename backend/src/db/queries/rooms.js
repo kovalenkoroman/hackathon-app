@@ -16,15 +16,18 @@ export async function findRoomById(roomId) {
 }
 
 export async function listPublicRooms(search = '', limit = 50, offset = 0) {
-  let query = 'SELECT * FROM rooms WHERE visibility = $1';
+  let query = `SELECT r.*, COUNT(rm.user_id)::int AS member_count
+               FROM rooms r
+               LEFT JOIN room_members rm ON r.id = rm.room_id
+               WHERE r.visibility = $1`;
   const params = ['public'];
 
   if (search) {
-    query += ' AND (name ILIKE $2 OR description ILIKE $2)';
+    query += ' AND (r.name ILIKE $2 OR r.description ILIKE $2)';
     params.push(`%${search}%`);
   }
 
-  query += ' ORDER BY created_at DESC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2);
+  query += ' GROUP BY r.id ORDER BY r.created_at DESC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2);
   params.push(limit, offset);
 
   const result = await pool.query(query, params);
@@ -150,4 +153,31 @@ export async function getUserRooms(userId) {
     [userId]
   );
   return result.rows;
+}
+
+export async function createInvitation(roomId, invitedBy, token, expiresAt) {
+  const result = await pool.query(
+    `INSERT INTO room_invitations (room_id, invited_by, token, expires_at)
+     VALUES ($1, $2, $3, $4)
+     RETURNING *`,
+    [roomId, invitedBy, token, expiresAt]
+  );
+  return result.rows[0];
+}
+
+export async function findInvitationByToken(token) {
+  const result = await pool.query(
+    `SELECT * FROM room_invitations
+     WHERE token = $1 AND expires_at > NOW() AND used_at IS NULL`,
+    [token]
+  );
+  return result.rows[0];
+}
+
+export async function markInvitationUsed(invitationId) {
+  const result = await pool.query(
+    `UPDATE room_invitations SET used_at = NOW() WHERE id = $1 RETURNING *`,
+    [invitationId]
+  );
+  return result.rows[0];
 }

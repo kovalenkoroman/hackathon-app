@@ -1,17 +1,23 @@
 import * as roomQueries from '../db/queries/rooms.js';
 import pool from '../db/index.js';
+import * as broadcast from '../ws/broadcast.js';
 
 export async function createRoom(name, description, visibility, ownerId) {
   if (!name || name.trim().length === 0) throw new Error('Room name is required');
   if (name.length > 255) throw new Error('Room name is too long');
   if (!['public', 'private'].includes(visibility)) throw new Error('Invalid visibility');
 
-  const room = await roomQueries.createRoom(name.trim(), description || null, visibility, ownerId);
+  try {
+    const room = await roomQueries.createRoom(name.trim(), description || null, visibility, ownerId);
 
-  // Add owner as admin member
-  await roomQueries.addRoomMember(room.id, ownerId, 'owner');
+    // Add owner as admin member
+    await roomQueries.addRoomMember(room.id, ownerId, 'owner');
 
-  return room;
+    return room;
+  } catch (error) {
+    if (error.code === '23505') throw new Error('Room name already taken');
+    throw error;
+  }
 }
 
 export async function deleteRoom(roomId, userId) {
@@ -55,7 +61,9 @@ export async function joinRoom(roomId, userId) {
   const existing = await roomQueries.getRoomMember(roomId, userId);
   if (existing) return existing;
 
-  return await roomQueries.addRoomMember(roomId, userId, 'member');
+  const member = await roomQueries.addRoomMember(roomId, userId, 'member');
+  await broadcast.broadcastToRoom(roomId, { type: 'room:joined', payload: { roomId, userId } });
+  return member;
 }
 
 export async function leaveRoom(roomId, userId) {
@@ -64,6 +72,7 @@ export async function leaveRoom(roomId, userId) {
   if (room.owner_id === userId) throw new Error('Room owner cannot leave');
 
   await roomQueries.removeRoomMember(roomId, userId);
+  await broadcast.broadcastToRoom(roomId, { type: 'room:left', payload: { roomId, userId } });
 }
 
 export async function promoteToAdmin(roomId, targetUserId, actorUserId) {
@@ -98,7 +107,9 @@ export async function banMember(roomId, targetUserId, actorUserId) {
     throw new Error('Only room admin or owner can ban members');
   }
 
-  return await roomQueries.banRoomMember(roomId, targetUserId, actorUserId);
+  const result = await roomQueries.banRoomMember(roomId, targetUserId, actorUserId);
+  await broadcast.broadcastToRoom(roomId, { type: 'room:member_banned', payload: { roomId, userId: targetUserId } });
+  return result;
 }
 
 export async function unbanMember(roomId, targetUserId, actorUserId) {
@@ -111,4 +122,35 @@ export async function unbanMember(roomId, targetUserId, actorUserId) {
   }
 
   await roomQueries.unbanRoomMember(roomId, targetUserId);
+}
+
+export async function createInvitation(roomId, userId, token, expiresAt) {
+  const room = await roomQueries.findRoomById(roomId);
+  if (!room) throw new Error('Room not found');
+
+  const member = await roomQueries.getRoomMember(roomId, userId);
+  if (!member || (member.role !== 'owner' && member.role !== 'admin')) {
+    throw new Error('Only room owner or admin can create invitations');
+  }
+
+  return await roomQueries.createInvitation(roomId, userId, token, expiresAt);
+}
+
+export async function acceptInvitation(token, userId) {
+  const invitation = await roomQueries.findInvitationByToken(token);
+  if (!invitation) throw new Error('Invalid or expired invitation');
+
+  const isBanned = await roomQueries.isRoomMemberBanned(invitation.room_id, userId);
+  if (isBanned) throw new Error('You are banned from this room');
+
+  const existing = await roomQueries.getRoomMember(invitation.room_id, userId);
+  if (existing) {
+    await roomQueries.markInvitationUsed(invitation.id);
+    return existing;
+  }
+
+  const member = await roomQueries.addRoomMember(invitation.room_id, userId, 'member');
+  await roomQueries.markInvitationUsed(invitation.id);
+  await broadcast.broadcastToRoom(invitation.room_id, { type: 'room:joined', payload: { roomId: invitation.room_id, userId } });
+  return member;
 }

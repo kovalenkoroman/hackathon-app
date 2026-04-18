@@ -1,11 +1,12 @@
 import * as messageQueries from '../db/queries/messages.js';
 import * as roomQueries from '../db/queries/rooms.js';
+import * as broadcast from '../ws/broadcast.js';
 
 export async function sendMessage(roomId, userId, content, replyToId = null) {
   if (!content || content.trim().length === 0) {
     throw new Error('Message content is required');
   }
-  if (content.length > 5000) {
+  if (Buffer.byteLength(content) > 3072) {
     throw new Error('Message is too long');
   }
 
@@ -23,14 +24,16 @@ export async function sendMessage(roomId, userId, content, replyToId = null) {
     if (!replyMsg) throw new Error('Reply message not found');
   }
 
-  return await messageQueries.createMessage(roomId, userId, content.trim(), replyToId);
+  const message = await messageQueries.createMessage(roomId, userId, content.trim(), replyToId);
+  await broadcast.broadcastToRoom(roomId, { type: 'message:new', payload: message });
+  return message;
 }
 
 export async function editMessage(messageId, userId, content) {
   if (!content || content.trim().length === 0) {
     throw new Error('Message content is required');
   }
-  if (content.length > 5000) {
+  if (Buffer.byteLength(content) > 3072) {
     throw new Error('Message is too long');
   }
 
@@ -42,7 +45,9 @@ export async function editMessage(messageId, userId, content) {
     throw new Error('You can only edit your own messages');
   }
 
-  return await messageQueries.updateMessage(messageId, content.trim());
+  const updated = await messageQueries.updateMessage(messageId, content.trim());
+  await broadcast.broadcastToRoom(message.room_id, { type: 'message:edit', payload: updated });
+  return updated;
 }
 
 export async function deleteMessage(messageId, userId) {
@@ -51,10 +56,16 @@ export async function deleteMessage(messageId, userId) {
   if (message.deleted) throw new Error('Message is already deleted');
 
   if (message.user_id !== userId) {
-    throw new Error('You can only delete your own messages');
+    // Allow admin/owner to delete other users' messages
+    const member = await roomQueries.getRoomMember(message.room_id, userId);
+    if (!member || (member.role !== 'admin' && member.role !== 'owner')) {
+      throw new Error('You can only delete your own messages');
+    }
   }
 
-  return await messageQueries.softDeleteMessage(messageId);
+  const deleted = await messageQueries.softDeleteMessage(messageId);
+  await broadcast.broadcastToRoom(message.room_id, { type: 'message:delete', payload: { id: messageId } });
+  return deleted;
 }
 
 export async function getMessageHistory(roomId, userId, beforeId = null, limit = 50) {

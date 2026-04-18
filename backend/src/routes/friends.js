@@ -22,12 +22,23 @@ router.post('/request', requireAuth, async (req, res) => {
 });
 
 // Accept friend request
-router.post('/:id/accept', requireAuth, async (req, res) => {
+router.post('/requests/:id/accept', requireAuth, async (req, res) => {
   try {
     const friendship = await friendsService.acceptRequest(parseInt(req.params.id), req.user.id);
     res.json({ data: friendship });
   } catch (error) {
     console.error('Accept request error:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Reject friend request
+router.post('/requests/:id/reject', requireAuth, async (req, res) => {
+  try {
+    await friendsService.removeFriend(parseInt(req.params.id), req.user.id);
+    res.status(204).send();
+  } catch (error) {
+    console.error('Reject request error:', error);
     res.status(400).json({ error: error.message });
   }
 });

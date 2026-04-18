@@ -1,0 +1,11 @@
+ALTER TABLE rooms ADD CONSTRAINT rooms_name_unique UNIQUE (name);
+
+CREATE TABLE room_invitations (
+  id SERIAL PRIMARY KEY,
+  room_id INTEGER NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+  invited_by INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token VARCHAR(64) UNIQUE NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  used_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);

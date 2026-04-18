@@ -1,0 +1,18 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - heading "Create Room" [level=2] [ref=e5]
+    - generic [ref=e6]:
+      - textbox "Room name" [ref=e7]
+      - textbox "Description (optional)" [ref=e8]
+      - combobox [ref=e9]:
+        - option "Public" [selected]
+        - option "Private"
+      - button "Create" [ref=e10] [cursor=pointer]
+  - generic [ref=e11]:
+    - heading "Public Rooms" [level=2] [ref=e12]
+    - textbox "Search rooms..." [ref=e13]
+    - generic [ref=e15]:
+      - heading "Test Room" [level=3] [ref=e16]
+      - paragraph [ref=e17]: A test room
+      - paragraph [ref=e18]: "Members: 0"
+      - button "Join" [active] [ref=e19] [cursor=pointer]

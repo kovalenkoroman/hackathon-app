@@ -1,12 +1,19 @@
 import bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 import * as userQueries from '../db/queries/users.js';
 import * as sessionQueries from '../db/queries/sessions.js';
+import * as passwordResetQueries from '../db/queries/password_reset.js';
 import pool from '../db/index.js';
 
 const BCRYPT_COST = 12;
 
 export async function register(email, username, password) {
+  email = email.toLowerCase();
+
+  if (!/^[a-zA-Z0-9_]{3,30}$/.test(username)) {
+    throw new Error('Username must be 3-30 characters and contain only alphanumeric characters and underscores');
+  }
+
   const existingEmail = await userQueries.findUserByEmail(email);
   if (existingEmail) throw new Error('Email already in use');
 
@@ -22,13 +29,15 @@ export async function register(email, username, password) {
 }
 
 export async function login(email, password, ip, userAgent) {
+  email = email.toLowerCase();
+
   const user = await userQueries.findUserByEmail(email);
-  if (!user) throw new Error('Invalid email or password');
+  if (!user) throw new Error('Invalid credentials');
 
   const passwordValid = await bcrypt.compare(password, user.password_hash);
-  if (!passwordValid) throw new Error('Invalid email or password');
+  if (!passwordValid) throw new Error('Invalid credentials');
 
-  const token = uuidv4();
+  const token = crypto.randomBytes(32).toString('hex');
   const session = await sessionQueries.createSession(user.id, token, ip, userAgent);
 
   return {
@@ -86,4 +95,42 @@ export async function deleteAccount(userId) {
   } finally {
     client.release();
   }
+}
+
+export async function logoutAll(userId) {
+  await sessionQueries.deleteAllSessionsByUserId(userId);
+}
+
+export async function requestPasswordReset(email) {
+  email = email.toLowerCase();
+  const user = await userQueries.findUserByEmail(email);
+  if (!user) throw new Error('User not found');
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 1);
+
+  const resetToken = await passwordResetQueries.createResetToken(user.id, token, expiresAt);
+  return { token: resetToken.token };
+}
+
+export async function confirmPasswordReset(token, newPassword) {
+  const resetToken = await passwordResetQueries.findResetToken(token);
+  if (!resetToken) throw new Error('Invalid or expired reset token');
+
+  if (newPassword.length < 6) throw new Error('Password must be at least 6 characters');
+
+  const passwordHash = await bcrypt.hash(newPassword, BCRYPT_COST);
+  await userQueries.updateUserPassword(resetToken.user_id, passwordHash);
+  await passwordResetQueries.markResetTokenUsed(resetToken.id);
+}
+
+export async function updateUser(userId, fields) {
+  const user = await userQueries.findUserById(userId);
+  if (!user) throw new Error('User not found');
+
+  const updated = await userQueries.updateUser(userId, fields);
+  if (!updated) throw new Error('No fields to update');
+
+  return { id: updated.id, email: updated.email, username: updated.username };
 }

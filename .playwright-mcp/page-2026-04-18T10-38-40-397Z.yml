@@ -1,0 +1,22 @@
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - heading "Test Room" [level=1] [ref=e6]
+    - paragraph [ref=e7]: 2 members
+  - generic [ref=e8]:
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]: testuser
+        - generic [ref=e12]: 12:37:55
+      - paragraph [ref=e13]: Hello from the API!
+      - generic [ref=e14]:
+        - button "Reply" [ref=e15] [cursor=pointer]
+        - button "Delete" [ref=e16] [cursor=pointer]
+    - generic [ref=e21]:
+      - generic [ref=e23]: 12:38:38
+      - paragraph [ref=e24]: This is a test message from the browser!
+      - generic [ref=e25]:
+        - button "Reply" [ref=e26] [cursor=pointer]
+        - button "Delete" [ref=e27] [cursor=pointer]
+  - generic [ref=e18]:
+    - textbox "Type a message..." [ref=e19]
+    - button "Send" [active] [ref=e20] [cursor=pointer]

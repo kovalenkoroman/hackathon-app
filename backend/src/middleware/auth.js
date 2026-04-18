@@ -1,4 +1,5 @@
 import * as authService from '../services/auth.js';
+import * as sessionQueries from '../db/queries/sessions.js';
 
 export async function authMiddleware(req, res, next) {
   const token = req.cookies.sessionToken;
@@ -14,6 +15,9 @@ export async function authMiddleware(req, res, next) {
 
   req.user = result.user;
   req.session = result.session;
+
+  sessionQueries.updateSessionLastSeen(result.session.id).catch(() => {});
+
   next();
 }
 

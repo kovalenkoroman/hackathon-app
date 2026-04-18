@@ -1,0 +1,8 @@
+- generic [ref=e35]:
+  - generic [ref=e36]:
+    - heading "Priority 3 Test Room" [level=1] [ref=e37]
+    - paragraph [ref=e38]: 1 members
+  - paragraph [ref=e40]: No messages yet. Start the conversation!
+  - generic [ref=e42]:
+    - textbox "Type a message..." [ref=e43]
+    - button "Send" [ref=e44] [cursor=pointer]

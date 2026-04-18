@@ -1,0 +1,29 @@
+- generic [ref=e3]:
+  - heading "Active Sessions" [level=1] [ref=e4]
+  - paragraph [ref=e5]: You have 2 active session(s)
+  - table [ref=e6]:
+    - rowgroup [ref=e7]:
+      - row "IP Address User Agent Created Last Seen Action" [ref=e8]:
+        - columnheader "IP Address" [ref=e9]
+        - columnheader "User Agent" [ref=e10]
+        - columnheader "Created" [ref=e11]
+        - columnheader "Last Seen" [ref=e12]
+        - columnheader "Action" [ref=e13]
+    - rowgroup [ref=e14]:
+      - row "::ffff:172.19.0.4 Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap... 18/04/2026 18/04/2026, 13:38:11 Revoke" [ref=e15]:
+        - cell "::ffff:172.19.0.4" [ref=e16]
+        - cell "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap..." [ref=e17]
+        - cell "18/04/2026" [ref=e18]
+        - cell "18/04/2026, 13:38:11" [ref=e19]
+        - cell "Revoke" [ref=e20]:
+          - button "Revoke" [ref=e21] [cursor=pointer]
+      - row "::ffff:172.19.0.4 Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap... 18/04/2026 18/04/2026, 13:37:19 Revoke" [ref=e22]:
+        - cell "::ffff:172.19.0.4" [ref=e23]
+        - cell "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap..." [ref=e24]
+        - cell "18/04/2026" [ref=e25]
+        - cell "18/04/2026, 13:37:19" [ref=e26]
+        - cell "Revoke" [ref=e27]:
+          - button "Revoke" [ref=e28] [cursor=pointer]
+  - button "Logout All Sessions" [ref=e30] [cursor=pointer]
+  - link "← Back to home" [ref=e32] [cursor=pointer]:
+    - /url: /

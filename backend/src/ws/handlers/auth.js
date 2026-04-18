@@ -26,9 +26,9 @@ export async function handleAuth(ws, data, tabId) {
 
     ws.send(JSON.stringify({ type: 'auth:ok', payload: { user: result.user } }));
 
-    // Notify friends of user coming online
-    const presenceChange = presenceService.getPresence(userId);
+    // Notify friends and room members of user coming online
     await broadcast.broadcastPresenceToFriends(userId);
+    await broadcast.broadcastPresenceToRoomMembers(userId);
   } catch (error) {
     console.error('Auth error:', error);
     ws.send(JSON.stringify({ type: 'auth:error', payload: { error: error.message } }));
@@ -36,8 +36,8 @@ export async function handleAuth(ws, data, tabId) {
   }
 }
 
-export function handlePing(ws) {
+export async function handlePing(ws) {
   if (ws.userId && ws.tabId) {
-    presenceService.updatePing(ws.userId, ws.tabId);
+    await presenceService.updatePing(ws.userId, ws.tabId);
   }
 }
