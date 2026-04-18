@@ -1,5 +1,6 @@
 import * as messageQueries from '../db/queries/messages.js';
 import * as roomQueries from '../db/queries/rooms.js';
+import * as unreadQueries from '../db/queries/unread.js';
 import * as broadcast from '../ws/broadcast.js';
 
 export async function sendMessage(roomId, userId, content, replyToId = null) {
@@ -76,4 +77,28 @@ export async function getMessageHistory(roomId, userId, beforeId = null, limit =
   if (!member) throw new Error('You are not a room member');
 
   return await messageQueries.getMessagesByRoom(roomId, beforeId, limit);
+}
+
+export async function getUnreadCounts(userId) {
+  return await unreadQueries.getUnreadCountsForUser(userId);
+}
+
+export async function markRoomAsRead(roomId, userId, lastMessageId) {
+  const room = await roomQueries.findRoomById(roomId);
+  if (!room) throw new Error('Room not found');
+
+  const member = await roomQueries.getRoomMember(roomId, userId);
+  if (!member) throw new Error('You are not a room member');
+
+  await unreadQueries.markRoomAsRead(userId, roomId, lastMessageId);
+
+  const counts = await unreadQueries.getUnreadCountsForUser(userId);
+  await broadcast.broadcastToUser(userId, { type: 'unread:update', payload: counts });
+}
+
+export async function markDialogAsRead(dialogId, userId, lastMessageId) {
+  await unreadQueries.markDialogAsRead(userId, dialogId, lastMessageId);
+
+  const counts = await unreadQueries.getUnreadCountsForUser(userId);
+  await broadcast.broadcastToUser(userId, { type: 'unread:update', payload: counts });
 }

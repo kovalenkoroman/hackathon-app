@@ -5,16 +5,19 @@ import ManageRoomModal from './ManageRoomModal';
 import { RoomContext } from '../RoomContext';
 import * as roomsApi from '../api/rooms';
 import * as friendsApi from '../api/friends';
+import { useUnreads } from '../hooks/useUnreads';
 import styles from './MainLayout.module.css';
 
 export default function MainLayout({ user, onLogout, wsState, presence, children }) {
   const navigate = useNavigate();
   const { roomInfo, roomMembers, setRoomInfo, setRoomMembers } = useContext(RoomContext);
+  const { getUnreadCount } = useUnreads();
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [publicRooms, setPublicRooms] = useState([]);
   const [privateRooms, setPrivateRooms] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [contactPresence, setContactPresence] = useState({});
   const [loading, setLoading] = useState(true);
   const [showManageModal, setShowManageModal] = useState(false);
 
@@ -130,16 +133,24 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                     {loading ? (
                       <div style={{ fontSize: '0.8rem', color: '#999', padding: '0.5rem' }}>Loading...</div>
                     ) : publicRooms.length > 0 ? (
-                      publicRooms.map((room) => (
-                        <div
-                          key={room.id}
-                          onClick={() => handleRoomClick(room.id)}
-                          className={styles.roomItem}
-                          title={room.name}
-                        >
-                          {room.name}
-                        </div>
-                      ))
+                      publicRooms.map((room) => {
+                        const unreadCount = getUnreadCount(room.id, 'room');
+                        return (
+                          <div
+                            key={room.id}
+                            onClick={() => handleRoomClick(room.id)}
+                            className={styles.roomItem}
+                            title={room.name}
+                          >
+                            {room.name}
+                            {unreadCount > 0 && (
+                              <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: '#ff4444', color: 'white', borderRadius: '10px', padding: '0.1rem 0.4rem' }}>
+                                {unreadCount}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })
                     ) : (
                       <div style={{ fontSize: '0.8rem', color: '#999', padding: '0.5rem' }}>No public rooms</div>
                     )}
@@ -147,16 +158,24 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                   <div className={styles.categoryHeader}>▼ Private Rooms</div>
                   <div className={styles.roomList}>
                     {privateRooms.length > 0 ? (
-                      privateRooms.map((room) => (
-                        <div
-                          key={room.id}
-                          onClick={() => handleRoomClick(room.id)}
-                          className={styles.roomItem}
-                          title={room.name}
-                        >
-                          {room.name}
-                        </div>
-                      ))
+                      privateRooms.map((room) => {
+                        const unreadCount = getUnreadCount(room.id, 'room');
+                        return (
+                          <div
+                            key={room.id}
+                            onClick={() => handleRoomClick(room.id)}
+                            className={styles.roomItem}
+                            title={room.name}
+                          >
+                            {room.name}
+                            {unreadCount > 0 && (
+                              <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: '#ff4444', color: 'white', borderRadius: '10px', padding: '0.1rem 0.4rem' }}>
+                                {unreadCount}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })
                     ) : (
                       <div style={{ fontSize: '0.8rem', color: '#999', padding: '0.5rem' }}>No private rooms</div>
                     )}
@@ -169,16 +188,27 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                 <h3 className={styles.sectionTitle}>CONTACTS</h3>
                 <div className={styles.contactList} id="contact-list">
                   {contacts.length > 0 ? (
-                    contacts.map((contact) => (
-                      <div
-                        key={contact.friend_id}
-                        onClick={() => navigate(`/dm/${contact.friend_id}`)}
-                        className={styles.contactItem}
-                        title={contact.username}
-                      >
-                        {contact.username}
-                      </div>
-                    ))
+                    contacts.map((contact) => {
+                      const contactId = contact.friend_id || contact.id;
+                      const contactStatus = presence[contactId] || 'offline';
+                      const unreadCount = getUnreadCount(contactId, 'dialog');
+                      return (
+                        <div
+                          key={contactId}
+                          onClick={() => navigate(`/dm/${contactId}`)}
+                          className={styles.contactItem}
+                          title={contact.username}
+                        >
+                          <span style={{ marginRight: '0.5rem' }}>{getPresenceIcon(contactStatus)}</span>
+                          {contact.username}
+                          {unreadCount > 0 && (
+                            <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: '#ff4444', color: 'white', borderRadius: '10px', padding: '0.1rem 0.4rem' }}>
+                              {unreadCount}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })
                   ) : (
                     <div style={{ fontSize: '0.8rem', color: '#999', padding: '0.5rem' }}>No contacts</div>
                   )}

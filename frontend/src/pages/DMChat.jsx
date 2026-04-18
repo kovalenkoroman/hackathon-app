@@ -1,12 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import wsClient from '../ws/client';
+import { useUnreads } from '../hooks/useUnreads';
 import styles from './DMChat.module.css';
 
 export default function DMChat({ user }) {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const { markDialogAsRead } = useUnreads();
   const [messages, setMessages] = useState([]);
   const [otherUser, setOtherUser] = useState(null);
+  const [dialogId, setDialogId] = useState(null);
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -24,6 +28,46 @@ export default function DMChat({ user }) {
     scrollToBottom();
   }, [messages]);
 
+  // Mark dialog as read when messages load
+  useEffect(() => {
+    if (messages.length > 0 && dialogId) {
+      const lastMessage = messages[messages.length - 1];
+      markDialogAsRead(dialogId, lastMessage.id);
+    }
+  }, [messages, dialogId, markDialogAsRead]);
+
+  useEffect(() => {
+    const handleMessageNew = (payload) => {
+      // Only add if this message is for our dialog (identified by participants)
+      if ((payload.room_id === null || payload.room_id === undefined)) {
+        // This is likely a DM, add it
+        setMessages(prev => [...prev, payload]);
+      }
+    };
+
+    const handleMessageEdit = (payload) => {
+      setMessages(prev =>
+        prev.map(m => m.id === payload.id ? payload : m)
+      );
+    };
+
+    const handleMessageDelete = (payload) => {
+      setMessages(prev =>
+        prev.filter(m => m.id !== payload.id)
+      );
+    };
+
+    wsClient.on('message:new', handleMessageNew);
+    wsClient.on('message:edit', handleMessageEdit);
+    wsClient.on('message:delete', handleMessageDelete);
+
+    return () => {
+      wsClient.off('message:new', handleMessageNew);
+      wsClient.off('message:edit', handleMessageEdit);
+      wsClient.off('message:delete', handleMessageDelete);
+    };
+  }, [userId]);
+
   const loadMessages = async () => {
     try {
       setLoading(true);
@@ -36,6 +80,13 @@ export default function DMChat({ user }) {
 
       // Determine the actual user ID for the dialog
       const actualUserId = friend?.friend_id || friend?.id || userId;
+
+      // Get dialog ID
+      const dialogRes = await fetch(`/api/v1/friends/dialogs/${actualUserId}`, { credentials: 'include' });
+      const dialogData = await dialogRes.json();
+      if (dialogRes.ok) {
+        setDialogId(dialogData.data.dialogId);
+      }
 
       // Get messages
       const msgRes = await fetch(`/api/v1/friends/dialogs/${actualUserId}/messages`);

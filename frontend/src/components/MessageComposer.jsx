@@ -53,6 +53,22 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, disable
     fileInputRef.current?.click();
   };
 
+  const handlePaste = (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let item of items) {
+      if (item.kind === 'file') {
+        const file = item.getAsFile();
+        if (file) {
+          setSelectedFile(file);
+          e.preventDefault();
+          break;
+        }
+      }
+    }
+  };
+
   const clearFile = () => {
     setSelectedFile(null);
     if (fileInputRef.current) {
@@ -147,6 +163,7 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, disable
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
           placeholder="message input"
           className={styles.input}
           disabled={disabled}
@@ -169,6 +186,7 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, disable
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
             placeholder="Type your message... (Ctrl+Enter to send)"
             className={styles.textarea}
             disabled={disabled}

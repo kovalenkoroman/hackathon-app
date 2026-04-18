@@ -98,6 +98,17 @@ router.delete('/users/:userId/ban', requireAuth, async (req, res) => {
   }
 });
 
+// Get dialog ID for user pair
+router.get('/dialogs/:userId', requireAuth, async (req, res) => {
+  try {
+    const dialog = await friendQueries.getOrCreateDialog(req.user.id, parseInt(req.params.userId));
+    res.json({ data: { dialogId: dialog.id } });
+  } catch (error) {
+    console.error('Get dialog error:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // Get DM history with user
 router.get('/dialogs/:userId/messages', requireAuth, async (req, res) => {
   try {

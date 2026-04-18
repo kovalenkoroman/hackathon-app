@@ -82,6 +82,27 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
 
               <div className={styles.content}>{msg.content}</div>
 
+              {msg.attachments && msg.attachments.length > 0 && (
+                <div className={styles.attachments}>
+                  {msg.attachments.map((att) => {
+                    const isImage = att.mime_type?.startsWith('image/');
+                    return (
+                      <div key={att.id} className={styles.attachment}>
+                        {isImage ? (
+                          <a href={`/api/v1/files/${att.id}`} target="_blank" rel="noopener noreferrer">
+                            <img src={`/api/v1/files/${att.id}`} alt={att.original_name} className={styles.thumbnail} />
+                          </a>
+                        ) : (
+                          <a href={`/api/v1/files/${att.id}`} download={att.original_name} className={styles.fileLink}>
+                            📄 {att.original_name} ({Math.round(att.size / 1024)} KB)
+                          </a>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
               <div className={styles.actions}>
                 <button
                   onClick={() => onReply?.(msg)}

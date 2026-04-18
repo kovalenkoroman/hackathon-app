@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { RoomContext } from '../RoomContext';
 import * as messagesApi from '../api/messages';
 import * as roomsApi from '../api/rooms';
+import wsClient from '../ws/client';
+import { useUnreads } from '../hooks/useUnreads';
 import MessageList from '../components/MessageList';
 import MessageComposer from '../components/MessageComposer';
 import RoomPanel from '../components/RoomPanel';
@@ -11,6 +13,7 @@ import styles from './RoomChat.module.css';
 export default function RoomChat({ user }) {
   const { roomId } = useParams();
   const { roomInfo, setRoomInfo, setRoomMembers } = useContext(RoomContext);
+  const { markRoomAsRead } = useUnreads();
   const [room, setRoom] = useState(null);
   const [members, setMembers] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -28,6 +31,68 @@ export default function RoomChat({ user }) {
       setMembers(roomInfo.members || []);
     }
   }, [roomInfo, roomId]);
+
+  // Mark room as read when messages load
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      markRoomAsRead(parseInt(roomId), lastMessage.id);
+    }
+  }, [messages, roomId, markRoomAsRead]);
+
+  useEffect(() => {
+    const handleMessageNew = (payload) => {
+      setMessages(prev => [...prev, payload]);
+    };
+
+    const handleMessageEdit = (payload) => {
+      setMessages(prev =>
+        prev.map(m => m.id === payload.id ? payload : m)
+      );
+    };
+
+    const handleMessageDelete = (payload) => {
+      setMessages(prev =>
+        prev.filter(m => m.id !== payload.id)
+      );
+    };
+
+    const handleRoomJoined = (payload) => {
+      if (parseInt(payload.roomId) === parseInt(roomId)) {
+        loadRoomAndMessages();
+      }
+    };
+
+    const handleRoomLeft = (payload) => {
+      if (parseInt(payload.roomId) === parseInt(roomId)) {
+        loadRoomAndMessages();
+      }
+    };
+
+    const handleRoomMemberBanned = (payload) => {
+      if (parseInt(payload.roomId) === parseInt(roomId)) {
+        setMembers(prev =>
+          prev.filter(m => m.user_id !== payload.userId)
+        );
+      }
+    };
+
+    wsClient.on('message:new', handleMessageNew);
+    wsClient.on('message:edit', handleMessageEdit);
+    wsClient.on('message:delete', handleMessageDelete);
+    wsClient.on('room:joined', handleRoomJoined);
+    wsClient.on('room:left', handleRoomLeft);
+    wsClient.on('room:member_banned', handleRoomMemberBanned);
+
+    return () => {
+      wsClient.off('message:new', handleMessageNew);
+      wsClient.off('message:edit', handleMessageEdit);
+      wsClient.off('message:delete', handleMessageDelete);
+      wsClient.off('room:joined', handleRoomJoined);
+      wsClient.off('room:left', handleRoomLeft);
+      wsClient.off('room:member_banned', handleRoomMemberBanned);
+    };
+  }, [roomId]);
 
   const loadRoomAndMessages = async () => {
     setLoading(true);
