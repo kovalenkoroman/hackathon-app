@@ -208,9 +208,6 @@ export default function RoomChat({ user }) {
   if (loading) return <div className={styles.container}><p>Loading...</p></div>;
   if (!room) return <div className={styles.container}><p>Room not found</p></div>;
 
-  // Reverse messages to show newer ones first
-  const reversedMessages = [...messages].reverse();
-
   return (
     <div className={styles.container}>
       {/* Room Header */}
@@ -222,7 +219,7 @@ export default function RoomChat({ user }) {
       {error && <div className={styles.error}>{error}</div>}
 
       <MessageList
-        messages={reversedMessages}
+        messages={messages}
         loading={false}
         onLoadMore={handleLoadMore}
         onReply={setReplyingTo}
