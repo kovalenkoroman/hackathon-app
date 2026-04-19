@@ -454,7 +454,7 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
                   onClick={handleSendInvite}
                   className={styles.primaryBtn}
                   disabled={loading || !inviteUsername.trim()}
-                  style={{ whiteSpace: 'nowrap' }}
+                  style={{ whiteSpace: 'nowrap', padding: '0.5rem 1rem' }}
                 >
                   {loading ? 'Sending...' : 'Send invite'}
                 </button>
