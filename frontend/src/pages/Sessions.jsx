@@ -71,7 +71,7 @@ export default function Sessions() {
   if (loading) return <div style={{ padding: '2rem' }}>Loading sessions...</div>;
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ padding: '2rem' }}>
       <h1>Account Settings</h1>
 
       <div style={{ marginBottom: '2rem', paddingBottom: '1.5rem', borderBottom: '1px solid #ddd' }}>

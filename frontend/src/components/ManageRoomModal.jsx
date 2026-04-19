@@ -117,7 +117,9 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
         headers: { 'Content-Type': 'application/json' }
       });
       if (res.ok) {
-        setBannedUsers(bannedUsers.filter(u => u.id !== userId));
+        setError('');
+        setBannedUsers(bannedUsers.filter(u => u.user_id !== userId));
+        await onMembersChanged();
       } else {
         const data = await res.json();
         setError(data.error || 'Failed to unban member');
@@ -364,7 +366,7 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
           {/* Admins Tab */}
           {tab === 'admins' && (
             <div>
-              <h3>Admins ({admins.length})</h3>
+              <h3>Admins</h3>
               {admins.length === 0 ? (
                 <p className={styles.emptyState}>No admins yet</p>
               ) : (
@@ -392,30 +394,40 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
           {/* Banned Users Tab */}
           {tab === 'banned' && (
             <div>
-              <h3>Banned Users ({bannedUsers.length})</h3>
+              <h3>Banned Users</h3>
               {loading && <p>Loading...</p>}
               {bannedUsers.length === 0 ? (
                 <p className={styles.emptyState}>No banned users</p>
               ) : (
-                bannedUsers.map(ban => (
-                  <div key={ban.user_id} className={styles.memberRow}>
-                    <span className={styles.memberName}>{ban.username}</span>
-                    <span style={{ fontSize: '0.8rem', color: '#999' }}>
-                      {new Date(ban.created_at).toLocaleDateString()}
-                    </span>
-                    <div className={styles.buttonGroup}>
-                      {canManage && (
-                        <button
-                          onClick={() => handleUnban(ban.user_id)}
-                          className={styles.actionBtn}
-                          disabled={loading}
-                        >
-                          Unban
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))
+                <div className={styles.membersTable}>
+                  {/* Table Header */}
+                  <div className={styles.tableHeader}>Username</div>
+                  <div className={styles.tableHeader}>Banned by</div>
+                  <div className={styles.tableHeader}>Date/Time</div>
+                  <div className={styles.tableHeader}>Actions</div>
+
+                  {/* Table Rows */}
+                  {bannedUsers.map(ban => (
+                    <React.Fragment key={ban.user_id}>
+                      <div className={styles.memberName}>{ban.username}</div>
+                      <div>{ban.banned_by_username || 'Unknown'}</div>
+                      <div style={{ fontSize: '0.85rem', color: '#666' }}>
+                        {new Date(ban.created_at).toLocaleString()}
+                      </div>
+                      <div className={styles.buttonGroup}>
+                        {canManage && (
+                          <button
+                            onClick={() => handleUnban(ban.user_id)}
+                            className={styles.actionBtn}
+                            disabled={loading}
+                          >
+                            Unban
+                          </button>
+                        )}
+                      </div>
+                    </React.Fragment>
+                  ))}
+                </div>
               )}
             </div>
           )}

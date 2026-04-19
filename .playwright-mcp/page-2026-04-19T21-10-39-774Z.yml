@@ -1,0 +1,50 @@
+- generic [ref=e56]:
+  - navigation [ref=e57]:
+    - generic [ref=e58]:
+      - img "Hackathon Chat" [ref=e59]
+      - text: Hackathon Chat
+    - generic [ref=e60]:
+      - link "Public Rooms" [ref=e61] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e62] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e63] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e64] [cursor=pointer]:
+        - /url: /sessions
+    - generic [ref=e65]:
+      - button "roman ▼" [ref=e67] [cursor=pointer]
+      - button "Sign out" [ref=e68] [cursor=pointer]
+  - generic [ref=e69]:
+    - complementary [ref=e70]:
+      - generic [ref=e71]:
+        - textbox "Search" [ref=e73]
+        - generic [ref=e74]:
+          - heading "ROOMS" [level=3] [ref=e75]
+          - generic [ref=e76]:
+            - generic [ref=e77] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e79] [cursor=pointer]: No public rooms
+            - generic [ref=e80] [cursor=pointer]: ▼ Private Rooms
+            - generic [ref=e82] [cursor=pointer]: No private rooms
+        - generic [ref=e83]:
+          - heading "CONTACTS" [level=3] [ref=e84]
+          - generic [ref=e86] [cursor=pointer]: No contacts
+        - button "[Create room]" [ref=e87] [cursor=pointer]
+      - button "◀" [ref=e88] [cursor=pointer]
+    - main [ref=e89]:
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - heading "Public Rooms" [level=2] [ref=e92]
+          - textbox "Search rooms..." [ref=e93]
+          - paragraph [ref=e94]: No rooms found
+        - generic [ref=e96]:
+          - heading "Create Room" [level=2] [ref=e97]
+          - generic [ref=e98]:
+            - textbox "Room name" [ref=e100]
+            - textbox "Description (optional)" [ref=e102]
+            - combobox [ref=e104]:
+              - option "Public" [selected]
+              - option "Private"
+            - generic [ref=e105]:
+              - button "Cancel" [ref=e106] [cursor=pointer]
+              - button "Create" [ref=e107] [cursor=pointer]

@@ -1,0 +1,37 @@
+- generic [ref=e70]:
+  - navigation [ref=e71]:
+    - generic [ref=e72]:
+      - img "Hackathon Chat" [ref=e73]
+      - text: Hackathon Chat
+    - generic [ref=e74]:
+      - link "Public Rooms" [ref=e75] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e76] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e77] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e78] [cursor=pointer]:
+        - /url: /sessions
+    - generic [ref=e79]:
+      - button "testuser2 ▼" [ref=e81] [cursor=pointer]
+      - button "Sign out" [ref=e82] [cursor=pointer]
+  - generic [ref=e83]:
+    - complementary [ref=e84]:
+      - generic [ref=e85]:
+        - textbox "Search" [ref=e87]
+        - generic [ref=e88]:
+          - heading "ROOMS" [level=3] [ref=e89]
+          - generic [ref=e90]:
+            - generic [ref=e91] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e93] [cursor=pointer]: No public rooms
+            - generic [ref=e94] [cursor=pointer]: ▼ Private Rooms
+            - generic [ref=e96] [cursor=pointer]: No private rooms
+        - generic [ref=e97]:
+          - heading "CONTACTS" [level=3] [ref=e98]
+          - generic [ref=e100] [cursor=pointer]: No contacts
+        - button "Create room" [ref=e101] [cursor=pointer]
+      - button "◀" [ref=e102] [cursor=pointer]
+    - main [ref=e103]:
+      - generic [ref=e104]:
+        - heading "Welcome to Chat!" [level=1] [ref=e105]
+        - paragraph [ref=e106]: Select a room from the sidebar or browse public rooms to get started.

@@ -1,0 +1,12 @@
+- generic [ref=e42]:
+  - navigation [ref=e43]:
+    - generic [ref=e44]:
+      - link "Sign In" [ref=e45] [cursor=pointer]:
+        - /url: /login-form
+      - link "Register" [ref=e46] [cursor=pointer]:
+        - /url: /register
+  - main [ref=e47]:
+    - generic [ref=e48]:
+      - img "Hackathon Chat" [ref=e49]
+      - heading "Welcome to Hackathon Chat" [level=1] [ref=e50]
+      - paragraph [ref=e51]: Connect, collaborate, and chat in real-time

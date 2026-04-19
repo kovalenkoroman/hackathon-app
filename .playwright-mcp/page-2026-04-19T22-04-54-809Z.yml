@@ -1,0 +1,74 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]:
+      - img "Hackathon Chat" [ref=e6]
+      - text: Hackathon Chat
+    - generic [ref=e7]:
+      - link "Public Rooms" [ref=e8] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e9] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e10] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e11] [cursor=pointer]:
+        - /url: /sessions
+    - generic [ref=e12]:
+      - button "alice ▼" [ref=e14] [cursor=pointer]
+      - button "Sign out" [ref=e15] [cursor=pointer]
+  - generic [ref=e16]:
+    - complementary [ref=e17]:
+      - generic [ref=e18]:
+        - textbox "Search" [ref=e20]
+        - generic [ref=e21]:
+          - heading "ROOMS" [level=3] [ref=e22]
+          - generic [ref=e23]:
+            - generic [ref=e24] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e25]:
+              - generic "General Chat" [ref=e26] [cursor=pointer]
+              - generic "Tech Discussion" [ref=e27] [cursor=pointer]
+              - generic "Random" [ref=e28] [cursor=pointer]
+              - generic "Project Updates" [ref=e29] [cursor=pointer]
+            - generic [ref=e30] [cursor=pointer]: ▼ Private Rooms
+            - generic [ref=e31]:
+              - generic "Design Team" [ref=e32] [cursor=pointer]
+              - generic "Book Club" [ref=e33] [cursor=pointer]
+        - generic [ref=e34]:
+          - heading "CONTACTS" [level=3] [ref=e35]
+          - generic [ref=e36]:
+            - generic "bob" [ref=e37] [cursor=pointer]: ○bob
+            - generic "diana" [ref=e38] [cursor=pointer]: ○diana
+        - button "Create room" [ref=e39] [cursor=pointer]
+      - button "◀" [ref=e40] [cursor=pointer]
+    - main [ref=e41]:
+      - generic [ref=e43]:
+        - heading "Public Rooms" [level=2] [ref=e44]
+        - textbox "Search rooms..." [ref=e45]
+        - generic [ref=e46]:
+          - generic [ref=e47] [cursor=pointer]:
+            - heading "General Chat" [level=3] [ref=e48]
+            - paragraph [ref=e49]: General discussion room for everyone
+            - paragraph [ref=e50]: "Members: 5"
+            - generic [ref=e51]:
+              - button "Enter" [ref=e52]
+              - button "Leave" [ref=e53]
+          - generic [ref=e54] [cursor=pointer]:
+            - heading "Tech Discussion" [level=3] [ref=e55]
+            - paragraph [ref=e56]: Share technology tips and ask questions
+            - paragraph [ref=e57]: "Members: 4"
+            - generic [ref=e58]:
+              - button "Enter" [ref=e59]
+              - button "Leave" [ref=e60]
+          - generic [ref=e61] [cursor=pointer]:
+            - heading "Random" [level=3] [ref=e62]
+            - paragraph [ref=e63]: Off-topic chat and fun content
+            - paragraph [ref=e64]: "Members: 4"
+            - generic [ref=e65]:
+              - button "Enter" [ref=e66]
+              - button "Leave" [ref=e67]
+          - generic [ref=e68] [cursor=pointer]:
+            - heading "Project Updates" [level=3] [ref=e69]
+            - paragraph [ref=e70]: Share project progress and updates
+            - paragraph [ref=e71]: "Members: 5"
+            - generic [ref=e72]:
+              - button "Enter" [ref=e73]
+              - button "Leave" [ref=e74]

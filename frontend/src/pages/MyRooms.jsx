@@ -30,45 +30,24 @@ export default function MyRooms() {
 
   return (
     <div className={styles.container}>
-      <h1>My Private Rooms</h1>
+      <div className={styles.catalogPanel}>
+        <h2>Private Rooms</h2>
 
-      {error && <div className={styles.error}>{error}</div>}
+        {error && <p className={styles.error}>{error}</p>}
+        {loading && <p>Loading...</p>}
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : rooms.length === 0 ? (
-        <p className={styles.empty}>
-          You don't have any private rooms yet.{' '}
-          <a href="/catalog" className={styles.link}>Create one</a>
-        </p>
-      ) : (
         <div className={styles.roomsList}>
           {rooms.map((room) => (
-            <div key={room.id} className={styles.roomCard}>
-              <div className={styles.roomInfo}>
-                <h2 className={styles.roomName}>{room.name}</h2>
-                {room.description && (
-                  <p className={styles.roomDesc}>{room.description}</p>
-                )}
-                <div className={styles.roomMeta}>
-                  <span className={styles.memberCount}>
-                    {room.member_count || 0} member{(room.member_count || 0) !== 1 ? 's' : ''}
-                  </span>
-                </div>
-              </div>
-              <button
-                className={styles.enterBtn}
-                onClick={() => navigate(`/rooms/${room.id}`)}
-              >
-                Enter Room
-              </button>
+            <div key={room.id} className={styles.roomCard} onClick={() => navigate(`/rooms/${room.id}`)}>
+              <h3>{room.name}</h3>
+              {room.description && <p>{room.description}</p>}
+              <p className={styles.meta}>Members: {room.member_count || 0}</p>
+              <button onClick={(e) => { e.stopPropagation(); navigate(`/rooms/${room.id}`); }} style={{ width: '100%', backgroundColor: '#667eea', color: 'white', padding: '0.75rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: '600', marginTop: '1rem' }}>Enter</button>
             </div>
           ))}
         </div>
-      )}
 
-      <div className={styles.back}>
-        <a href="/" className={styles.link}>← Back to home</a>
+        {!loading && rooms.length === 0 && <p className={styles.empty}>No private rooms</p>}
       </div>
     </div>
   );

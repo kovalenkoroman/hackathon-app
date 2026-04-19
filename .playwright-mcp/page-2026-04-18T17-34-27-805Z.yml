@@ -1,0 +1,80 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]: 💬 Chat
+    - generic [ref=e6]:
+      - link "Public Rooms" [ref=e7] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e8] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e9] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e10] [cursor=pointer]:
+        - /url: /sessions
+      - generic [ref=e12] [cursor=pointer]: rkovalenko ▼
+    - button "Sign out" [ref=e13] [cursor=pointer]
+  - generic [ref=e14]:
+    - complementary [ref=e15]:
+      - generic [ref=e16]:
+        - textbox "Search" [ref=e18]
+        - generic [ref=e19]:
+          - heading "ROOMS" [level=3] [ref=e20]
+          - generic [ref=e21]:
+            - generic [ref=e22] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e23]:
+              - generic "111" [ref=e24] [cursor=pointer]
+              - generic "Navigate Test Room" [ref=e25] [cursor=pointer]
+              - generic "Test Create Room" [ref=e26] [cursor=pointer]
+              - generic "My updated room" [ref=e27] [cursor=pointer]
+            - generic [ref=e28] [cursor=pointer]: ▼ Private Rooms
+            - generic [ref=e29]:
+              - generic "Roma 2" [ref=e30] [cursor=pointer]
+              - generic "Room 2" [ref=e31] [cursor=pointer]
+        - generic [ref=e32]:
+          - heading "CONTACTS" [level=3] [ref=e33]
+          - generic "bob2bob2" [ref=e35] [cursor=pointer]
+        - button "[Create room]" [ref=e36] [cursor=pointer]
+      - button "◀" [ref=e37] [cursor=pointer]
+    - main [ref=e38]:
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - heading "Public Rooms" [level=2] [ref=e42]
+          - button "+ Create Room" [ref=e43] [cursor=pointer]
+        - textbox "Search rooms..." [ref=e44]
+        - generic [ref=e45]:
+          - generic [ref=e46] [cursor=pointer]:
+            - heading "111" [level=3] [ref=e47]
+            - paragraph [ref=e48]: "1111"
+            - paragraph [ref=e49]: "Members: 1"
+            - button "Join" [ref=e50]
+          - generic [ref=e51] [cursor=pointer]:
+            - heading "Navigate Test Room" [level=3] [ref=e52]
+            - paragraph [ref=e53]: Should navigate on create
+            - paragraph [ref=e54]: "Members: 1"
+            - button "Join" [ref=e55]
+          - generic [ref=e56] [cursor=pointer]:
+            - heading "Test Create Room" [level=3] [ref=e57]
+            - paragraph [ref=e58]: Testing create room navigation
+            - paragraph [ref=e59]: "Members: 1"
+            - button "Join" [ref=e60]
+          - generic [ref=e61] [cursor=pointer]:
+            - heading "Priority 3 Test Room" [level=3] [ref=e62]
+            - paragraph [ref=e63]: Testing rooms feature
+            - paragraph [ref=e64]: "Members: 2"
+            - button "Join" [ref=e65]
+          - generic [ref=e66] [cursor=pointer]:
+            - heading "My updated room" [level=3] [ref=e67]
+            - paragraph [ref=e68]: New description for the room - verify it updates on main page
+            - paragraph [ref=e69]: "Members: 1"
+            - button "Join" [ref=e70]
+          - generic [ref=e71] [cursor=pointer]:
+            - heading "General Discussion" [level=3] [ref=e72]
+            - paragraph [ref=e73]: A general discussion room for all topics
+            - paragraph [ref=e74]: "Members: 2"
+            - button "Join" [ref=e75]
+          - generic [ref=e76] [cursor=pointer]:
+            - heading "Test Room" [level=3] [ref=e77]
+            - paragraph [ref=e78]: A test room
+            - paragraph [ref=e79]: "Members: 3"
+            - button "Join" [ref=e80]
+    - complementary [ref=e81]:
+      - generic [ref=e83]: Select a room to view details

@@ -148,6 +148,12 @@ export async function unbanMember(roomId, targetUserId, actorUserId) {
   }
 
   await roomQueries.unbanRoomMember(roomId, targetUserId);
+
+  const existing = await roomQueries.getRoomMember(roomId, targetUserId);
+  if (!existing) {
+    await roomQueries.addRoomMember(roomId, targetUserId, 'member');
+    await broadcast.broadcastToRoom(roomId, { type: 'room:joined', payload: { roomId, userId: targetUserId } });
+  }
 }
 
 export async function createInvitation(roomId, userId, token, expiresAt) {

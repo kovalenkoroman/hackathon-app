@@ -135,10 +135,13 @@ export async function isRoomMemberBanned(roomId, userId) {
 
 export async function getRoomBans(roomId) {
   const result = await pool.query(
-    `SELECT rb.user_id, rb.banned_by, rb.created_at, u.username
+    `SELECT rb.user_id, rb.banned_by, rb.created_at,
+            u.username, admin.username as banned_by_username
      FROM room_bans rb
      JOIN users u ON rb.user_id = u.id
-     WHERE rb.room_id = $1`,
+     LEFT JOIN users admin ON rb.banned_by = admin.id
+     WHERE rb.room_id = $1
+     ORDER BY rb.created_at DESC`,
     [roomId]
   );
   return result.rows;
@@ -146,7 +149,7 @@ export async function getRoomBans(roomId) {
 
 export async function getUserRooms(userId) {
   const result = await pool.query(
-    `SELECT r.* FROM rooms r
+    `SELECT r.*, rm.role FROM rooms r
      JOIN room_members rm ON r.id = rm.room_id
      WHERE rm.user_id = $1
      ORDER BY rm.joined_at DESC`,

@@ -15,7 +15,7 @@ export default function RoomCatalog() {
   const [createDesc, setCreateDesc] = useState('');
   const [createVis, setCreateVis] = useState('public');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [userRoomIds, setUserRoomIds] = useState(new Set());
+  const [userRoomRoles, setUserRoomRoles] = useState({});
 
   useEffect(() => {
     loadUserRooms();
@@ -31,15 +31,22 @@ export default function RoomCatalog() {
   const loadUserRooms = async () => {
     try {
       const data = await roomsApi.listUserRooms();
-      const ids = new Set(data.map(r => r.id));
-      setUserRoomIds(ids);
+      const roles = {};
+      data.forEach(r => {
+        roles[r.id] = r.role;
+      });
+      setUserRoomRoles(roles);
     } catch (err) {
       console.error('Failed to fetch user rooms:', err);
     }
   };
 
   const isUserInRoom = (room) => {
-    return userRoomIds.has(room.id);
+    return userRoomRoles.hasOwnProperty(room.id);
+  };
+
+  const isUserOwner = (room) => {
+    return userRoomRoles[room.id] === 'owner';
   };
 
   const loadRooms = async () => {
@@ -73,6 +80,7 @@ export default function RoomCatalog() {
   const handleJoin = async (roomId) => {
     try {
       await roomsApi.joinRoom(roomId);
+      await loadUserRooms();
       await loadRooms();
       navigate(`/rooms/${roomId}`);
     } catch (err) {
@@ -84,6 +92,7 @@ export default function RoomCatalog() {
     e.stopPropagation();
     try {
       await roomsApi.leaveRoom(roomId);
+      await loadUserRooms();
       await loadRooms();
       navigate('/');
     } catch (err) {
@@ -110,16 +119,24 @@ export default function RoomCatalog() {
         <div className={styles.roomsList}>
           {rooms.map((room) => {
             const userInRoom = isUserInRoom(room);
+            const isOwner = isUserOwner(room);
             return (
-              <div key={room.id} className={styles.roomCard} onClick={() => navigate(`/rooms/${room.id}`)}>
-                <h3>{room.name}</h3>
+              <div key={room.id} className={styles.roomCard}>
+                <h3 onClick={() => userInRoom && navigate(`/rooms/${room.id}`)} style={{ cursor: userInRoom ? 'pointer' : 'default' }}>{room.name}</h3>
                 {room.description && <p>{room.description}</p>}
                 <p className={styles.meta}>Members: {room.member_count || 0}</p>
-                {userInRoom ? (
-                  <button onClick={(e) => handleLeave(e, room.id)} style={{ backgroundColor: '#ff9800', color: 'white', padding: '0.75rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: '600' }}>Leave</button>
-                ) : (
-                  <button onClick={(e) => { e.stopPropagation(); handleJoin(room.id); }} style={{ backgroundColor: '#667eea', color: 'white', padding: '0.75rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: '600' }}>Enter</button>
-                )}
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                  {userInRoom ? (
+                    <>
+                      <button onClick={(e) => { e.stopPropagation(); navigate(`/rooms/${room.id}`); }} style={{ flex: 1, backgroundColor: '#667eea', color: 'white', padding: '0.75rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '600' }}>Enter</button>
+                      {!isOwner && (
+                        <button onClick={(e) => handleLeave(e, room.id)} style={{ flex: 1, backgroundColor: '#ff9800', color: 'white', padding: '0.75rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '600' }}>Leave</button>
+                      )}
+                    </>
+                  ) : (
+                    <button onClick={(e) => { e.stopPropagation(); handleJoin(room.id); }} style={{ width: '100%', backgroundColor: '#28a745', color: 'white', padding: '0.75rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '600' }}>Join</button>
+                  )}
+                </div>
               </div>
             );
           })}
