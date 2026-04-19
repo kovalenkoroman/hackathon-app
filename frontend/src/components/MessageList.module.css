@@ -98,6 +98,28 @@
   border-left-color: white;
 }
 
+.replyAuthor {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #667eea;
+}
+
+.messageWrapper.own .replyAuthor {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.replyContent {
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.messageWrapper.own .replyContent {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .content {
   line-height: 1.4;
   white-space: pre-wrap;

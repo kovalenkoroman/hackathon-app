@@ -62,6 +62,7 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
 
       {messages.map((msg, idx) => {
         const isOwn = msg.user_id === currentUserId;
+        const repliedToMessage = msg.reply_to_id ? messages.find(m => m.id === msg.reply_to_id) : null;
         return (
           <div
             key={msg.id}
@@ -74,9 +75,10 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
                 {msg.edited && <span className={styles.edited}>edited</span>}
               </div>
 
-              {msg.reply_to && (
+              {repliedToMessage && (
                 <div className={styles.reply}>
-                  <strong>↩️ Reply to message</strong>
+                  <div className={styles.replyAuthor}>↪ Reply to {repliedToMessage.username}</div>
+                  <div className={styles.replyContent}>{repliedToMessage.content}</div>
                 </div>
               )}
 
