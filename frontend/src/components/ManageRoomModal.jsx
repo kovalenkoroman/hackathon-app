@@ -446,7 +446,7 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
                 onKeyDown={(e) => e.key === 'Enter' && !loading && handleSendInvite()}
                 placeholder="Enter username"
                 className={styles.searchInput}
-                style={{ width: '100%' }}
+                style={{ width: '100%', boxSizing: 'border-box' }}
                 disabled={loading}
               />
               <button
