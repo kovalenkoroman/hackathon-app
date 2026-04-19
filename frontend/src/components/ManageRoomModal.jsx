@@ -467,60 +467,51 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
 
           {/* Settings Tab */}
           {tab === 'settings' && canManage && (
-            <div>
-              <div style={{ display: 'flex', gap: '2rem', alignItems: 'stretch' }}>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  <div className={styles.field}>
-                    <label>Room Name</label>
-                    <input
-                      type="text"
-                      value={settingsName}
-                      onChange={(e) => setSettingsName(e.target.value)}
-                      placeholder="Enter room name"
-                    />
-                  </div>
-
-                  <div className={styles.field}>
-                    <label>Description</label>
-                    <textarea
-                      value={settingsDesc}
-                      onChange={(e) => setSettingsDesc(e.target.value)}
-                      placeholder="Enter room description"
-                    />
-                  </div>
-
-                  <div className={styles.field} style={{ marginBottom: 0 }}>
-                    <label>Visibility</label>
-                    <select value={settingsVis} onChange={(e) => setSettingsVis(e.target.value)}>
-                      <option value="public">Public</option>
-                      <option value="private">Private</option>
-                    </select>
-                  </div>
+            <div style={{ display: 'flex', gap: '2rem', alignItems: 'stretch' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <div className={styles.field}>
+                  <label>Room Name</label>
+                  <input
+                    type="text"
+                    value={settingsName}
+                    onChange={(e) => setSettingsName(e.target.value)}
+                    placeholder="Enter room name"
+                  />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', paddingBottom: '0.5rem' }}>
-                  <button onClick={handleSaveSettings} className={styles.primaryBtn} disabled={loading} style={{ whiteSpace: 'nowrap' }}>
-                    {loading ? 'Saving...' : 'Save changes'}
-                  </button>
+                <div className={styles.field}>
+                  <label>Description</label>
+                  <textarea
+                    value={settingsDesc}
+                    onChange={(e) => setSettingsDesc(e.target.value)}
+                    placeholder="Enter room description"
+                  />
+                </div>
+
+                <div className={styles.field} style={{ marginBottom: 0 }}>
+                  <label>Visibility</label>
+                  <select value={settingsVis} onChange={(e) => setSettingsVis(e.target.value)}>
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                  </select>
                 </div>
               </div>
 
-              {isOwner && (
-                <div className={styles.deleteSection}>
-                  <div className={styles.deleteTitle}>⚠️ Danger Zone</div>
-                  <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>
-                    Deleting a room is permanent and cannot be undone.
-                  </p>
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                <button onClick={handleSaveSettings} className={styles.primaryBtn} disabled={loading} style={{ whiteSpace: 'nowrap' }}>
+                  {loading ? 'Saving...' : 'Save changes'}
+                </button>
+                {isOwner && (
                   <button
                     onClick={handleDeleteRoom}
-                    className={`${styles.primaryBtn} ${styles.dangerBtn}`}
-                    style={{ background: '#d44', borderColor: '#d44' }}
+                    className={styles.primaryBtn}
+                    style={{ background: '#d44', color: 'white', border: 'none', whiteSpace: 'nowrap' }}
                     disabled={loading}
                   >
-                    Delete Room
+                    Delete room
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           )}
         </div>
