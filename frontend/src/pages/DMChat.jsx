@@ -1,34 +1,38 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import wsClient from '../ws/client';
 import { useUnreads } from '../hooks/useUnreads';
+import MessageComposer from '../components/MessageComposer';
 import styles from './DMChat.module.css';
 
 export default function DMChat({ user }) {
   const { userId } = useParams();
-  const navigate = useNavigate();
   const { markDialogAsRead } = useUnreads();
   const [messages, setMessages] = useState([]);
   const [otherUser, setOtherUser] = useState(null);
   const [dialogId, setDialogId] = useState(null);
-  const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const messagesEndRef = useRef(null);
+  const messageListRef = useRef(null);
+  const hasInitialScrolled = useRef(false);
 
   useEffect(() => {
     loadMessages();
   }, [userId]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    const list = messageListRef.current;
+    if (!list || messages.length === 0) return;
+
+    if (!hasInitialScrolled.current) {
+      list.scrollTop = list.scrollHeight;
+      hasInitialScrolled.current = true;
+    } else {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
 
-  // Mark dialog as read when messages load
   useEffect(() => {
     if (messages.length > 0 && dialogId) {
       const lastMessage = messages[messages.length - 1];
@@ -38,9 +42,7 @@ export default function DMChat({ user }) {
 
   useEffect(() => {
     const handleMessageNew = (payload) => {
-      // Only add if this message is for our dialog (identified by participants)
       if ((payload.room_id === null || payload.room_id === undefined)) {
-        // This is likely a DM, add it
         setMessages(prev => [...prev, payload]);
       }
     };
@@ -71,24 +73,19 @@ export default function DMChat({ user }) {
   const loadMessages = async () => {
     try {
       setLoading(true);
-      // Get other user info
       const userRes = await fetch(`/api/v1/friends`);
       const friendsList = await userRes.json();
-      // Find friend by friend_id (actual user ID), not by friendship id
       const friend = friendsList.data?.find((f) => f.friend_id === parseInt(userId) || f.id === parseInt(userId));
       setOtherUser(friend || { id: userId, username: 'User' });
 
-      // Determine the actual user ID for the dialog
       const actualUserId = friend?.friend_id || friend?.id || userId;
 
-      // Get dialog ID
       const dialogRes = await fetch(`/api/v1/friends/dialogs/${actualUserId}`, { credentials: 'include' });
       const dialogData = await dialogRes.json();
       if (dialogRes.ok) {
         setDialogId(dialogData.data.dialogId);
       }
 
-      // Get messages
       const msgRes = await fetch(`/api/v1/friends/dialogs/${actualUserId}/messages`);
       const json = await msgRes.json();
       setMessages(json.data || []);
@@ -100,12 +97,9 @@ export default function DMChat({ user }) {
     }
   };
 
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!content.trim()) return;
-
+  const handleSend = async (msgData) => {
+    setError('');
     try {
-      // Get the actual user ID from the friends list (in case userId is friendship ID)
       const friendsRes = await fetch(`/api/v1/friends`);
       const friendsData = await friendsRes.json();
       const friend = friendsData.data?.find((f) => f.friend_id === parseInt(userId) || f.id === parseInt(userId));
@@ -114,13 +108,13 @@ export default function DMChat({ user }) {
       const res = await fetch(`/api/v1/friends/dialogs/${actualUserId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: content.trim() })
+        credentials: 'include',
+        body: JSON.stringify({ content: msgData.content })
       });
 
       if (res.ok) {
         const json = await res.json();
         setMessages((prev) => [...prev, json.data]);
-        setContent('');
       } else {
         setError('Failed to send message');
       }
@@ -129,28 +123,19 @@ export default function DMChat({ user }) {
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && e.ctrlKey) {
-      handleSend(e);
-    }
-  };
-
   if (loading) {
-    return <div style={{ padding: '2rem' }}>Loading...</div>;
+    return <div className={styles.container}><p className={styles.loading}>Loading...</p></div>;
   }
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <button onClick={() => navigate('/friends')} className={styles.backButton}>
-          ← Back
-        </button>
-        <h1>Chat with {otherUser?.username || 'User'}</h1>
+        <h2 className={styles.title}>{otherUser?.username || 'User'}</h2>
       </div>
 
       {error && <div className={styles.error}>{error}</div>}
 
-      <div className={styles.messageList}>
+      <div className={styles.messageList} ref={messageListRef}>
         {messages.length === 0 ? (
           <div className={styles.noMessages}>No messages yet. Start a conversation!</div>
         ) : (
@@ -172,18 +157,7 @@ export default function DMChat({ user }) {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSend} className={styles.form}>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Type your message... (Ctrl+Enter to send)"
-          className={styles.input}
-        />
-        <button type="submit" className={styles.sendButton}>
-          Send
-        </button>
-      </form>
+      <MessageComposer onSend={handleSend} />
     </div>
   );
 }
