@@ -80,8 +80,9 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, disable
     <form onSubmit={handleSend} className={styles.composer}>
       {/* Reply indicator */}
       {replyTo && (
-        <div className={styles.replyTag}>
-          Replying to: {replyTo.username}
+        <div className={styles.replyContainer}>
+          <div className={styles.replyLabel}>↪ Replying to {replyTo.username}</div>
+          <div className={styles.replyPreview}>"{replyTo.content}"</div>
           <button
             type="button"
             onClick={onClearReply}
