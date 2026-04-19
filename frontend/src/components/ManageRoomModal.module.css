@@ -11,9 +11,9 @@
 .modal {
   background: white;
   border-radius: 8px;
-  width: 640px;
+  width: 768px;
   max-width: 90vw;
-  max-height: 80vh;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
