@@ -468,8 +468,8 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
           {/* Settings Tab */}
           {tab === 'settings' && canManage && (
             <div>
-              <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
-                <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', gap: '2rem', alignItems: 'stretch' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <div className={styles.field}>
                     <label>Room Name</label>
                     <input
@@ -489,7 +489,7 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
                     />
                   </div>
 
-                  <div className={styles.field}>
+                  <div className={styles.field} style={{ marginBottom: 0 }}>
                     <label>Visibility</label>
                     <select value={settingsVis} onChange={(e) => setSettingsVis(e.target.value)}>
                       <option value="public">Public</option>
@@ -498,8 +498,8 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <button onClick={handleSaveSettings} className={styles.primaryBtn} disabled={loading}>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', paddingBottom: '0.5rem' }}>
+                  <button onClick={handleSaveSettings} className={styles.primaryBtn} disabled={loading} style={{ whiteSpace: 'nowrap' }}>
                     {loading ? 'Saving...' : 'Save changes'}
                   </button>
                 </div>
