@@ -435,8 +435,8 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
           {/* Invitations Tab */}
           {tab === 'invitations' && (
             <div>
-              <h3>Invite by username</h3>
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '1rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <label style={{ fontSize: '0.95rem', fontWeight: '600' }}>Invite by username</label>
                 <input
                   type="text"
                   value={inviteUsername}
