@@ -468,34 +468,32 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
           {/* Settings Tab */}
           {tab === 'settings' && canManage && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ display: 'flex', gap: '2rem' }}>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  <div className={styles.field}>
-                    <label>Room Name</label>
-                    <input
-                      type="text"
-                      value={settingsName}
-                      onChange={(e) => setSettingsName(e.target.value)}
-                      placeholder="Enter room name"
-                    />
-                  </div>
+              <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '400px', marginLeft: 'auto' }}>
+                <div className={styles.field}>
+                  <label>Room Name</label>
+                  <input
+                    type="text"
+                    value={settingsName}
+                    onChange={(e) => setSettingsName(e.target.value)}
+                    placeholder="Enter room name"
+                  />
+                </div>
 
-                  <div className={styles.field}>
-                    <label>Description</label>
-                    <textarea
-                      value={settingsDesc}
-                      onChange={(e) => setSettingsDesc(e.target.value)}
-                      placeholder="Enter room description"
-                    />
-                  </div>
+                <div className={styles.field}>
+                  <label>Description</label>
+                  <textarea
+                    value={settingsDesc}
+                    onChange={(e) => setSettingsDesc(e.target.value)}
+                    placeholder="Enter room description"
+                  />
+                </div>
 
-                  <div className={styles.field} style={{ marginBottom: 0 }}>
-                    <label>Visibility</label>
-                    <select value={settingsVis} onChange={(e) => setSettingsVis(e.target.value)}>
-                      <option value="public">Public</option>
-                      <option value="private">Private</option>
-                    </select>
-                  </div>
+                <div className={styles.field} style={{ marginBottom: 0 }}>
+                  <label>Visibility</label>
+                  <select value={settingsVis} onChange={(e) => setSettingsVis(e.target.value)}>
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                  </select>
                 </div>
               </div>
 
