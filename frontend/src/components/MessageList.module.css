@@ -43,7 +43,7 @@
 }
 
 .messageWrapper.own .message {
-  background: #0066cc;
+  background: #667eea;
   color: white;
 }
 
@@ -88,7 +88,7 @@
 .reply {
   padding: 0.5rem;
   background: rgba(0, 0, 0, 0.05);
-  border-left: 2px solid #0066cc;
+  border-left: 2px solid #667eea;
   margin-bottom: 0.5rem;
   font-size: 0.85rem;
 }
@@ -139,18 +139,19 @@
   position: sticky;
   bottom: 10px;
   align-self: center;
-  padding: 0.6rem 1rem;
-  background: #0066cc;
+  padding: 0.75rem 1.5rem;
+  background: #667eea;
   color: white;
   border: none;
   border-radius: 20px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 600;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .scrollDownBtn:hover {
-  background: #0052a3;
+  background: #5568d3;
 }
 
 .attachments {
@@ -183,7 +184,7 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   text-decoration: none;
-  color: #0066cc;
+  color: #667eea;
   font-size: 0.85rem;
   transition: background 0.2s;
 }

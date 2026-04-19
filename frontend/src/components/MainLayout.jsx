@@ -20,6 +20,7 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
   const [contactPresence, setContactPresence] = useState({});
   const [loading, setLoading] = useState(true);
   const [showManageModal, setShowManageModal] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   const fetchRooms = async () => {
     try {
@@ -93,18 +94,38 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
       {/* Top Navigation - Wireframe style */}
       <nav className={styles.topNav}>
         <div className={styles.navBrand}>
-          💬 Chat
+          <img src="/logo.svg" alt="Hackathon Chat" className={styles.logo} />
+          Hackathon Chat
         </div>
         <div className={styles.navLinks}>
           <a href="/catalog">Public Rooms</a>
           <a href="/my-rooms">Private Rooms</a>
           <a href="/friends">Contacts</a>
           <a href="/sessions">Sessions</a>
-          <div className={styles.profileDropdown}>
-            <span className={styles.profileBtn}>{user?.username} ▼</span>
-          </div>
         </div>
-        <button onClick={onLogout} className={styles.logoutBtn}>Sign out</button>
+        <div className={styles.navRight}>
+          <div className={styles.profileDropdown}>
+            <button
+              className={styles.profileBtn}
+              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+            >
+              {user?.username} ▼
+            </button>
+            {profileDropdownOpen && (
+              <div className={styles.dropdownMenu}>
+                <a href="/change-password" className={styles.dropdownItem}>Change Password</a>
+                <a href="#" className={styles.dropdownItem} onClick={(e) => {
+                  e.preventDefault();
+                  if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
+                    // TODO: Implement account deletion
+                    alert('Account deletion coming soon');
+                  }
+                }}>Delete Account</a>
+              </div>
+            )}
+          </div>
+          <button onClick={onLogout} className={styles.logoutBtn}>Sign out</button>
+        </div>
       </nav>
 
       {/* Main Layout - 3 columns */}
@@ -216,8 +237,8 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
               </div>
 
               {/* Create Room Button */}
-              <button className={styles.createRoomBtn} onClick={() => navigate('/catalog')}>
-                [Create room]
+              <button className={styles.createRoomBtn} onClick={() => navigate('/catalog?create=true')}>
+                Create room
               </button>
             </div>
           )}
@@ -236,9 +257,9 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
         </main>
 
         {/* Right Sidebar - Room Context & Members */}
-        <aside className={styles.rightSidebar}>
-          <div className={styles.sidebarContent}>
-            {roomInfo ? (
+        {roomInfo && (
+          <aside className={styles.rightSidebar}>
+            <div className={styles.sidebarContent}>
               <RoomPanel
                 room={roomInfo}
                 members={roomMembers}
@@ -251,13 +272,9 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                 onDemote={() => {}}
                 onLeave={() => navigate('/')}
               />
-            ) : (
-              <div style={{ padding: '1rem', color: '#999', fontSize: '0.9rem' }}>
-                Select a room to view details
-              </div>
-            )}
-          </div>
-        </aside>
+            </div>
+          </aside>
+        )}
 
         {/* Manage Room Modal */}
         {showManageModal && roomInfo && (

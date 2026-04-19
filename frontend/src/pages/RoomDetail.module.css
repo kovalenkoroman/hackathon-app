@@ -55,8 +55,8 @@
 }
 
 .tabs button.active {
-  border-bottom-color: #0066cc;
-  color: #0066cc;
+  border-bottom-color: #667eea;
+  color: #667eea;
 }
 
 .membersList {
@@ -142,7 +142,8 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1rem;
 }
 
 .deleteBtn {

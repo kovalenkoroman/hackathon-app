@@ -1,0 +1,31 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="url(#grad)" opacity="0.1" stroke="url(#grad)" stroke-width="2"/>
+
+  <!-- Left chat bubble -->
+  <path d="M 40 70 Q 40 50 60 50 L 90 50 Q 110 50 110 70 L 110 95 Q 110 115 90 115 L 65 115 L 55 130 L 60 115 L 60 115 Q 40 115 40 95 Z"
+        fill="#6366f1" opacity="0.9"/>
+
+  <!-- Right chat bubble (slightly overlapping) -->
+  <path d="M 80 90 Q 80 75 100 75 L 140 75 Q 160 75 160 95 L 160 120 Q 160 140 140 140 L 110 140 L 100 155 L 105 140 L 105 140 Q 80 140 80 120 Z"
+        fill="#8b5cf6" opacity="0.9"/>
+
+  <!-- Code brackets in chat -->
+  <g fill="#ffffff" font-family="monospace" font-size="18" font-weight="bold">
+    <!-- < bracket in left bubble -->
+    <text x="50" y="90" opacity="0.8">&lt;</text>
+    <!-- > bracket in right bubble -->
+    <text x="135" y="115" opacity="0.8">&gt;</text>
+  </g>
+
+  <!-- Lightning bolt accent (hackathon vibe) -->
+  <path d="M 100 45 L 105 60 L 95 60 L 105 75 L 90 75 L 110 50 Z"
+        fill="#fbbf24" opacity="0.9" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.2))"/>
+</svg>

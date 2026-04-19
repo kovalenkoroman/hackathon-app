@@ -22,6 +22,15 @@ export async function listPublicRooms(search = '', limit = 50, offset = 0) {
   return json.data;
 }
 
+export async function listUserRooms() {
+  const res = await fetch(`${BASE_URL}/mine`, {
+    credentials: 'include',
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error);
+  return json.data;
+}
+
 export async function getRoomDetail(roomId) {
   const res = await fetch(`${BASE_URL}/${roomId}`, {
     credentials: 'include',

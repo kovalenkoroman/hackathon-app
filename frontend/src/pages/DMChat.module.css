@@ -113,15 +113,16 @@
 
 .sendButton {
   padding: 0.75rem 1.5rem;
-  background: #0066cc;
+  background: #667eea;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 600;
   white-space: nowrap;
 }
 
 .sendButton:hover {
-  background: #0052a3;
+  background: #5568d3;
 }

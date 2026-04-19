@@ -5,6 +5,7 @@ import wsClient from './ws/client';
 import { RoomContextProvider } from './RoomContext';
 import MainLayout from './components/MainLayout';
 import Login from './pages/Login';
+import LoginForm from './pages/LoginForm';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ChangePassword from './pages/ChangePassword';
@@ -16,6 +17,7 @@ import RoomChat from './pages/RoomChat';
 import Sessions from './pages/Sessions';
 import Friends from './pages/Friends';
 import DMChat from './pages/DMChat';
+import Welcome from './pages/Welcome';
 
 function Home() {
   return (
@@ -120,11 +122,12 @@ function AppContent() {
               <Home />
             </MainLayout>
           ) : (
-            <Navigate to="/login" />
+            <Welcome />
           )
         }
       />
       <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+      <Route path="/login-form" element={user ? <Navigate to="/" /> : <LoginForm />} />
       <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
       <Route path="/forgot-password" element={user ? <Navigate to="/" /> : <ForgotPassword />} />
       <Route path="/reset-password" element={user ? <Navigate to="/" /> : <ResetPasswordConfirm />} />

@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #fff;
+  background: #f5f5f5;
 }
 
 /* Top Navigation - Wireframe style horizontal bar */
@@ -11,16 +11,25 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1rem;
-  background: #fff;
-  border-bottom: 1px solid #ccc;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
   flex-shrink: 0;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .navBrand {
   font-weight: bold;
   font-size: 1.1rem;
   min-width: 80px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
 
 .navLinks {
@@ -44,15 +53,70 @@
   border-bottom-color: #000;
 }
 
-.profileDropdown {
+.navRight {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
+  gap: 1rem;
+}
+
+.profileDropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .profileBtn {
+  background: none;
+  border: none;
   font-size: 0.95rem;
+  color: #000;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+}
+
+.profileBtn:hover {
+  color: #666;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+  z-index: 1000;
+  margin-top: 0.5rem;
+}
+
+.dropdownItem {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  background: none;
+  width: 100%;
+  text-align: left;
+  transition: background-color 0.15s;
+}
+
+.dropdownItem:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdownItem:first-child {
+  border-radius: 4px 4px 0 0;
+}
+
+.dropdownItem:last-child {
+  border-radius: 0 0 4px 4px;
 }
 
 .logoutBtn {
@@ -82,8 +146,8 @@
 /* Left Sidebar - Wireframe style */
 .leftSidebar {
   width: 220px;
-  background: #f9f9f9;
-  border-right: 1px solid #ccc;
+  background: #fafafa;
+  border-right: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -175,17 +239,19 @@
 
 .createRoomBtn {
   margin-top: auto;
-  padding: 0.5rem;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 2px;
+  padding: 0.75rem 1.5rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 1rem;
+  font-weight: 600;
   width: 100%;
 }
 
 .createRoomBtn:hover {
-  background: #f5f5f5;
+  background: #5568d3;
 }
 
 .toggleBtn {
@@ -208,14 +274,14 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #fff;
+  background: #ffffff;
 }
 
 /* Right Sidebar */
 .rightSidebar {
   width: 280px;
-  background: #f9f9f9;
-  border-left: 1px solid #ccc;
+  background: #fafafa;
+  border-left: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
   overflow: hidden;

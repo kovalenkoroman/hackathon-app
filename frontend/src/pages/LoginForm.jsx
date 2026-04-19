@@ -3,11 +3,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import * as authApi from '../api/auth';
 import styles from './Auth.module.css';
 
-export default function Register() {
+export default function LoginForm() {
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [keepSignedIn, setKeepSignedIn] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -15,18 +14,18 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
     setLoading(true);
 
     try {
-      await authApi.register(email, username, password);
-      // Log in automatically after registration
       await authApi.login(email, password);
+      // Store preference for "keep me signed in" in localStorage
+      if (keepSignedIn) {
+        localStorage.setItem('keepMeSignedIn', 'true');
+        localStorage.setItem('userEmail', email);
+      } else {
+        localStorage.removeItem('keepMeSignedIn');
+        localStorage.removeItem('userEmail');
+      }
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -38,7 +37,7 @@ export default function Register() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h2>Create Account</h2>
+        <h2>Sign In</h2>
         {error && <div className={styles.error}>{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
@@ -53,17 +52,6 @@ export default function Register() {
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="username">Username</label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              disabled={loading}
-              required
-            />
-          </div>
-          <div className={styles.formGroup}>
             <label htmlFor="password">Password</label>
             <input
               id="password"
@@ -71,28 +59,26 @@ export default function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
-              minLength="6"
               required
             />
           </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="confirmPassword">Confirm Password</label>
+          <div className={styles.checkboxGroup}>
             <input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              id="keepSignedIn"
+              type="checkbox"
+              checked={keepSignedIn}
+              onChange={(e) => setKeepSignedIn(e.target.checked)}
               disabled={loading}
-              minLength="6"
-              required
             />
+            <label htmlFor="keepSignedIn">Keep me signed in</label>
           </div>
           <button type="submit" disabled={loading}>
-            {loading ? 'Creating account...' : 'Create Account'}
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
         <div className={styles.links}>
-          <Link to="/login">Already have an account?</Link>
+          <Link to="/register">Create account</Link>
+          <Link to="/forgot-password">Forgot password?</Link>
         </div>
       </div>
     </div>

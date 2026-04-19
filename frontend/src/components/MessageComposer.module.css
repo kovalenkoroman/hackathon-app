@@ -7,12 +7,18 @@
   background: #fff;
 }
 
-/* Wireframe-style single row input */
+/* Input row with tools and textarea */
 .inputRow {
   display: flex;
   gap: 0.5rem;
-  align-items: center;
-  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.toolsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .toolBtn {
@@ -138,42 +144,46 @@
   color: #333;
 }
 
-/* Input Field */
-.input {
+/* Textarea Field */
+.textarea {
   flex: 1;
-  padding: 0.4rem 0.5rem;
+  padding: 0.5rem;
   border: 1px solid #ccc;
-  border-radius: 2px;
-  font-size: 0.9rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
   font-family: inherit;
-  min-width: 150px;
-  height: 32px;
+  resize: vertical;
+  min-height: 80px;
+  max-height: 200px;
 }
 
-.input:focus {
+.textarea:focus {
   outline: none;
-  border-color: #0066cc;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
 }
 
-.input:disabled {
+.textarea:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
 /* Send Button */
 .sendBtn {
-  padding: 0.4rem 0.8rem;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 2px;
+  padding: 0.75rem 1.5rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 600;
   white-space: nowrap;
-  flex-shrink: 0;
+  align-self: flex-end;
 }
 
 .sendBtn:hover:not(:disabled) {
-  background: #f0f0f0;
+  background: #5568d3;
 }
 
 .sendBtn:disabled {
@@ -181,29 +191,3 @@
   cursor: not-allowed;
 }
 
-/* Expanded multiline mode */
-.expandedInput {
-  margin-top: 0.5rem;
-}
-
-.textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 2px;
-  font-size: 0.9rem;
-  font-family: inherit;
-  resize: vertical;
-  min-height: 60px;
-  max-height: 150px;
-}
-
-.textarea:focus {
-  outline: none;
-  border-color: #0066cc;
-}
-
-.textarea:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}

@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useContext } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import * as roomsApi from '../api/rooms';
+import * as authApi from '../api/auth';
 import styles from './RoomCatalog.module.css';
 
 export default function RoomCatalog() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [rooms, setRooms] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
@@ -13,10 +15,32 @@ export default function RoomCatalog() {
   const [createDesc, setCreateDesc] = useState('');
   const [createVis, setCreateVis] = useState('public');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [userRoomIds, setUserRoomIds] = useState(new Set());
 
   useEffect(() => {
+    loadUserRooms();
     loadRooms();
   }, [search]);
+
+  useEffect(() => {
+    if (searchParams.get('create') === 'true') {
+      setShowCreateModal(true);
+    }
+  }, [searchParams]);
+
+  const loadUserRooms = async () => {
+    try {
+      const data = await roomsApi.listUserRooms();
+      const ids = new Set(data.map(r => r.id));
+      setUserRoomIds(ids);
+    } catch (err) {
+      console.error('Failed to fetch user rooms:', err);
+    }
+  };
+
+  const isUserInRoom = (room) => {
+    return userRoomIds.has(room.id);
+  };
 
   const loadRooms = async () => {
     setLoading(true);
@@ -50,6 +74,18 @@ export default function RoomCatalog() {
     try {
       await roomsApi.joinRoom(roomId);
       await loadRooms();
+      navigate(`/rooms/${roomId}`);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleLeave = async (e, roomId) => {
+    e.stopPropagation();
+    try {
+      await roomsApi.leaveRoom(roomId);
+      await loadRooms();
+      navigate('/');
     } catch (err) {
       setError(err.message);
     }
@@ -58,12 +94,7 @@ export default function RoomCatalog() {
   return (
     <div className={styles.container}>
       <div className={styles.catalogPanel}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <h2>Public Rooms</h2>
-          <button onClick={() => setShowCreateModal(true)} style={{ padding: '0.5rem 1rem', backgroundColor: '#0066cc', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-            + Create Room
-          </button>
-        </div>
+        <h2>Public Rooms</h2>
 
         <input
           type="text"
@@ -77,14 +108,21 @@ export default function RoomCatalog() {
         {loading && <p>Loading...</p>}
 
         <div className={styles.roomsList}>
-          {rooms.map((room) => (
-            <div key={room.id} className={styles.roomCard} onClick={() => navigate(`/rooms/${room.id}`)}>
-              <h3>{room.name}</h3>
-              {room.description && <p>{room.description}</p>}
-              <p className={styles.meta}>Members: {room.member_count || 0}</p>
-              <button onClick={(e) => { e.stopPropagation(); handleJoin(room.id); }}>Join</button>
-            </div>
-          ))}
+          {rooms.map((room) => {
+            const userInRoom = isUserInRoom(room);
+            return (
+              <div key={room.id} className={styles.roomCard} onClick={() => navigate(`/rooms/${room.id}`)}>
+                <h3>{room.name}</h3>
+                {room.description && <p>{room.description}</p>}
+                <p className={styles.meta}>Members: {room.member_count || 0}</p>
+                {userInRoom ? (
+                  <button onClick={(e) => handleLeave(e, room.id)} style={{ backgroundColor: '#ff9800', color: 'white', padding: '0.75rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: '600' }}>Leave</button>
+                ) : (
+                  <button onClick={(e) => { e.stopPropagation(); handleJoin(room.id); }} style={{ backgroundColor: '#667eea', color: 'white', padding: '0.75rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: '600' }}>Enter</button>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {!loading && rooms.length === 0 && <p>No rooms found</p>}
@@ -121,10 +159,10 @@ export default function RoomCatalog() {
                 </select>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setShowCreateModal(false)} style={{ padding: '0.5rem 1rem', backgroundColor: '#f0f0f0', border: '1px solid #ccc', borderRadius: '4px', cursor: 'pointer' }}>
+                <button type="button" onClick={() => setShowCreateModal(false)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#f0f0f0', border: '1px solid #ccc', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: '600' }}>
                   Cancel
                 </button>
-                <button type="submit" style={{ padding: '0.5rem 1rem', backgroundColor: '#0066cc', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                <button type="submit" style={{ padding: '0.75rem 1.5rem', backgroundColor: '#667eea', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: '600' }}>
                   Create
                 </button>
               </div>
