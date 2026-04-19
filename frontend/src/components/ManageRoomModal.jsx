@@ -468,7 +468,7 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
           {/* Settings Tab */}
           {tab === 'settings' && canManage && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '400px', marginLeft: 'auto' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div className={styles.field}>
                   <label>Room Name</label>
                   <input
