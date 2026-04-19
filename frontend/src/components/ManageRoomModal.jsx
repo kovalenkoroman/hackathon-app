@@ -436,29 +436,27 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
           {tab === 'invitations' && (
             <div>
               <label style={{ fontSize: '0.95rem', fontWeight: '600', display: 'block', marginBottom: '0.5rem' }}>Invite by username</label>
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <input
-                  type="text"
-                  value={inviteUsername}
-                  onChange={(e) => {
-                    setInviteUsername(e.target.value);
-                    setInviteSuccess('');
-                  }}
-                  onKeyDown={(e) => e.key === 'Enter' && !loading && handleSendInvite()}
-                  placeholder="Enter username"
-                  className={styles.searchInput}
-                  style={{ flex: 1, minWidth: 0 }}
-                  disabled={loading}
-                />
-                <button
-                  onClick={handleSendInvite}
-                  className={styles.primaryBtn}
-                  disabled={loading || !inviteUsername.trim()}
-                  style={{ whiteSpace: 'nowrap', padding: '0.5rem 1rem', flex: '0 0 auto' }}
-                >
-                  {loading ? 'Sending...' : 'Send invite'}
-                </button>
-              </div>
+              <input
+                type="text"
+                value={inviteUsername}
+                onChange={(e) => {
+                  setInviteUsername(e.target.value);
+                  setInviteSuccess('');
+                }}
+                onKeyDown={(e) => e.key === 'Enter' && !loading && handleSendInvite()}
+                placeholder="Enter username"
+                className={styles.searchInput}
+                style={{ width: '100%' }}
+                disabled={loading}
+              />
+              <button
+                onClick={handleSendInvite}
+                className={styles.primaryBtn}
+                disabled={loading || !inviteUsername.trim()}
+                style={{ whiteSpace: 'nowrap', padding: '0.5rem 1rem', marginTop: '0.5rem' }}
+              >
+                {loading ? 'Sending...' : 'Send invite'}
+              </button>
               {inviteSuccess && (
                 <p style={{ color: '#2a9d2a', fontSize: '0.9rem', marginTop: '0.75rem' }}>
                   {inviteSuccess}

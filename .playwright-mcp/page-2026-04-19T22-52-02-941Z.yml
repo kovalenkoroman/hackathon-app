@@ -1,0 +1,45 @@
+- generic [ref=e20]:
+  - navigation [ref=e21]:
+    - generic [ref=e22]:
+      - img "Hackathon Chat" [ref=e23]
+      - text: Hackathon Chat
+    - generic [ref=e24]:
+      - link "Public Rooms" [ref=e25] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e26] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e27] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e28] [cursor=pointer]:
+        - /url: /sessions
+    - generic [ref=e29]:
+      - button "alice ▼" [ref=e31] [cursor=pointer]
+      - button "Sign out" [ref=e32] [cursor=pointer]
+  - generic [ref=e33]:
+    - complementary [ref=e34]:
+      - generic [ref=e35]:
+        - textbox "Search" [ref=e37]
+        - generic [ref=e38]:
+          - heading "ROOMS" [level=3] [ref=e39]
+          - generic [ref=e40]:
+            - generic [ref=e41] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e42]:
+              - generic "General Chat" [ref=e43] [cursor=pointer]: General Chat1
+              - generic "Tech Discussion" [ref=e44] [cursor=pointer]
+              - generic "Random" [ref=e45] [cursor=pointer]
+              - generic "Project Updates" [ref=e46] [cursor=pointer]
+            - generic [ref=e47] [cursor=pointer]: ▼ Private Rooms
+            - generic [ref=e48]:
+              - generic "Design Team" [ref=e49] [cursor=pointer]
+              - generic "Book Club" [ref=e50] [cursor=pointer]
+        - generic [ref=e51]:
+          - heading "CONTACTS" [level=3] [ref=e52]
+          - generic [ref=e53]:
+            - generic "bob" [ref=e54] [cursor=pointer]: ○bob
+            - generic "diana" [ref=e55] [cursor=pointer]: ○diana
+        - button "Create room" [ref=e56] [cursor=pointer]
+      - button "◀" [ref=e57] [cursor=pointer]
+    - main [ref=e58]:
+      - generic [ref=e59]:
+        - heading "Welcome to Chat!" [level=1] [ref=e60]
+        - paragraph [ref=e61]: Select a room from the sidebar or browse public rooms to get started.
