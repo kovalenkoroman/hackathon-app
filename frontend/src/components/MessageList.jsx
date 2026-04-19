@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './MessageList.module.css';
 
 export default function MessageList({ messages, loading, onLoadMore, onReply, onDelete, currentUserId }) {
@@ -6,28 +6,31 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
   const messagesEndRef = useRef(null);
   const messagesStartRef = useRef(null);
   const containerRef = useRef(null);
-
-  const scrollToBottom = useCallback(() => {
-    if (autoScroll) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [autoScroll]);
+  const hasInitialScrolled = useRef(false);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+    const container = containerRef.current;
+    if (!container || messages.length === 0) return;
+
+    if (!hasInitialScrolled.current) {
+      container.scrollTop = container.scrollHeight;
+      hasInitialScrolled.current = true;
+    } else if (autoScroll) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, autoScroll]);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const handleScroll = () => {
-      // Check if scrolled to top
+      if (!hasInitialScrolled.current) return;
+
       if (container.scrollTop < 100 && !loading) {
         onLoadMore?.();
       }
 
-      // Disable auto-scroll if user scrolls up
       setAutoScroll(container.scrollHeight - container.scrollTop - container.clientHeight < 100);
     };
 
@@ -134,7 +137,7 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
         <button
           onClick={() => {
             setAutoScroll(true);
-            scrollToBottom();
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
           }}
           className={styles.scrollDownBtn}
         >
