@@ -435,8 +435,8 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
           {/* Invitations Tab */}
           {tab === 'invitations' && (
             <div>
+              <label style={{ fontSize: '0.95rem', fontWeight: '600', display: 'block', marginBottom: '0.5rem' }}>Invite by username</label>
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <label style={{ fontSize: '0.95rem', fontWeight: '600' }}>Invite by username</label>
                 <input
                   type="text"
                   value={inviteUsername}
@@ -447,13 +447,14 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
                   onKeyDown={(e) => e.key === 'Enter' && !loading && handleSendInvite()}
                   placeholder="Enter username"
                   className={styles.searchInput}
-                  style={{ flex: 1 }}
+                  style={{ flex: 1, minWidth: 0 }}
                   disabled={loading}
                 />
                 <button
                   onClick={handleSendInvite}
                   className={styles.primaryBtn}
                   disabled={loading || !inviteUsername.trim()}
+                  style={{ whiteSpace: 'nowrap' }}
                 >
                   {loading ? 'Sending...' : 'Send invite'}
                 </button>
