@@ -154,15 +154,20 @@ export default function DMChat({ user }) {
         {messages.length === 0 ? (
           <div className={styles.noMessages}>No messages yet. Start a conversation!</div>
         ) : (
-          messages.map((msg) => (
-            <div key={msg.id} className={styles.message}>
-              <div className={styles.sender}>{msg.username}</div>
-              <div className={styles.content}>{msg.content}</div>
-              <div className={styles.timestamp}>
-                {new Date(msg.created_at).toLocaleTimeString()}
+          messages.map((msg) => {
+            const isOwn = msg.user_id === user?.id;
+            return (
+              <div
+                key={msg.id}
+                className={`${styles.message} ${isOwn ? styles.own : ''}`}
+              >
+                <div className={styles.content}>{msg.content}</div>
+                <div className={styles.timestamp}>
+                  {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
         <div ref={messagesEndRef} />
       </div>
