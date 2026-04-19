@@ -1,0 +1,166 @@
+- generic [ref=e4]:
+  - navigation [ref=e5]:
+    - generic [ref=e6]:
+      - img "Hackathon Chat" [ref=e7]
+      - text: Hackathon Chat
+    - generic [ref=e8]:
+      - link "Public Rooms" [ref=e9] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e10] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e11] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e12] [cursor=pointer]:
+        - /url: /sessions
+    - generic [ref=e13]:
+      - button "alice ▼" [ref=e15] [cursor=pointer]
+      - button "Sign out" [ref=e16] [cursor=pointer]
+  - generic [ref=e17]:
+    - complementary [ref=e18]:
+      - generic [ref=e19]:
+        - textbox "Search" [ref=e21]
+        - generic [ref=e22]:
+          - heading "ROOMS" [level=3] [ref=e23]
+          - generic [ref=e24]:
+            - generic [ref=e25] [cursor=pointer]: ▼ Public Rooms
+            - generic [ref=e26]:
+              - generic "General Chat" [ref=e27] [cursor=pointer]
+              - generic "Tech Discussion" [ref=e28] [cursor=pointer]
+              - generic "Random" [ref=e29] [cursor=pointer]
+              - generic "Project Updates" [ref=e30] [cursor=pointer]
+            - generic [ref=e31] [cursor=pointer]: ▼ Private Rooms
+            - generic [ref=e32]:
+              - generic "Design Team" [ref=e33] [cursor=pointer]
+              - generic "Book Club" [ref=e34] [cursor=pointer]
+        - generic [ref=e35]:
+          - heading "CONTACTS" [level=3] [ref=e36]
+          - generic [ref=e37]:
+            - generic "bob" [ref=e38] [cursor=pointer]: ○bob
+            - generic "diana" [ref=e39] [cursor=pointer]: ○diana
+        - button "Create room" [ref=e40] [cursor=pointer]
+      - button "◀" [ref=e41] [cursor=pointer]
+    - main [ref=e42]:
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - heading "General Chat" [level=2] [ref=e45]
+          - paragraph [ref=e46]: General discussion room for everyone
+        - generic [ref=e47]:
+          - generic [ref=e49]:
+            - generic [ref=e50]:
+              - strong [ref=e51]: alice
+              - generic [ref=e52]: 01:36
+            - generic [ref=e53]: "111"
+            - generic [ref=e54]:
+              - button "↩️ Reply" [ref=e55] [cursor=pointer]
+              - button "🗑️ Delete" [ref=e56] [cursor=pointer]
+          - generic [ref=e58]:
+            - generic [ref=e59]:
+              - strong [ref=e60]: alice
+              - generic [ref=e61]: 01:34
+            - generic [ref=e62]:
+              - generic [ref=e63]: ↪ Reply to alice
+              - generic [ref=e64]: Welcome to General Chat! 👋 Feel free to introduce yourselves
+            - generic [ref=e65]: hi
+            - generic [ref=e66]:
+              - button "↩️ Reply" [ref=e67] [cursor=pointer]
+              - button "🗑️ Delete" [ref=e68] [cursor=pointer]
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - strong [ref=e72]: alice
+              - generic [ref=e73]: 01:32
+            - generic [ref=e74]:
+              - generic [ref=e75]: ↪ Reply to eve
+              - generic [ref=e76]: Hey folks! 🎉 Ready to chat
+            - generic [ref=e77]: Me too
+            - generic [ref=e78]:
+              - button "↩️ Reply" [ref=e79] [cursor=pointer]
+              - button "🗑️ Delete" [ref=e80] [cursor=pointer]
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - strong [ref=e84]: alice
+              - generic [ref=e85]: 01:29
+            - generic [ref=e86]:
+              - generic [ref=e87]: ↪ Reply to diana
+              - generic [ref=e88]: Hi there! 👋 Great to see everyone
+            - generic [ref=e89]: "111"
+            - generic [ref=e90]:
+              - button "↩️ Reply" [ref=e91] [cursor=pointer]
+              - button "🗑️ Delete" [ref=e92] [cursor=pointer]
+          - generic [ref=e94]:
+            - generic [ref=e95]:
+              - strong [ref=e96]: alice
+              - generic [ref=e97]: 01:29
+            - generic [ref=e98]:
+              - generic [ref=e99]: ↪ Reply to alice
+              - generic [ref=e100]: "@bob Sure! Tell us about yourself"
+            - generic [ref=e101]: qqq
+            - generic [ref=e102]:
+              - button "↩️ Reply" [ref=e103] [cursor=pointer]
+              - button "🗑️ Delete" [ref=e104] [cursor=pointer]
+          - generic [ref=e106]:
+            - generic [ref=e107]:
+              - strong [ref=e108]: alice
+              - generic [ref=e109]: 01:00
+            - generic [ref=e110]:
+              - generic [ref=e111]: ↪ Reply to bob
+              - generic [ref=e112]: Hi everyone! 😊 Excited to join this community
+            - generic [ref=e113]: "@bob Sure! Tell us about yourself"
+            - generic [ref=e114]:
+              - button "↩️ Reply" [ref=e115] [cursor=pointer]
+              - button "🗑️ Delete" [ref=e116] [cursor=pointer]
+          - generic [ref=e118]:
+            - generic [ref=e119]:
+              - strong [ref=e120]: eve
+              - generic [ref=e121]: 01:00
+            - generic [ref=e122]: Hey folks! 🎉 Ready to chat
+            - button "↩️ Reply" [ref=e124] [cursor=pointer]
+          - generic [ref=e126]:
+            - generic [ref=e127]:
+              - strong [ref=e128]: diana
+              - generic [ref=e129]: 01:00
+            - generic [ref=e130]: Hi there! 👋 Great to see everyone
+            - button "↩️ Reply" [ref=e132] [cursor=pointer]
+          - generic [ref=e134]:
+            - generic [ref=e135]:
+              - strong [ref=e136]: charlie
+              - generic [ref=e137]: 01:00
+            - generic [ref=e138]: Hello all! Looking forward to interesting discussions here
+            - button "↩️ Reply" [ref=e140] [cursor=pointer]
+          - generic [ref=e142]:
+            - generic [ref=e143]:
+              - strong [ref=e144]: bob
+              - generic [ref=e145]: 01:00
+            - generic [ref=e146]: Hi everyone! 😊 Excited to join this community
+            - button "↩️ Reply" [ref=e148] [cursor=pointer]
+          - generic [ref=e150]:
+            - generic [ref=e151]:
+              - strong [ref=e152]: alice
+              - generic [ref=e153]: 01:00
+            - generic [ref=e154]: Welcome to General Chat! 👋 Feel free to introduce yourselves
+            - generic [ref=e155]:
+              - button "↩️ Reply" [ref=e156] [cursor=pointer]
+              - button "🗑️ Delete" [ref=e157] [cursor=pointer]
+          - button "⬇️ New messages" [ref=e158] [cursor=pointer]
+        - generic [ref=e159]:
+          - generic [ref=e160]:
+            - generic [ref=e161]:
+              - button "😀" [ref=e163] [cursor=pointer]
+              - button "📎" [ref=e164] [cursor=pointer]
+            - textbox "Type your message... (Ctrl+Enter to send)" [ref=e165]
+          - button "Send" [disabled] [ref=e166]
+    - complementary [ref=e167]:
+      - generic [ref=e169]:
+        - heading "Room info" [level=2] [ref=e170]
+        - generic [ref=e171]:
+          - generic [ref=e172]:
+            - generic [ref=e173]: "Type:"
+            - generic [ref=e174]: Public
+          - generic [ref=e175]:
+            - generic [ref=e176]: "Owner:"
+            - generic [ref=e177]: alice
+        - generic [ref=e178]:
+          - heading "Members (0)" [level=3] [ref=e179]
+          - generic [ref=e181]: No regular members
+        - generic [ref=e182]:
+          - button "📨 Invite user" [ref=e183] [cursor=pointer]
+          - button "⚙️ Manage room" [ref=e184] [cursor=pointer]
