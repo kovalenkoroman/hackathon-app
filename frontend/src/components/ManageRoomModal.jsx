@@ -467,45 +467,46 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
 
           {/* Settings Tab */}
           {tab === 'settings' && canManage && (
-            <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
-              <div style={{ flex: 1 }}>
-                <div className={styles.field}>
-                  <label>Room Name</label>
-                  <input
-                    type="text"
-                    value={settingsName}
-                    onChange={(e) => setSettingsName(e.target.value)}
-                    placeholder="Enter room name"
-                  />
+            <div>
+              <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
+                <div style={{ flex: 1 }}>
+                  <div className={styles.field}>
+                    <label>Room Name</label>
+                    <input
+                      type="text"
+                      value={settingsName}
+                      onChange={(e) => setSettingsName(e.target.value)}
+                      placeholder="Enter room name"
+                    />
+                  </div>
+
+                  <div className={styles.field}>
+                    <label>Description</label>
+                    <textarea
+                      value={settingsDesc}
+                      onChange={(e) => setSettingsDesc(e.target.value)}
+                      placeholder="Enter room description"
+                    />
+                  </div>
+
+                  <div className={styles.field}>
+                    <label>Visibility</label>
+                    <select value={settingsVis} onChange={(e) => setSettingsVis(e.target.value)}>
+                      <option value="public">Public</option>
+                      <option value="private">Private</option>
+                    </select>
+                  </div>
                 </div>
 
-                <div className={styles.field}>
-                  <label>Description</label>
-                  <textarea
-                    value={settingsDesc}
-                    onChange={(e) => setSettingsDesc(e.target.value)}
-                    placeholder="Enter room description"
-                  />
-                </div>
-
-                <div className={styles.field}>
-                  <label>Visibility</label>
-                  <select value={settingsVis} onChange={(e) => setSettingsVis(e.target.value)}>
-                    <option value="public">Public</option>
-                    <option value="private">Private</option>
-                  </select>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <button onClick={handleSaveSettings} className={styles.primaryBtn} disabled={loading}>
+                    {loading ? 'Saving...' : 'Save changes'}
+                  </button>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <button onClick={handleSaveSettings} className={styles.primaryBtn} disabled={loading}>
-                  {loading ? 'Saving...' : 'Save changes'}
-                </button>
-              </div>
-            </div>
-
-            {isOwner && (
-              <div className={styles.deleteSection}>
+              {isOwner && (
+                <div className={styles.deleteSection}>
                   <div className={styles.deleteTitle}>⚠️ Danger Zone</div>
                   <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>
                     Deleting a room is permanent and cannot be undone.
