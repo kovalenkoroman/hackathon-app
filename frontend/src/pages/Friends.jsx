@@ -4,7 +4,8 @@ import styles from './Friends.module.css';
 
 const TABS = [
   { key: 'list', label: 'Friends' },
-  { key: 'pending', label: 'Pending requests' },
+  { key: 'pending', label: 'Pending' },
+  { key: 'blocked', label: 'Blocked' },
   { key: 'find', label: 'Add friend' },
 ];
 
@@ -13,7 +14,9 @@ export default function Friends({ user }) {
   const [tab, setTab] = useState('list');
   const [friends, setFriends] = useState([]);
   const [pending, setPending] = useState([]);
+  const [blocked, setBlocked] = useState([]);
   const [usernameInput, setUsernameInput] = useState('');
+  const [requestMessage, setRequestMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -23,6 +26,7 @@ export default function Friends({ user }) {
     setSuccessMsg('');
     if (tab === 'list') fetchFriends();
     else if (tab === 'pending') fetchPendingRequests();
+    else if (tab === 'blocked') fetchBlocked();
   }, [tab]);
 
   const fetchFriends = async () => {
@@ -51,6 +55,19 @@ export default function Friends({ user }) {
     }
   };
 
+  const fetchBlocked = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/v1/friends/bans');
+      const json = await res.json();
+      setBlocked(json.data || []);
+    } catch (err) {
+      setError('Failed to load blocked users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSendRequest = async (e) => {
     e.preventDefault();
     if (!usernameInput.trim()) return;
@@ -59,13 +76,18 @@ export default function Friends({ user }) {
       const res = await fetch('/api/v1/friends/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: usernameInput }),
+        body: JSON.stringify({
+          username: usernameInput.trim(),
+          message: requestMessage.trim() || undefined,
+        }),
       });
 
       if (res.ok) {
+        const sent = usernameInput.trim();
         setUsernameInput('');
+        setRequestMessage('');
         setError('');
-        setSuccessMsg(`Friend request sent to ${usernameInput}`);
+        setSuccessMsg(`Friend request sent to ${sent}`);
       } else {
         const json = await res.json();
         setError(json.error || 'Failed to send request');
@@ -93,13 +115,40 @@ export default function Friends({ user }) {
     }
   };
 
-  const handleRemove = async (id) => {
+  const handleRemove = async (friendshipId) => {
     if (!confirm('Remove this friend?')) return;
     try {
-      const res = await fetch(`/api/v1/friends/${id}`, { method: 'DELETE' });
-      if (res.ok) setFriends((prev) => prev.filter((f) => f.id !== id));
+      const res = await fetch(`/api/v1/friends/${friendshipId}`, { method: 'DELETE' });
+      if (res.ok) setFriends((prev) => prev.filter((f) => f.id !== friendshipId));
     } catch (err) {
       setError('Failed to remove friend');
+    }
+  };
+
+  const handleBlock = async (userId, username) => {
+    if (!confirm(`Block ${username}? They won't be able to message you, and you'll stop being friends.`)) return;
+    try {
+      const res = await fetch(`/api/v1/friends/users/${userId}/ban`, { method: 'POST' });
+      if (res.ok) {
+        setFriends((prev) => prev.filter((f) => (f.friend_id || f.id) !== userId));
+        setSuccessMsg(`${username} has been blocked.`);
+      } else {
+        const json = await res.json();
+        setError(json.error || 'Failed to block user');
+      }
+    } catch (err) {
+      setError('Failed to block user');
+    }
+  };
+
+  const handleUnblock = async (userId) => {
+    try {
+      const res = await fetch(`/api/v1/friends/users/${userId}/ban`, { method: 'DELETE' });
+      if (res.ok) {
+        setBlocked((prev) => prev.filter((b) => b.user_id !== userId));
+      }
+    } catch (err) {
+      setError('Failed to unblock user');
     }
   };
 
@@ -110,7 +159,7 @@ export default function Friends({ user }) {
       <header className={styles.pageHeader}>
         <div>
           <h1 className={styles.pageTitle}>Contacts</h1>
-          <p className={styles.pageSubtitle}>Your friends and pending requests.</p>
+          <p className={styles.pageSubtitle}>Your friends, pending requests, and blocked users.</p>
         </div>
       </header>
 
@@ -166,6 +215,12 @@ export default function Friends({ user }) {
                     >
                       Remove
                     </button>
+                    <button
+                      onClick={() => handleBlock(friend.friend_id || friend.id, friend.username)}
+                      className={styles.dangerBtn}
+                    >
+                      Block
+                    </button>
                   </div>
                 </div>
               ))}
@@ -191,6 +246,7 @@ export default function Friends({ user }) {
                   <div className={styles.info}>
                     <strong className={styles.name}>{req.username}</strong>
                     <span className={styles.email}>{req.email}</span>
+                    {req.message && <p className={styles.requestMessage}>"{req.message}"</p>}
                   </div>
                   <div className={styles.actions}>
                     <button
@@ -213,17 +269,58 @@ export default function Friends({ user }) {
         </>
       )}
 
+      {tab === 'blocked' && (
+        <>
+          {loading ? (
+            <div className={styles.mutedNote}>Loading…</div>
+          ) : blocked.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>🚫</div>
+              <p>You haven't blocked anyone.</p>
+            </div>
+          ) : (
+            <div className={styles.list}>
+              {blocked.map((b) => (
+                <div key={b.user_id} className={styles.card}>
+                  <div className={styles.avatar}>{getAvatar(b.username)}</div>
+                  <div className={styles.info}>
+                    <strong className={styles.name}>{b.username}</strong>
+                    <span className={styles.email}>{b.email}</span>
+                  </div>
+                  <div className={styles.actions}>
+                    <button
+                      onClick={() => handleUnblock(b.user_id)}
+                      className={styles.secondaryBtn}
+                    >
+                      Unblock
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
       {tab === 'find' && (
         <div className={styles.findCard}>
           <h2 className={styles.findTitle}>Send a friend request</h2>
-          <p className={styles.findSubtitle}>Enter the username of the person you want to add.</p>
-          <form onSubmit={handleSendRequest} className={styles.form}>
+          <p className={styles.findSubtitle}>Enter the username of the person you want to add. You can include a short note.</p>
+          <form onSubmit={handleSendRequest} className={styles.findForm}>
             <input
               type="text"
               placeholder="username"
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
               className={styles.findInput}
+            />
+            <textarea
+              placeholder="Add a note (optional)"
+              value={requestMessage}
+              onChange={(e) => setRequestMessage(e.target.value)}
+              maxLength={500}
+              className={styles.findTextarea}
+              rows={3}
             />
             <button
               type="submit"

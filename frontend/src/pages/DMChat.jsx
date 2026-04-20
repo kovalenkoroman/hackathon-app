@@ -11,6 +11,8 @@ export default function DMChat({ user }) {
   const [messages, setMessages] = useState([]);
   const [otherUser, setOtherUser] = useState(null);
   const [dialogId, setDialogId] = useState(null);
+  const [canSend, setCanSend] = useState(true);
+  const [frozenReason, setFrozenReason] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const messagesEndRef = useRef(null);
@@ -84,6 +86,8 @@ export default function DMChat({ user }) {
       const dialogData = await dialogRes.json();
       if (dialogRes.ok) {
         setDialogId(dialogData.data.dialogId);
+        setCanSend(dialogData.data.canSend !== false);
+        setFrozenReason(dialogData.data.reason || null);
       }
 
       const msgRes = await fetch(`/api/v1/friends/dialogs/${actualUserId}/messages`);
@@ -157,7 +161,15 @@ export default function DMChat({ user }) {
         <div ref={messagesEndRef} />
       </div>
 
-      <MessageComposer onSend={handleSend} />
+      {canSend ? (
+        <MessageComposer onSend={handleSend} />
+      ) : (
+        <div className={styles.frozenBanner}>
+          {frozenReason === 'you-blocked' && 'You blocked this user. Unblock them in Contacts to continue the conversation.'}
+          {frozenReason === 'they-blocked' && 'You can no longer send messages to this user.'}
+          {(frozenReason === 'not-friends' || !frozenReason) && 'This conversation is read-only. Send a friend request to continue.'}
+        </div>
+      )}
     </div>
   );
 }

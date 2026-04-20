@@ -10,10 +10,10 @@ router.use(authMiddleware);
 // Send friend request by username
 router.post('/request', requireAuth, async (req, res) => {
   try {
-    const { username } = req.body;
+    const { username, message } = req.body;
     if (!username) return res.status(400).json({ error: 'Username is required' });
 
-    const request = await friendsService.sendFriendRequest(req.user.id, username);
+    const request = await friendsService.sendFriendRequest(req.user.id, username, message);
     res.status(201).json({ data: request });
   } catch (error) {
     console.error('Send friend request error:', error);
@@ -98,11 +98,24 @@ router.delete('/users/:userId/ban', requireAuth, async (req, res) => {
   }
 });
 
-// Get dialog ID for user pair
+// List users the current user has blocked
+router.get('/bans', requireAuth, async (req, res) => {
+  try {
+    const bans = await friendQueries.listBans(req.user.id);
+    res.json({ data: bans });
+  } catch (error) {
+    console.error('List bans error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get dialog ID + read-only status for a user pair
 router.get('/dialogs/:userId', requireAuth, async (req, res) => {
   try {
-    const dialog = await friendQueries.getOrCreateDialog(req.user.id, parseInt(req.params.userId));
-    res.json({ data: { dialogId: dialog.id } });
+    const otherId = parseInt(req.params.userId);
+    const dialog = await friendQueries.getOrCreateDialog(req.user.id, otherId);
+    const status = await friendsService.getDialogStatus(req.user.id, otherId);
+    res.json({ data: { dialogId: dialog.id, canSend: status.canSend, reason: status.reason } });
   } catch (error) {
     console.error('Get dialog error:', error);
     res.status(400).json({ error: error.message });

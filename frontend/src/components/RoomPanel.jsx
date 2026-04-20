@@ -1,10 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './RoomPanel.module.css';
 
 export default function RoomPanel({ room, members, user, onInvite, onManage, onBan, onRemove, onPromote, onDemote, onLeave }) {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteLink, setInviteLink] = useState('');
   const [copied, setCopied] = useState(false);
+  const [friendIds, setFriendIds] = useState(new Set());
+  const [pendingRequestIds, setPendingRequestIds] = useState(new Set());
+
+  useEffect(() => {
+    loadFriends();
+  }, []);
+
+  const loadFriends = async () => {
+    try {
+      const res = await fetch('/api/v1/friends');
+      if (res.ok) {
+        const json = await res.json();
+        const ids = new Set((json.data || []).map((f) => f.friend_id || f.id));
+        setFriendIds(ids);
+      }
+    } catch (err) {
+      /* non-fatal */
+    }
+  };
+
+  const handleAddFriend = async (memberUserId, memberUsername) => {
+    try {
+      const res = await fetch('/api/v1/friends/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: memberUsername }),
+      });
+      if (res.ok) {
+        setPendingRequestIds((prev) => new Set(prev).add(memberUserId));
+      }
+    } catch (err) {
+      /* non-fatal */
+    }
+  };
 
   const isOwner = room && user && room.owner_id === user.id;
   const isMemberAdmin = members?.find((m) => m.user_id === user?.id)?.role === 'admin';
@@ -61,12 +95,29 @@ export default function RoomPanel({ room, members, user, onInvite, onManage, onB
   const adminMembers = members?.filter((m) => m.role === 'admin') || [];
   const regularMembers = members?.filter((m) => m.role === 'member') || [];
 
-  const renderMember = (m) => (
-    <div key={m.user_id} className={styles.memberRow}>
-      <div className={styles.memberAvatar}>{getAvatar(m.username)}</div>
-      <span className={styles.memberName}>{m.username}</span>
-    </div>
-  );
+  const renderMember = (m) => {
+    const isSelf = m.user_id === user?.id;
+    const isFriend = friendIds.has(m.user_id);
+    const requested = pendingRequestIds.has(m.user_id);
+    const canAddFriend = !isSelf && !isFriend;
+    return (
+      <div key={m.user_id} className={styles.memberRow}>
+        <div className={styles.memberAvatar}>{getAvatar(m.username)}</div>
+        <span className={styles.memberName}>{m.username}</span>
+        {canAddFriend && !requested && (
+          <button
+            type="button"
+            onClick={() => handleAddFriend(m.user_id, m.username)}
+            className={styles.addFriendBtn}
+            title={`Send friend request to ${m.username}`}
+          >
+            +
+          </button>
+        )}
+        {requested && <span className={styles.requestedBadge} title="Request sent">✓</span>}
+      </div>
+    );
+  };
 
   return (
     <div className={styles.panel}>

@@ -82,3 +82,14 @@
 .message.own .timestamp {
   color: rgba(255, 255, 255, 0.75);
 }
+
+.frozenBanner {
+  padding: 0.85rem 1.25rem;
+  background: #fafafb;
+  border-top: 1px solid #ececf2;
+  color: #777;
+  font-size: 0.85rem;
+  text-align: center;
+  font-style: italic;
+  flex-shrink: 0;
+}

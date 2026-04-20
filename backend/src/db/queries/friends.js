@@ -1,11 +1,11 @@
 import pool from '../index.js';
 
-export async function createFriendRequest(requesterId, addresseeId) {
+export async function createFriendRequest(requesterId, addresseeId, message = null) {
   const result = await pool.query(
-    `INSERT INTO friendships (requester_id, addressee_id, status)
-     VALUES ($1, $2, 'pending')
+    `INSERT INTO friendships (requester_id, addressee_id, status, message)
+     VALUES ($1, $2, 'pending', $3)
      RETURNING *`,
-    [requesterId, addresseeId]
+    [requesterId, addresseeId, message]
   );
   return result.rows[0];
 }
@@ -69,7 +69,7 @@ export async function listFriends(userId) {
 
 export async function listPendingRequests(userId) {
   const result = await pool.query(
-    `SELECT f.id, f.requester_id, f.addressee_id, u.username, u.email, f.created_at
+    `SELECT f.id, f.requester_id, f.addressee_id, u.username, u.email, f.message, f.created_at
      FROM friendships f
      JOIN users u ON f.requester_id = u.id
      WHERE f.addressee_id = $1 AND f.status = 'pending'
@@ -77,6 +77,28 @@ export async function listPendingRequests(userId) {
     [userId]
   );
   return result.rows;
+}
+
+export async function listBans(bannerId) {
+  const result = await pool.query(
+    `SELECT b.banned_id as user_id, u.username, u.email, b.created_at
+     FROM user_bans b
+     JOIN users u ON b.banned_id = u.id
+     WHERE b.banner_id = $1
+     ORDER BY b.created_at DESC`,
+    [bannerId]
+  );
+  return result.rows;
+}
+
+export async function dialogExistsBetween(userId1, userId2) {
+  const result = await pool.query(
+    `SELECT id FROM personal_dialogs
+     WHERE (user_a_id = $1 AND user_b_id = $2)
+        OR (user_a_id = $2 AND user_b_id = $1)`,
+    [userId1, userId2]
+  );
+  return result.rows[0];
 }
 
 export async function banUser(bannerId, bannedId) {

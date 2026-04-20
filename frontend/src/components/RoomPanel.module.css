@@ -130,6 +130,41 @@
   white-space: nowrap;
 }
 
+.addFriendBtn {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid #dcdce3;
+  background: white;
+  color: #667eea;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: inherit;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.memberRow:hover .addFriendBtn {
+  display: inline-flex;
+}
+
+.addFriendBtn:hover {
+  background: #eef0ff;
+  border-color: #667eea;
+}
+
+.requestedBadge {
+  font-size: 0.8rem;
+  color: #2a9d2a;
+  padding: 0 0.25rem;
+}
+
 .actions {
   display: flex;
   flex-direction: column;

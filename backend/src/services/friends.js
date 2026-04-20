@@ -4,21 +4,27 @@ import * as messageQueries from '../db/queries/messages.js';
 import { broadcastToUser } from '../ws/broadcast.js';
 import pool from '../db/index.js';
 
-export async function sendFriendRequest(requesterId, addresseeUsername) {
+export async function sendFriendRequest(requesterId, addresseeUsername, message = null) {
   const addressee = await userQueries.findUserByUsername(addresseeUsername);
   if (!addressee) throw new Error('User not found');
   if (addressee.id === requesterId) throw new Error('Cannot send request to yourself');
 
+  // Cannot send a request to someone who has banned us or whom we've banned
+  const weBanned = await friendQueries.isUserBanned(requesterId, addressee.id);
+  if (weBanned) throw new Error('You have blocked this user');
+  const theyBanned = await friendQueries.isUserBanned(addressee.id, requesterId);
+  if (theyBanned) throw new Error('Cannot send request to this user');
+
   const existing = await friendQueries.getFriendshipBetween(requesterId, addressee.id);
   if (existing) throw new Error('Friendship already exists or request pending');
 
+  const trimmed = message && message.trim().length > 0 ? message.trim().slice(0, 500) : null;
   const requester = await userQueries.findUserById(requesterId);
-  const request = await friendQueries.createFriendRequest(requesterId, addressee.id);
+  const request = await friendQueries.createFriendRequest(requesterId, addressee.id, trimmed);
 
-  // Notify addressee of friend request
   broadcastToUser(addressee.id, {
     type: 'friend:request',
-    payload: { id: request.id, requesterId, requesterUsername: requester.username }
+    payload: { id: request.id, requesterId, requesterUsername: requester.username, message: trimmed }
   });
 
   return request;
@@ -100,22 +106,18 @@ export async function sendDM(senderId, recipientId, content) {
   return await messageQueries.createMessage(dialog.id, senderId, content.trim(), null, true);
 }
 
+// Per requirement 2.3.5, existing dialog history must stay visible even after
+// a user-to-user ban — it just becomes read-only. So we don't enforce friendship
+// or ban status here; that check lives in sendDM for writes.
 export async function getDMHistory(userId, otherId, beforeId = null, limit = 50) {
-  const friendship = await friendQueries.getFriendshipBetween(userId, otherId);
-  if (!friendship || friendship.status !== 'accepted') {
-    throw new Error('You are not friends with this user');
-  }
-
-  const isBanned = await friendQueries.isUserBanned(otherId, userId);
-  if (isBanned) throw new Error('You are banned by this user');
-
-  const dialog = await friendQueries.getOrCreateDialog(userId, otherId);
+  const existing = await friendQueries.dialogExistsBetween(userId, otherId);
+  if (!existing) return [];
 
   let query = `SELECT m.*, u.username, u.email
                FROM messages m
                JOIN users u ON m.user_id = u.id
                WHERE m.dialog_id = $1 AND m.deleted = false`;
-  const params = [dialog.id];
+  const params = [existing.id];
 
   if (beforeId) {
     query += ` AND m.id < $2`;
@@ -127,6 +129,23 @@ export async function getDMHistory(userId, otherId, beforeId = null, limit = 50)
 
   const result = await pool.query(query, params);
   return result.rows.reverse();
+}
+
+// Used by the DMChat page to decide whether the composer should be shown.
+// "frozen" means the user can read the history but not send new messages.
+export async function getDialogStatus(userId, otherId) {
+  const friendship = await friendQueries.getFriendshipBetween(userId, otherId);
+  const weBlocked = await friendQueries.isUserBanned(userId, otherId);
+  const theyBlocked = await friendQueries.isUserBanned(otherId, userId);
+
+  const canSend = friendship?.status === 'accepted' && !weBlocked && !theyBlocked;
+
+  let reason = null;
+  if (weBlocked) reason = 'you-blocked';
+  else if (theyBlocked) reason = 'they-blocked';
+  else if (!friendship || friendship.status !== 'accepted') reason = 'not-friends';
+
+  return { canSend, reason };
 }
 
 export async function getFriendsWithPresence(userId) {
