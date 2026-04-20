@@ -198,10 +198,48 @@
 }
 
 .sectionTitle {
-  margin: 0 0 0.4rem 0;
+  margin: 0;
   font-size: 0.75rem;
   font-weight: 600;
   color: #888;
+}
+
+.sectionToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.35rem 0.25rem;
+  margin: 0 0 0.2rem 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  border-radius: 4px;
+  transition: background 0.12s;
+}
+
+.sectionToggle:hover {
+  background: #ececf2;
+}
+
+.chevron {
+  font-size: 0.7rem;
+  color: #999;
+  width: 12px;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.sectionCount {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: #999;
+  background: #ececf2;
+  padding: 0.05rem 0.4rem;
+  border-radius: 10px;
+  font-weight: 600;
 }
 
 .categoryHeader {

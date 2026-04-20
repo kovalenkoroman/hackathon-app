@@ -15,9 +15,18 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
   const activeDmMatch = matchPath('/dm/:userId', location.pathname);
   const activeRoomId = activeRoomMatch ? parseInt(activeRoomMatch.params.roomId) : null;
   const activeDmUserId = activeDmMatch ? parseInt(activeDmMatch.params.userId) : null;
+
+  // Req 4.1.1: when entering a room, compact the sidebar in accordion style.
+  // We auto-collapse the opposite section so the user focuses on where they are.
+  useEffect(() => {
+    if (activeRoomId) setContactsOpen(false);
+    else if (activeDmUserId) setRoomsOpen(false);
+  }, [activeRoomId, activeDmUserId]);
   const { roomInfo, roomMembers, setRoomInfo, setRoomMembers } = useContext(RoomContext);
   const { getUnreadCount } = useUnreads();
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
+  const [roomsOpen, setRoomsOpen] = useState(true);
+  const [contactsOpen, setContactsOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [publicRooms, setPublicRooms] = useState([]);
   const [privateRooms, setPrivateRooms] = useState([]);
@@ -165,83 +174,107 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                 </div>
 
                 <div className={styles.sidebarSection}>
-                  <h3 className={styles.sectionTitle}>Rooms</h3>
-                  <div className={styles.roomsSection}>
-                    <div className={styles.categoryHeader}>Public</div>
-                    <div className={styles.roomList} id="room-list">
-                      {loading ? (
-                        <div className={styles.mutedNote}>Loading...</div>
-                      ) : filteredPublic.length > 0 ? (
-                        filteredPublic.map((room) => {
-                          const unreadCount = getUnreadCount(room.id, 'room');
-                          const isActive = activeRoomId === room.id;
-                          return (
-                            <div
-                              key={room.id}
-                              onClick={() => handleRoomClick(room.id)}
-                              className={`${styles.roomItem} ${isActive ? styles.active : ''}`}
-                              title={room.name}
-                            >
-                              <span className={styles.itemName}>{room.name}</span>
-                              {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <div className={styles.mutedNote}>{q ? 'No matches' : 'No public rooms'}</div>
-                      )}
+                  <button
+                    type="button"
+                    className={styles.sectionToggle}
+                    onClick={() => setRoomsOpen((v) => !v)}
+                  >
+                    <span className={styles.chevron}>{roomsOpen ? '▾' : '▸'}</span>
+                    <span className={styles.sectionTitle}>Rooms</span>
+                    {!roomsOpen && filteredPublic.length + filteredPrivate.length > 0 && (
+                      <span className={styles.sectionCount}>{filteredPublic.length + filteredPrivate.length}</span>
+                    )}
+                  </button>
+                  {roomsOpen && (
+                    <div className={styles.roomsSection}>
+                      <div className={styles.categoryHeader}>Public</div>
+                      <div className={styles.roomList} id="room-list">
+                        {loading ? (
+                          <div className={styles.mutedNote}>Loading...</div>
+                        ) : filteredPublic.length > 0 ? (
+                          filteredPublic.map((room) => {
+                            const unreadCount = getUnreadCount(room.id, 'room');
+                            const isActive = activeRoomId === room.id;
+                            return (
+                              <div
+                                key={room.id}
+                                onClick={() => handleRoomClick(room.id)}
+                                className={`${styles.roomItem} ${isActive ? styles.active : ''}`}
+                                title={room.name}
+                              >
+                                <span className={styles.itemName}>{room.name}</span>
+                                {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className={styles.mutedNote}>{q ? 'No matches' : 'No public rooms'}</div>
+                        )}
+                      </div>
+                      <div className={styles.categoryHeader}>Private</div>
+                      <div className={styles.roomList}>
+                        {filteredPrivate.length > 0 ? (
+                          filteredPrivate.map((room) => {
+                            const unreadCount = getUnreadCount(room.id, 'room');
+                            const isActive = activeRoomId === room.id;
+                            return (
+                              <div
+                                key={room.id}
+                                onClick={() => handleRoomClick(room.id)}
+                                className={`${styles.roomItem} ${isActive ? styles.active : ''}`}
+                                title={room.name}
+                              >
+                                <span className={styles.itemName}>{room.name}</span>
+                                {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className={styles.mutedNote}>{q ? 'No matches' : 'No private rooms'}</div>
+                        )}
+                      </div>
                     </div>
-                    <div className={styles.categoryHeader}>Private</div>
-                    <div className={styles.roomList}>
-                      {filteredPrivate.length > 0 ? (
-                        filteredPrivate.map((room) => {
-                          const unreadCount = getUnreadCount(room.id, 'room');
-                          const isActive = activeRoomId === room.id;
-                          return (
-                            <div
-                              key={room.id}
-                              onClick={() => handleRoomClick(room.id)}
-                              className={`${styles.roomItem} ${isActive ? styles.active : ''}`}
-                              title={room.name}
-                            >
-                              <span className={styles.itemName}>{room.name}</span>
-                              {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <div className={styles.mutedNote}>{q ? 'No matches' : 'No private rooms'}</div>
-                      )}
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 <div className={styles.sidebarSection}>
-                  <h3 className={styles.sectionTitle}>Contacts</h3>
-                  <div className={styles.contactList} id="contact-list">
-                    {filteredContacts.length > 0 ? (
-                      filteredContacts.map((contact) => {
-                        const contactId = contact.friend_id || contact.id;
-                        const contactStatus = presence[contactId] || 'offline';
-                        const unreadCount = getUnreadCount(contactId, 'dialog');
-                        const isActive = activeDmUserId === contactId;
-                        return (
-                          <div
-                            key={contactId}
-                            onClick={() => navigate(`/dm/${contactId}`)}
-                            className={`${styles.contactItem} ${isActive ? styles.active : ''}`}
-                            title={contact.username}
-                          >
-                            <span className={styles.presenceDot}>{getPresenceIcon(contactStatus)}</span>
-                            <span className={styles.itemName}>{contact.username}</span>
-                            {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <div className={styles.mutedNote}>{q ? 'No matches' : 'No contacts'}</div>
+                  <button
+                    type="button"
+                    className={styles.sectionToggle}
+                    onClick={() => setContactsOpen((v) => !v)}
+                  >
+                    <span className={styles.chevron}>{contactsOpen ? '▾' : '▸'}</span>
+                    <span className={styles.sectionTitle}>Contacts</span>
+                    {!contactsOpen && filteredContacts.length > 0 && (
+                      <span className={styles.sectionCount}>{filteredContacts.length}</span>
                     )}
-                  </div>
+                  </button>
+                  {contactsOpen && (
+                    <div className={styles.contactList} id="contact-list">
+                      {filteredContacts.length > 0 ? (
+                        filteredContacts.map((contact) => {
+                          const contactId = contact.friend_id || contact.id;
+                          const contactStatus = presence[contactId] || 'offline';
+                          const unreadCount = getUnreadCount(contactId, 'dialog');
+                          const isActive = activeDmUserId === contactId;
+                          return (
+                            <div
+                              key={contactId}
+                              onClick={() => navigate(`/dm/${contactId}`)}
+                              className={`${styles.contactItem} ${isActive ? styles.active : ''}`}
+                              title={contact.username}
+                            >
+                              <span className={styles.presenceDot}>{getPresenceIcon(contactStatus)}</span>
+                              <span className={styles.itemName}>{contact.username}</span>
+                              {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className={styles.mutedNote}>{q ? 'No matches' : 'No contacts'}</div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <button className={styles.createRoomBtn} onClick={() => navigate('/catalog?create=true')}>
