@@ -5,11 +5,10 @@ Classic web-based chat server built for the DataArt hackathon: registration, pub
 ## Run
 
 ```bash
-cp .env.example .env
 docker compose up --build
 ```
 
-Open <http://localhost:3000>
+Open <http://localhost:3000>. No `.env` setup needed — `docker-compose.yml` injects all service env vars inline.
 
 The PostgreSQL volume is named; drop it with `docker compose down -v` if you want a clean slate.
 
@@ -102,7 +101,7 @@ notes.md          Running decisions log
 
 ## Environment variables
 
-See `.env.example`. `docker-compose.yml` already provides sensible defaults; the `.env` file is only needed if you want to override them.
+`docker-compose.yml` sets all service env vars inline, so no `.env` file is required to run the stack. `.env.example` is kept as a reference for which variables the backend reads at runtime — useful if you later split compose into per-service env files or deploy outside Docker.
 
 ## How migrations are applied
 

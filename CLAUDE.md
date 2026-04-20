@@ -153,7 +153,6 @@ MAX_IMAGE_SIZE_BYTES=3145728
 ## How to Run
 
 ```bash
-cp .env.example .env
 docker compose up --build
 ```
 
