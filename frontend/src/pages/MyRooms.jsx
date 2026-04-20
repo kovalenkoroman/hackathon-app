@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './MyRooms.module.css';
+import styles from './RoomCatalog.module.css';
 
 export default function MyRooms() {
   const navigate = useNavigate();
@@ -18,8 +18,7 @@ export default function MyRooms() {
     try {
       const res = await fetch('/api/v1/rooms/mine');
       const json = await res.json();
-      // Filter to only show private rooms
-      const privateRooms = (json.data || []).filter(room => room.visibility === 'private');
+      const privateRooms = (json.data || []).filter((room) => room.visibility === 'private');
       setRooms(privateRooms);
     } catch (err) {
       setError('Failed to load private rooms');
@@ -30,24 +29,60 @@ export default function MyRooms() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.catalogPanel}>
-        <h2>Private Rooms</h2>
-
-        {error && <p className={styles.error}>{error}</p>}
-        {loading && <p>Loading...</p>}
-
-        <div className={styles.roomsList}>
-          {rooms.map((room) => (
-            <div key={room.id} className={styles.roomCard} onClick={() => navigate(`/rooms/${room.id}`)}>
-              <h3>{room.name}</h3>
-              {room.description && <p>{room.description}</p>}
-              <p className={styles.meta}>Members: {room.member_count || 0}</p>
-              <button onClick={(e) => { e.stopPropagation(); navigate(`/rooms/${room.id}`); }} style={{ width: '100%', backgroundColor: '#667eea', color: 'white', padding: '0.75rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: '600', marginTop: '1rem' }}>Enter</button>
-            </div>
-          ))}
+      <header className={styles.pageHeader}>
+        <div>
+          <h1 className={styles.pageTitle}>Private rooms</h1>
+          <p className={styles.pageSubtitle}>Invite-only rooms you're a member of.</p>
         </div>
+        <button
+          className={styles.primaryBtn}
+          onClick={() => navigate('/catalog?create=true')}
+        >
+          + Create room
+        </button>
+      </header>
 
-        {!loading && rooms.length === 0 && <p className={styles.empty}>No private rooms</p>}
+      {error && <div className={styles.error}>{error}</div>}
+      {loading && <div className={styles.mutedNote}>Loading rooms…</div>}
+
+      {!loading && rooms.length === 0 && (
+        <div className={styles.emptyState}>
+          <div className={styles.emptyIcon}>🔒</div>
+          <p>You don't have any private rooms yet.</p>
+          <button
+            className={styles.primaryBtn}
+            onClick={() => navigate('/catalog?create=true')}
+          >
+            Create a private room
+          </button>
+        </div>
+      )}
+
+      <div className={styles.roomsGrid}>
+        {rooms.map((room) => (
+          <article
+            key={room.id}
+            className={`${styles.roomCard} ${styles.roomCardJoined}`}
+          >
+            <span className={styles.joinedBadge}>{room.role || 'member'}</span>
+            <h3 className={styles.roomName}>{room.name}</h3>
+            {room.description && <p className={styles.roomDesc}>{room.description}</p>}
+            <div className={styles.roomMeta}>
+              <span className={styles.metaItem}>
+                <span className={styles.metaIcon}>👥</span>
+                {room.member_count || 0} {room.member_count === 1 ? 'member' : 'members'}
+              </span>
+            </div>
+            <div className={styles.roomActions}>
+              <button
+                className={styles.primaryBtn}
+                onClick={() => navigate(`/rooms/${room.id}`)}
+              >
+                Enter
+              </button>
+            </div>
+          </article>
+        ))}
       </div>
     </div>
   );
