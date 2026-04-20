@@ -2,21 +2,27 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Friends.module.css';
 
+const TABS = [
+  { key: 'list', label: 'Friends' },
+  { key: 'pending', label: 'Pending requests' },
+  { key: 'find', label: 'Add friend' },
+];
+
 export default function Friends({ user }) {
   const navigate = useNavigate();
-  const [tab, setTab] = useState('list'); // 'list', 'pending', 'find'
+  const [tab, setTab] = useState('list');
   const [friends, setFriends] = useState([]);
   const [pending, setPending] = useState([]);
   const [usernameInput, setUsernameInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   useEffect(() => {
-    if (tab === 'list') {
-      fetchFriends();
-    } else if (tab === 'pending') {
-      fetchPendingRequests();
-    }
+    setError('');
+    setSuccessMsg('');
+    if (tab === 'list') fetchFriends();
+    else if (tab === 'pending') fetchPendingRequests();
   }, [tab]);
 
   const fetchFriends = async () => {
@@ -53,13 +59,13 @@ export default function Friends({ user }) {
       const res = await fetch('/api/v1/friends/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: usernameInput })
+        body: JSON.stringify({ username: usernameInput }),
       });
 
       if (res.ok) {
         setUsernameInput('');
         setError('');
-        setTab('list'); // Switch to friends list
+        setSuccessMsg(`Friend request sent to ${usernameInput}`);
       } else {
         const json = await res.json();
         setError(json.error || 'Failed to send request');
@@ -71,13 +77,8 @@ export default function Friends({ user }) {
 
   const handleAccept = async (id) => {
     try {
-      const res = await fetch(`/api/v1/friends/requests/${id}/accept`, {
-        method: 'POST'
-      });
-
-      if (res.ok) {
-        setPending((prev) => prev.filter((p) => p.id !== id));
-      }
+      const res = await fetch(`/api/v1/friends/requests/${id}/accept`, { method: 'POST' });
+      if (res.ok) setPending((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
       setError('Failed to accept request');
     }
@@ -85,13 +86,8 @@ export default function Friends({ user }) {
 
   const handleReject = async (id) => {
     try {
-      const res = await fetch(`/api/v1/friends/requests/${id}/reject`, {
-        method: 'POST'
-      });
-
-      if (res.ok) {
-        setPending((prev) => prev.filter((p) => p.id !== id));
-      }
+      const res = await fetch(`/api/v1/friends/requests/${id}/reject`, { method: 'POST' });
+      if (res.ok) setPending((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
       setError('Failed to reject request');
     }
@@ -99,71 +95,75 @@ export default function Friends({ user }) {
 
   const handleRemove = async (id) => {
     if (!confirm('Remove this friend?')) return;
-
     try {
-      const res = await fetch(`/api/v1/friends/${id}`, {
-        method: 'DELETE'
-      });
-
-      if (res.ok) {
-        setFriends((prev) => prev.filter((f) => f.id !== id));
-      }
+      const res = await fetch(`/api/v1/friends/${id}`, { method: 'DELETE' });
+      if (res.ok) setFriends((prev) => prev.filter((f) => f.id !== id));
     } catch (err) {
       setError('Failed to remove friend');
     }
   };
 
-  const handleMessage = (friendId) => {
-    navigate(`/dm/${friendId}`);
-  };
+  const getAvatar = (name) => (name ? name[0].toUpperCase() : '?');
 
   return (
     <div className={styles.container}>
-      <h1>Friends</h1>
+      <header className={styles.pageHeader}>
+        <div>
+          <h1 className={styles.pageTitle}>Contacts</h1>
+          <p className={styles.pageSubtitle}>Your friends and pending requests.</p>
+        </div>
+      </header>
 
       <div className={styles.tabs}>
-        <button
-          className={tab === 'list' ? styles.active : ''}
-          onClick={() => setTab('list')}
-        >
-          Friends List
-        </button>
-        <button
-          className={tab === 'pending' ? styles.active : ''}
-          onClick={() => setTab('pending')}
-        >
-          Pending Requests
-        </button>
-        <button
-          className={tab === 'find' ? styles.active : ''}
-          onClick={() => setTab('find')}
-        >
-          Find Users
-        </button>
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            className={`${styles.tab} ${tab === t.key ? styles.active : ''}`}
+            onClick={() => setTab(t.key)}
+          >
+            {t.label}
+            {t.key === 'pending' && pending.length > 0 && (
+              <span className={styles.tabBadge}>{pending.length}</span>
+            )}
+          </button>
+        ))}
       </div>
 
       {error && <div className={styles.error}>{error}</div>}
+      {successMsg && <div className={styles.success}>{successMsg}</div>}
 
       {tab === 'list' && (
-        <div className={styles.section}>
-          <h2>Your Friends</h2>
+        <>
           {loading ? (
-            <p>Loading...</p>
+            <div className={styles.mutedNote}>Loading…</div>
           ) : friends.length === 0 ? (
-            <p>No friends yet. Send a friend request!</p>
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>👋</div>
+              <p>You don't have any friends yet.</p>
+              <button className={styles.primaryBtn} onClick={() => setTab('find')}>
+                Send a friend request
+              </button>
+            </div>
           ) : (
             <div className={styles.list}>
               {friends.map((friend) => (
                 <div key={friend.id} className={styles.card}>
+                  <div className={styles.avatar}>{getAvatar(friend.username)}</div>
                   <div className={styles.info}>
-                    <strong>{friend.username}</strong>
+                    <strong className={styles.name}>{friend.username}</strong>
                     <span className={styles.email}>{friend.email}</span>
                   </div>
                   <div className={styles.actions}>
-                    <button onClick={() => handleMessage(friend.friend_id || friend.id)} className={styles.primary}>
+                    <button
+                      onClick={() => navigate(`/dm/${friend.friend_id || friend.id}`)}
+                      className={styles.primaryBtn}
+                    >
                       Message
                     </button>
-                    <button onClick={() => handleRemove(friend.id)} className={styles.secondary}>
+                    <button
+                      onClick={() => handleRemove(friend.id)}
+                      className={styles.secondaryBtn}
+                    >
                       Remove
                     </button>
                   </div>
@@ -171,29 +171,38 @@ export default function Friends({ user }) {
               ))}
             </div>
           )}
-        </div>
+        </>
       )}
 
       {tab === 'pending' && (
-        <div className={styles.section}>
-          <h2>Pending Requests</h2>
+        <>
           {loading ? (
-            <p>Loading...</p>
+            <div className={styles.mutedNote}>Loading…</div>
           ) : pending.length === 0 ? (
-            <p>No pending requests.</p>
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>📭</div>
+              <p>No pending requests.</p>
+            </div>
           ) : (
             <div className={styles.list}>
               {pending.map((req) => (
                 <div key={req.id} className={styles.card}>
+                  <div className={styles.avatar}>{getAvatar(req.username)}</div>
                   <div className={styles.info}>
-                    <strong>{req.username}</strong>
+                    <strong className={styles.name}>{req.username}</strong>
                     <span className={styles.email}>{req.email}</span>
                   </div>
                   <div className={styles.actions}>
-                    <button onClick={() => handleAccept(req.id)} className={styles.primary}>
+                    <button
+                      onClick={() => handleAccept(req.id)}
+                      className={styles.primaryBtn}
+                    >
                       Accept
                     </button>
-                    <button onClick={() => handleReject(req.id)} className={styles.secondary}>
+                    <button
+                      onClick={() => handleReject(req.id)}
+                      className={styles.secondaryBtn}
+                    >
                       Reject
                     </button>
                   </div>
@@ -201,29 +210,31 @@ export default function Friends({ user }) {
               ))}
             </div>
           )}
-        </div>
+        </>
       )}
 
       {tab === 'find' && (
-        <div className={styles.section}>
-          <h2>Send Friend Request</h2>
+        <div className={styles.findCard}>
+          <h2 className={styles.findTitle}>Send a friend request</h2>
+          <p className={styles.findSubtitle}>Enter the username of the person you want to add.</p>
           <form onSubmit={handleSendRequest} className={styles.form}>
             <input
               type="text"
-              placeholder="Enter username"
+              placeholder="username"
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
+              className={styles.findInput}
             />
-            <button type="submit" className={styles.primary}>
-              Send Request
+            <button
+              type="submit"
+              className={styles.primaryBtn}
+              disabled={!usernameInput.trim()}
+            >
+              Send request
             </button>
           </form>
         </div>
       )}
-
-      <div className={styles.back}>
-        <a href="/">← Back to home</a>
-      </div>
     </div>
   );
 }
