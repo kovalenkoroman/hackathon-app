@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import * as authApi from '../api/auth';
 import styles from './Auth.module.css';
 
@@ -40,7 +40,7 @@ export default function ChangePassword() {
     setLoading(true);
     try {
       await authApi.changePassword(currentPassword, newPassword);
-      setSuccess('Password changed successfully');
+      setSuccess('Password changed successfully.');
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -53,51 +53,63 @@ export default function ChangePassword() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.page}>
+      <Link to="/" className={styles.brand}>
+        <img src="/logo.svg" alt="" className={styles.brandLogo} />
+        <span className={styles.brandName}>Hackathon Chat</span>
+      </Link>
+
       <div className={styles.card}>
-        <h1>Change Password</h1>
+        <h1 className={styles.cardTitle}>Change password</h1>
+        <p className={styles.cardSubtitle}>Enter your current password, then pick a new one.</p>
+
         {error && <div className={styles.error}>{error}</div>}
         {success && <div className={styles.success}>{success}</div>}
-        <form onSubmit={handleSubmit}>
+
+        <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>
-            <label htmlFor="currentPassword">Current Password</label>
+            <label htmlFor="currentPassword">Current password</label>
             <input
               id="currentPassword"
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               disabled={loading}
+              placeholder="••••••••"
               required
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="newPassword">New Password</label>
+            <label htmlFor="newPassword">New password</label>
             <input
               id="newPassword"
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               disabled={loading}
+              placeholder="At least 6 characters"
               required
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="confirmPassword">Confirm New Password</label>
+            <label htmlFor="confirmPassword">Confirm new password</label>
             <input
               id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={loading}
+              placeholder="••••••••"
               required
             />
           </div>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Changing...' : 'Change Password'}
+          <button type="submit" disabled={loading} className={styles.primaryBtn}>
+            {loading ? 'Changing…' : 'Change password'}
           </button>
         </form>
-        <div className={styles.links}>
-          <a href="/">Back to home</a>
+
+        <div className={styles.footer}>
+          <Link to="/" className={styles.inlineLink}>← Back to app</Link>
         </div>
       </div>
     </div>

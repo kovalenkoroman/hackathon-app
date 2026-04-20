@@ -25,7 +25,6 @@ export default function Register() {
 
     try {
       await authApi.register(email, username, password);
-      // Log in automatically after registration
       await authApi.login(email, password);
       navigate('/');
     } catch (err) {
@@ -36,11 +35,19 @@ export default function Register() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.page}>
+      <Link to="/" className={styles.brand}>
+        <img src="/logo.svg" alt="" className={styles.brandLogo} />
+        <span className={styles.brandName}>Hackathon Chat</span>
+      </Link>
+
       <div className={styles.card}>
-        <h2>Create Account</h2>
+        <h1 className={styles.cardTitle}>Create your account</h1>
+        <p className={styles.cardSubtitle}>It takes less than a minute.</p>
+
         {error && <div className={styles.error}>{error}</div>}
-        <form onSubmit={handleSubmit}>
+
+        <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>
             <label htmlFor="email">Email</label>
             <input
@@ -49,6 +56,7 @@ export default function Register() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
+              placeholder="you@example.com"
               required
             />
           </div>
@@ -60,6 +68,7 @@ export default function Register() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               disabled={loading}
+              placeholder="yourname"
               required
             />
           </div>
@@ -71,28 +80,31 @@ export default function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
+              placeholder="At least 6 characters"
               minLength="6"
               required
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="confirmPassword">Confirm Password</label>
+            <label htmlFor="confirmPassword">Confirm password</label>
             <input
               id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={loading}
+              placeholder="••••••••"
               minLength="6"
               required
             />
           </div>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Creating account...' : 'Create Account'}
+          <button type="submit" disabled={loading} className={styles.primaryBtn}>
+            {loading ? 'Creating account…' : 'Create account'}
           </button>
         </form>
-        <div className={styles.links}>
-          <Link to="/login">Already have an account?</Link>
+
+        <div className={styles.footer}>
+          Already have an account? <Link to="/login" className={styles.inlineLink}>Sign in</Link>
         </div>
       </div>
     </div>
