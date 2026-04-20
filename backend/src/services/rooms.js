@@ -1,7 +1,10 @@
+import { unlink } from 'fs/promises';
 import * as roomQueries from '../db/queries/rooms.js';
 import * as userQueries from '../db/queries/users.js';
 import pool from '../db/index.js';
 import * as broadcast from '../ws/broadcast.js';
+
+const UPLOAD_DIR = process.env.UPLOAD_DIR || '/app/uploads';
 
 export async function createRoom(name, description, visibility, ownerId) {
   if (!name || name.trim().length === 0) throw new Error('Room name is required');
@@ -27,18 +30,21 @@ export async function deleteRoom(roomId, userId) {
   if (room.owner_id !== userId) throw new Error('Only room owner can delete');
 
   const client = await pool.connect();
+  let filenames = [];
   try {
     await client.query('BEGIN');
 
-    // Delete all messages and their attachments
+    // Collect filenames before deletion so we can unlink them after commit (req 2.4.6).
+    const attachmentsResult = await client.query(
+      'SELECT a.filename FROM attachments a JOIN messages m ON a.message_id = m.id WHERE m.room_id = $1',
+      [roomId]
+    );
+    filenames = attachmentsResult.rows.map((r) => r.filename);
+
     await client.query('DELETE FROM attachments WHERE message_id IN (SELECT id FROM messages WHERE room_id = $1)', [roomId]);
     await client.query('DELETE FROM messages WHERE room_id = $1', [roomId]);
-
-    // Delete room bans and members
     await client.query('DELETE FROM room_bans WHERE room_id = $1', [roomId]);
     await client.query('DELETE FROM room_members WHERE room_id = $1', [roomId]);
-
-    // Delete room
     await client.query('DELETE FROM rooms WHERE id = $1', [roomId]);
 
     await client.query('COMMIT');
@@ -47,6 +53,14 @@ export async function deleteRoom(roomId, userId) {
     throw e;
   } finally {
     client.release();
+  }
+
+  for (const filename of filenames) {
+    try {
+      await unlink(`${UPLOAD_DIR}/${filename}`);
+    } catch (err) {
+      console.error(`Failed to delete file ${filename}:`, err);
+    }
   }
 }
 
@@ -76,21 +90,12 @@ export async function leaveRoom(roomId, userId) {
   await broadcast.broadcastToRoom(roomId, { type: 'room:left', payload: { roomId, userId } });
 }
 
+// Per req 2.4.8, removing a user from a room by an admin IS a ban — the user
+// must not be able to rejoin until they're unbanned. So kick == ban.
+// Kept as a distinct function name to preserve the existing call site; the UI
+// has merged the two actions into one.
 export async function kickMember(roomId, targetUserId, requestorId) {
-  const room = await roomQueries.findRoomById(roomId);
-  if (!room) throw new Error('Room not found');
-
-  const requestor = await roomQueries.getRoomMember(roomId, requestorId);
-  if (!requestor || (requestor.role !== 'owner' && requestor.role !== 'admin')) {
-    throw new Error('Only room admin or owner can remove members');
-  }
-
-  const target = await roomQueries.getRoomMember(roomId, targetUserId);
-  if (!target) throw new Error('User is not a member of this room');
-  if (target.role === 'owner') throw new Error('Cannot remove the room owner');
-
-  await roomQueries.removeRoomMember(roomId, targetUserId);
-  await broadcast.broadcastToRoom(roomId, { type: 'room:left', payload: { roomId, userId: targetUserId } });
+  return banMember(roomId, targetUserId, requestorId);
 }
 
 export async function promoteToAdmin(roomId, targetUserId, actorUserId) {

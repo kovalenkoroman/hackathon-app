@@ -59,8 +59,11 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
 
   const handlePromote = (userId) => runMemberAction(`/api/v1/rooms/${room.id}/admins/${userId}`, 'POST');
   const handleDemote = (userId) => runMemberAction(`/api/v1/rooms/${room.id}/admins/${userId}`, 'DELETE');
-  const handleBan = (userId) => runMemberAction(`/api/v1/rooms/${room.id}/members/${userId}/ban`, 'POST');
-  const handleKick = (userId) => runMemberAction(`/api/v1/rooms/${room.id}/members/${userId}`, 'DELETE');
+  // Per req 2.4.8, removing a member from a room is treated as a ban.
+  const handleRemoveAndBan = (userId, username) => {
+    if (!confirm(`Remove ${username} from the room? They will be banned and won't be able to rejoin unless unbanned.`)) return;
+    runMemberAction(`/api/v1/rooms/${room.id}/members/${userId}/ban`, 'POST');
+  };
   const handleUnban = (userId) => runMemberAction(`/api/v1/rooms/${room.id}/bans/${userId}`, 'DELETE', () => {
     setBannedUsers((prev) => prev.filter((u) => u.user_id !== userId));
   });
@@ -227,14 +230,13 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
                           {member.role === 'admin' && member.user_id !== user.id && isOwner && (
                             <>
                               <button onClick={() => handleDemote(member.user_id)} className={styles.secondaryBtn} disabled={loading}>Demote</button>
-                              <button onClick={() => handleBan(member.user_id)} className={styles.dangerBtn} disabled={loading}>Ban</button>
+                              <button onClick={() => handleRemoveAndBan(member.user_id, member.username)} className={styles.dangerBtn} disabled={loading}>Remove & ban</button>
                             </>
                           )}
                           {member.role === 'member' && canManage && (
                             <>
                               {isOwner && <button onClick={() => handlePromote(member.user_id)} className={styles.secondaryBtn} disabled={loading}>Make admin</button>}
-                              <button onClick={() => handleKick(member.user_id)} className={styles.secondaryBtn} disabled={loading}>Remove</button>
-                              <button onClick={() => handleBan(member.user_id)} className={styles.dangerBtn} disabled={loading}>Ban</button>
+                              <button onClick={() => handleRemoveAndBan(member.user_id, member.username)} className={styles.dangerBtn} disabled={loading}>Remove & ban</button>
                             </>
                           )}
                         </div>
