@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Lock, Plus } from 'lucide-react';
+import RoomActionButton from '../components/RoomActionButton';
 import styles from './RoomCatalog.module.css';
 
 export default function MyRooms() {
@@ -75,12 +76,11 @@ export default function MyRooms() {
               </span>
             </div>
             <div className={styles.roomActions}>
-              <button
+              <RoomActionButton
+                action="enter"
                 className={styles.primaryBtn}
                 onClick={() => navigate(`/rooms/${room.id}`)}
-              >
-                Enter
-              </button>
+              />
             </div>
           </article>
         ))}

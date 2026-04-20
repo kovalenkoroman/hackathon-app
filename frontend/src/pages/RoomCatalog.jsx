@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Users, X, Plus, Search } from 'lucide-react';
 import * as roomsApi from '../api/rooms';
+import RoomActionButton from '../components/RoomActionButton';
 import styles from './RoomCatalog.module.css';
 
 export default function RoomCatalog() {
@@ -151,28 +152,25 @@ export default function RoomCatalog() {
               <div className={styles.roomActions}>
                 {userInRoom ? (
                   <>
-                    <button
+                    <RoomActionButton
+                      action="enter"
                       className={styles.primaryBtn}
                       onClick={() => navigate(`/rooms/${room.id}`)}
-                    >
-                      Enter
-                    </button>
+                    />
                     {!isOwner && (
-                      <button
+                      <RoomActionButton
+                        action="leave"
                         className={styles.secondaryBtn}
                         onClick={(e) => handleLeave(e, room.id)}
-                      >
-                        Leave
-                      </button>
+                      />
                     )}
                   </>
                 ) : (
-                  <button
+                  <RoomActionButton
+                    action="join"
                     className={styles.primaryBtn}
                     onClick={() => handleJoin(room.id)}
-                  >
-                    Join room
-                  </button>
+                  />
                 )}
               </div>
             </article>

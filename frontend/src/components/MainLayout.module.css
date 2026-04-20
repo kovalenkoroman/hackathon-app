@@ -426,13 +426,29 @@
 }
 
 .unreadBadge {
-  font-size: 0.7rem;
-  background: #ff4444;
-  color: white;
-  border-radius: 10px;
-  padding: 0.05rem 0.4rem;
-  font-weight: 600;
+  font-size: 0.68rem;
+  line-height: 1;
+  background: var(--accent);
+  color: #fff;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
   flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(102, 126, 234, 0.35);
+}
+
+.roomItem.active .unreadBadge,
+.contactItem.active .unreadBadge {
+  background: #fff;
+  color: var(--accent);
+  box-shadow: none;
 }
 
 .mutedNote {

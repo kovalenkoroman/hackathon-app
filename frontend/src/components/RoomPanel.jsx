@@ -9,6 +9,12 @@ export default function RoomPanel({ room, members, user, presence = {}, onInvite
   const [copied, setCopied] = useState(false);
   const [friendIds, setFriendIds] = useState(new Set());
   const [pendingRequestIds, setPendingRequestIds] = useState(new Set());
+  const [actionError, setActionError] = useState('');
+
+  const flashError = (msg) => {
+    setActionError(msg);
+    setTimeout(() => setActionError((cur) => (cur === msg ? '' : cur)), 4000);
+  };
 
   useEffect(() => {
     loadFriends();
@@ -52,7 +58,7 @@ export default function RoomPanel({ room, members, user, presence = {}, onInvite
       await fetch(`/api/v1/rooms/${room.id}/leave`, { method: 'POST', credentials: 'include' });
       if (onLeave) onLeave();
     } catch (err) {
-      alert('Failed to leave room');
+      flashError('Failed to leave room');
     }
   };
 
@@ -69,7 +75,7 @@ export default function RoomPanel({ room, members, user, presence = {}, onInvite
         setInviteLink(link);
       }
     } catch (err) {
-      alert('Failed to create invitation');
+      flashError('Failed to create invitation');
     }
   };
 
@@ -127,6 +133,7 @@ export default function RoomPanel({ room, members, user, presence = {}, onInvite
 
   return (
     <div className={styles.panel}>
+      {actionError && <div className={styles.errorToast}>{actionError}</div>}
       <div className={styles.header}>
         <h2 className={styles.roomName}>{room.name}</h2>
         <span className={`${styles.visibilityBadge} ${room.visibility === 'public' ? styles.public : styles.private}`}>

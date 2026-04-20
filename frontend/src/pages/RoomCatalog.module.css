@@ -158,6 +158,18 @@
   margin-top: 0.75rem;
 }
 
+.roomActions .primaryBtn,
+.roomActions .secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  line-height: 1;
+}
+
 .primaryBtn {
   flex: 1;
   padding: 0.55rem 1rem;

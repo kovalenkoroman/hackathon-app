@@ -7,6 +7,15 @@
   gap: 1.25rem;
 }
 
+.errorToast {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-text);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
 .header {
   display: flex;
   flex-direction: column;
