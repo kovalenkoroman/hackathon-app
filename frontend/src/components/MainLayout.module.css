@@ -294,11 +294,22 @@
 }
 
 .chevron {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.5);
-  width: 12px;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.8);
+  width: 14px;
+  height: 14px;
   display: inline-flex;
+  align-items: center;
   justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.sectionToggle:hover .chevron {
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
 }
 
 .sectionCount {
@@ -342,10 +353,22 @@
 }
 
 .roomItem::before {
-  content: '#';
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.4);
   font-weight: 500;
   flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.roomPublic::before {
+  content: '#';
+}
+
+.roomPrivate::before {
+  content: '🔒';
+  font-size: 0.75rem;
 }
 
 .roomItem:hover,
@@ -362,7 +385,7 @@
 }
 
 .roomItem.active::before {
-  color: rgba(255, 255, 255, 0.85);
+  color: white;
 }
 
 .itemName {

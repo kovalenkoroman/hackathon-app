@@ -227,7 +227,7 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                               <div
                                 key={room.id}
                                 onClick={() => handleRoomClick(room.id)}
-                                className={`${styles.roomItem} ${isActive ? styles.active : ''}`}
+                                className={`${styles.roomItem} ${styles[room.visibility === 'private' ? 'roomPrivate' : 'roomPublic']} ${isActive ? styles.active : ''}`}
                                 title={room.name}
                               >
                                 <span className={styles.itemName}>{room.name}</span>
@@ -249,7 +249,7 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                               <div
                                 key={room.id}
                                 onClick={() => handleRoomClick(room.id)}
-                                className={`${styles.roomItem} ${isActive ? styles.active : ''}`}
+                                className={`${styles.roomItem} ${styles[room.visibility === 'private' ? 'roomPrivate' : 'roomPublic']} ${isActive ? styles.active : ''}`}
                                 title={room.name}
                               >
                                 <span className={styles.itemName}>{room.name}</span>
