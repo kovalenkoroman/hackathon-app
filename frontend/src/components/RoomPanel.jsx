@@ -3,140 +3,178 @@ import styles from './RoomPanel.module.css';
 
 export default function RoomPanel({ room, members, user, onInvite, onManage, onBan, onRemove, onPromote, onDemote, onLeave }) {
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [inviteUsername, setInviteUsername] = useState('');
+  const [inviteLink, setInviteLink] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const isOwner = room && user && room.owner_id === user.id;
-  const isMemberAdmin = members?.find(m => m.user_id === user?.id)?.role === 'admin';
+  const isMemberAdmin = members?.find((m) => m.user_id === user?.id)?.role === 'admin';
   const canManage = isOwner || isMemberAdmin;
 
   const handleLeave = async () => {
     if (!confirm('Are you sure you want to leave this room?')) return;
     try {
-      await fetch(`/api/v1/rooms/${room.id}/leave`, {
-        method: 'POST',
-        credentials: 'include'
-      });
+      await fetch(`/api/v1/rooms/${room.id}/leave`, { method: 'POST', credentials: 'include' });
       if (onLeave) onLeave();
     } catch (err) {
       alert('Failed to leave room');
     }
   };
 
-  const handleInvite = async () => {
-    if (!inviteUsername.trim()) return;
+  const handleGenerateInvite = async () => {
     try {
       const res = await fetch(`/api/v1/rooms/${room.id}/invitations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
+        body: JSON.stringify({}),
       });
       if (res.ok) {
         const data = await res.json();
-        const inviteLink = `${window.location.origin}/?invite=${data.data.token}`;
-        alert(`Invitation created:\n${inviteLink}`);
-        setInviteUsername('');
-        setShowInviteModal(false);
+        const link = `${window.location.origin}/?invite=${data.data.token}`;
+        setInviteLink(link);
       }
     } catch (err) {
       alert('Failed to create invitation');
     }
   };
 
-  const getPresenceIcon = (status) => {
-    switch (status) {
-      case 'online':
-        return '●';
-      case 'afk':
-        return '◐';
-      default:
-        return '○';
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      /* ignore */
     }
+  };
+
+  const openInviteModal = () => {
+    setInviteLink('');
+    setCopied(false);
+    setShowInviteModal(true);
   };
 
   if (!room) return null;
 
-  const ownerMember = members?.find(m => m.role === 'owner');
-  const adminMembers = members?.filter(m => m.role === 'admin') || [];
-  const regularMembers = members?.filter(m => m.role === 'member') || [];
+  const getAvatar = (name) => (name ? name[0].toUpperCase() : '?');
+
+  const ownerMember = members?.find((m) => m.role === 'owner');
+  const adminMembers = members?.filter((m) => m.role === 'admin') || [];
+  const regularMembers = members?.filter((m) => m.role === 'member') || [];
+
+  const renderMember = (m) => (
+    <div key={m.user_id} className={styles.memberRow}>
+      <div className={styles.memberAvatar}>{getAvatar(m.username)}</div>
+      <span className={styles.memberName}>{m.username}</span>
+    </div>
+  );
 
   return (
     <div className={styles.panel}>
-      <h2 className={styles.roomTitle}>Room info</h2>
+      <div className={styles.header}>
+        <h2 className={styles.roomName}>{room.name}</h2>
+        <span className={`${styles.visibilityBadge} ${room.visibility === 'public' ? styles.public : styles.private}`}>
+          {room.visibility === 'public' ? '🌍 Public' : '🔒 Private'}
+        </span>
+      </div>
 
-      <div className={styles.infoSection}>
-        <div className={styles.infoItem}>
-          <span className={styles.label}>Type:</span>
-          <span className={styles.value}>{room.visibility === 'public' ? 'Public' : 'Private'}</span>
-        </div>
+      {room.description && (
+        <p className={styles.description}>{room.description}</p>
+      )}
 
-        <div className={styles.infoItem}>
-          <span className={styles.label}>Owner:</span>
-          <span className={styles.value}>{ownerMember?.username || 'Unknown'}</span>
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h3 className={styles.sectionTitle}>Owner</h3>
         </div>
+        {ownerMember ? renderMember(ownerMember) : <div className={styles.mutedNote}>Unknown</div>}
       </div>
 
       {adminMembers.length > 0 && (
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Admins ({adminMembers.length})</h3>
-          <div className={styles.list}>
-            {adminMembers.map(admin => (
-              <div key={admin.user_id} className={styles.listItem}>
-                {admin.username}
-              </div>
-            ))}
+          <div className={styles.sectionHeader}>
+            <h3 className={styles.sectionTitle}>Admins</h3>
+            <span className={styles.count}>{adminMembers.length}</span>
+          </div>
+          <div className={styles.memberList}>
+            {adminMembers.map(renderMember)}
           </div>
         </div>
       )}
 
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Members ({regularMembers.length})</h3>
-        <div className={styles.list}>
-          {regularMembers.length > 0 ? (
-            regularMembers.map(member => (
-              <div key={member.user_id} className={styles.listItem}>
-                {member.username}
-              </div>
-            ))
-          ) : (
-            <div style={{ fontSize: '0.85rem', color: '#999', padding: '0.5rem' }}>No regular members</div>
-          )}
+        <div className={styles.sectionHeader}>
+          <h3 className={styles.sectionTitle}>Members</h3>
+          <span className={styles.count}>{regularMembers.length}</span>
+        </div>
+        <div className={styles.memberList}>
+          {regularMembers.length > 0
+            ? regularMembers.map(renderMember)
+            : <div className={styles.mutedNote}>No regular members</div>}
         </div>
       </div>
 
       <div className={styles.actions}>
-        <button onClick={() => setShowInviteModal(true)} className={styles.actionLink}>
-          📨 Invite user
-        </button>
         {canManage && (
-          <button onClick={onManage} className={styles.actionLink}>
-            ⚙️ Manage room
+          <button onClick={openInviteModal} className={styles.actionBtn}>
+            <span className={styles.actionIcon}>✉️</span>
+            <span>Invite by link</span>
+          </button>
+        )}
+        {canManage && (
+          <button onClick={onManage} className={styles.actionBtn}>
+            <span className={styles.actionIcon}>⚙️</span>
+            <span>Manage room</span>
           </button>
         )}
         {!isOwner && (
-          <button onClick={handleLeave} className={styles.actionLink}>
-            👋 Leave room
+          <button onClick={handleLeave} className={`${styles.actionBtn} ${styles.dangerAction}`}>
+            <span className={styles.actionIcon}>👋</span>
+            <span>Leave room</span>
           </button>
         )}
       </div>
 
-      {/* Invite Modal */}
       {showInviteModal && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h3>Create Invitation</h3>
-            <p>Generate an invitation link for this room:</p>
-            <button
-              onClick={handleInvite}
-              className={styles.primaryBtn}
-            >
-              Generate Link
-            </button>
-            <button
-              onClick={() => setShowInviteModal(false)}
-              className={styles.secondaryBtn}
-            >
-              Close
-            </button>
+        <div className={styles.modalOverlay} onClick={() => setShowInviteModal(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <header className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>Invite to {room.name}</h3>
+              <button
+                className={styles.modalClose}
+                onClick={() => setShowInviteModal(false)}
+                title="Close"
+              >
+                ×
+              </button>
+            </header>
+            <div className={styles.modalBody}>
+              {!inviteLink ? (
+                <>
+                  <p className={styles.modalDesc}>Generate a shareable invitation link. It's valid for 24 hours.</p>
+                  <button className={styles.primaryBtn} onClick={handleGenerateInvite}>
+                    Generate invite link
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className={styles.modalDesc}>Share this link with someone you want to invite:</p>
+                  <div className={styles.linkBox}>
+                    <input
+                      type="text"
+                      readOnly
+                      value={inviteLink}
+                      className={styles.linkInput}
+                      onClick={(e) => e.target.select()}
+                    />
+                    <button
+                      onClick={handleCopy}
+                      className={styles.copyBtn}
+                    >
+                      {copied ? '✓ Copied' : 'Copy'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
