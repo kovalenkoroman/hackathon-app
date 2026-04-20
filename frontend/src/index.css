@@ -79,3 +79,17 @@ body {
   color: var(--text);
   transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+/* All form inputs/textareas pick up the text color by default, and
+   their placeholders follow the themed faint-text color. */
+input,
+textarea,
+select {
+  color: var(--text);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-faint);
+  opacity: 1;
+}

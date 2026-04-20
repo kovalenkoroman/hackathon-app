@@ -68,8 +68,8 @@
   gap: 0.75rem;
   padding: 3rem 1rem;
   color: var(--text-muted);
-  background: var(--input-bg);
-  border: 1px dashed #ddd;
+  background: var(--bg-raised);
+  border: 1px dashed var(--border-strong);
   border-radius: 10px;
 }
 
@@ -85,7 +85,7 @@
 
 .roomCard {
   position: relative;
-  background: var(--input-bg);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1.25rem;
@@ -96,14 +96,14 @@
 }
 
 .roomCard:hover {
-  border-color: #d0d4ef;
-  box-shadow: 0 4px 16px rgba(30, 30, 60, 0.06);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
 
 .roomCardJoined {
-  border-color: #d5ddfa;
-  background: linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .joinedBadge {
@@ -112,8 +112,8 @@
   right: 0.9rem;
   font-size: 0.7rem;
   font-weight: 600;
-  color: #4c5bc4;
-  background: #e4e8ff;
+  color: var(--accent);
+  background: var(--accent-soft);
   padding: 0.15rem 0.5rem;
   border-radius: 10px;
 }
