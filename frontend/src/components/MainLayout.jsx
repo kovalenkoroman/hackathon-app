@@ -124,7 +124,7 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
               className={styles.profileBtn}
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
             >
-              Profile ▼
+              Profile
             </button>
             {profileDropdownOpen && (
               <div className={styles.dropdownMenu}>
