@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
-import React from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import styles from './ManageRoomModal.module.css';
 
 export default function ManageRoomModal({ room, members, user, presence, onClose, onMembersChanged }) {
   const [tab, setTab] = useState('members');
   const [bannedUsers, setBannedUsers] = useState([]);
-  const [inviteLink, setInviteLink] = useState('');
   const [settingsName, setSettingsName] = useState(room.name);
   const [settingsDesc, setSettingsDesc] = useState(room.description || '');
   const [settingsVis, setSettingsVis] = useState(room.visibility);
@@ -16,10 +14,9 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
   const [inviteSuccess, setInviteSuccess] = useState('');
 
   const isOwner = room.owner_id === user.id;
-  const isMemberAdmin = members?.find(m => m.user_id === user.id)?.role === 'admin';
+  const isMemberAdmin = members?.find((m) => m.user_id === user.id)?.role === 'admin';
   const canManage = isOwner || isMemberAdmin;
 
-  // Load banned users when Banned tab is activated
   useEffect(() => {
     if (tab === 'banned' && bannedUsers.length === 0) {
       fetchBannedUsers();
@@ -35,126 +32,38 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
         setBannedUsers(data.data || []);
       }
     } catch (err) {
-      console.error('Failed to load banned users:', err);
       setError('Failed to load banned users');
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePromote = async (userId) => {
-    try {
-      const res = await fetch(`/api/v1/rooms/${room.id}/admins/${userId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (res.ok) {
-        onMembersChanged();
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to promote member');
-      }
-    } catch (err) {
-      setError('Failed to promote member');
-    }
-  };
-
-  const handleDemote = async (userId) => {
-    try {
-      const res = await fetch(`/api/v1/rooms/${room.id}/admins/${userId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (res.ok) {
-        onMembersChanged();
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to demote member');
-      }
-    } catch (err) {
-      setError('Failed to demote member');
-    }
-  };
-
-  const handleBan = async (userId) => {
-    try {
-      const res = await fetch(`/api/v1/rooms/${room.id}/members/${userId}/ban`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (res.ok) {
-        onMembersChanged();
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to ban member');
-      }
-    } catch (err) {
-      setError('Failed to ban member');
-    }
-  };
-
-  const handleKick = async (userId) => {
-    try {
-      const res = await fetch(`/api/v1/rooms/${room.id}/members/${userId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (res.ok) {
-        onMembersChanged();
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to remove member');
-      }
-    } catch (err) {
-      setError('Failed to remove member');
-    }
-  };
-
-  const handleUnban = async (userId) => {
-    try {
-      const res = await fetch(`/api/v1/rooms/${room.id}/bans/${userId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (res.ok) {
-        setError('');
-        setBannedUsers(bannedUsers.filter(u => u.user_id !== userId));
-        await onMembersChanged();
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to unban member');
-      }
-    } catch (err) {
-      setError('Failed to unban member');
-    }
-  };
-
-  const handleGenerateInvite = async () => {
+  const runMemberAction = async (url, method, onSuccess) => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/v1/rooms/${room.id}/invitations`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
+      setError('');
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' } });
       if (res.ok) {
-        const data = await res.json();
-        const link = `${window.location.origin}/?invite=${data.data.token}`;
-        setInviteLink(link);
-        setError('');
+        onSuccess?.();
+        onMembersChanged();
       } else {
         const data = await res.json();
-        setError(data.error || 'Failed to generate invitation');
+        setError(data.error || 'Action failed');
       }
     } catch (err) {
-      setError('Failed to generate invitation');
+      setError('Action failed');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCopyInvite = () => {
-    navigator.clipboard.writeText(inviteLink);
-  };
+  const handlePromote = (userId) => runMemberAction(`/api/v1/rooms/${room.id}/admins/${userId}`, 'POST');
+  const handleDemote = (userId) => runMemberAction(`/api/v1/rooms/${room.id}/admins/${userId}`, 'DELETE');
+  const handleBan = (userId) => runMemberAction(`/api/v1/rooms/${room.id}/members/${userId}/ban`, 'POST');
+  const handleKick = (userId) => runMemberAction(`/api/v1/rooms/${room.id}/members/${userId}`, 'DELETE');
+  const handleUnban = (userId) => runMemberAction(`/api/v1/rooms/${room.id}/bans/${userId}`, 'DELETE', () => {
+    setBannedUsers((prev) => prev.filter((u) => u.user_id !== userId));
+  });
 
   const handleSendInvite = async () => {
     const trimmed = inviteUsername.trim();
@@ -167,7 +76,7 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ username: trimmed })
+        body: JSON.stringify({ username: trimmed }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -187,6 +96,7 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
   const handleSaveSettings = async () => {
     try {
       setLoading(true);
+      setError('');
       const updates = {};
       if (settingsName !== room.name) updates.name = settingsName;
       if (settingsDesc !== (room.description || '')) updates.description = settingsDesc;
@@ -200,11 +110,10 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
       const res = await fetch(`/api/v1/rooms/${room.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
+        body: JSON.stringify(updates),
       });
 
       if (res.ok) {
-        setError('');
         await onMembersChanged();
         onClose();
       } else {
@@ -219,17 +128,13 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
   };
 
   const handleDeleteRoom = async () => {
-    if (!window.confirm('Are you sure you want to delete this room? This action cannot be undone.')) {
-      return;
-    }
-
+    if (!window.confirm('Are you sure you want to delete this room? This action cannot be undone.')) return;
     try {
       setLoading(true);
       const res = await fetch(`/api/v1/rooms/${room.id}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
-
       if (res.ok) {
         window.location.href = '/';
       } else {
@@ -244,274 +149,245 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
   };
 
   const getStatusLabel = (userId) => presence?.[userId] || 'offline';
+  const getStatusDot = (status) => (status === 'online' ? '●' : status === 'afk' ? '◐' : '○');
+  const getAvatar = (name) => (name ? name[0].toUpperCase() : '?');
 
-  const filteredMembers = members?.filter(m =>
+  const filteredMembers = members?.filter((m) =>
     m.username.toLowerCase().includes(memberSearch.toLowerCase())
   ) || [];
 
-  const admins = members?.filter(m => m.role === 'admin') || [];
-  const regularMembers = members?.filter(m => m.role === 'member') || [];
+  const admins = members?.filter((m) => m.role === 'admin') || [];
+
+  const TABS = [
+    { key: 'members', label: 'Members' },
+    { key: 'admins', label: 'Admins' },
+    { key: 'banned', label: 'Banned' },
+    { key: 'invitations', label: 'Invite' },
+    ...(canManage ? [{ key: 'settings', label: 'Settings' }] : []),
+  ];
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>Manage Room: #{room.name}</h2>
-          <button onClick={onClose} className={styles.closeBtn} title="Close">
-            ✕
-          </button>
-        </div>
+    <div className={styles.overlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <header className={styles.header}>
+          <div>
+            <h2 className={styles.title}>Manage room</h2>
+            <p className={styles.subtitle}>{room.name}</p>
+          </div>
+          <button onClick={onClose} className={styles.closeBtn} title="Close">×</button>
+        </header>
 
         <div className={styles.tabs}>
-          <button
-            className={`${styles.tab} ${tab === 'members' ? styles.active : ''}`}
-            onClick={() => setTab('members')}
-          >
-            Members
-          </button>
-          <button
-            className={`${styles.tab} ${tab === 'admins' ? styles.active : ''}`}
-            onClick={() => setTab('admins')}
-          >
-            Admins
-          </button>
-          <button
-            className={`${styles.tab} ${tab === 'banned' ? styles.active : ''}`}
-            onClick={() => setTab('banned')}
-          >
-            Banned users
-          </button>
-          <button
-            className={`${styles.tab} ${tab === 'invitations' ? styles.active : ''}`}
-            onClick={() => setTab('invitations')}
-          >
-            Invitations
-          </button>
-          {canManage && (
+          {TABS.map((t) => (
             <button
-              className={`${styles.tab} ${tab === 'settings' ? styles.active : ''}`}
-              onClick={() => setTab('settings')}
+              key={t.key}
+              className={`${styles.tab} ${tab === t.key ? styles.active : ''}`}
+              onClick={() => setTab(t.key)}
             >
-              Settings
+              {t.label}
             </button>
-          )}
+          ))}
         </div>
 
         <div className={styles.body}>
-          {error && <div style={{ color: '#d44', marginBottom: '1rem', fontSize: '0.9rem' }}>⚠️ {error}</div>}
+          {error && <div className={styles.error}>{error}</div>}
 
-          {/* Members Tab */}
           {tab === 'members' && (
-            <div>
-              {/* Search bar */}
-              <div className={styles.searchBar}>
-                <input
-                  type="text"
-                  placeholder="Search member"
-                  value={memberSearch}
-                  onChange={(e) => setMemberSearch(e.target.value)}
-                  className={styles.searchInput}
-                />
-              </div>
+            <>
+              <input
+                type="text"
+                placeholder="Search members…"
+                value={memberSearch}
+                onChange={(e) => setMemberSearch(e.target.value)}
+                className={styles.searchInput}
+              />
 
-              {/* Table */}
-              <div className={styles.membersTable}>
-                {/* Header */}
-                <div className={styles.tableHeader}>Username</div>
-                <div className={styles.tableHeader}>Status</div>
-                <div className={styles.tableHeader}>Role</div>
-                <div className={styles.tableHeader}>Actions</div>
-
-                {/* Rows */}
-                {filteredMembers.length === 0 ? (
-                  <div style={{ gridColumn: '1 / -1' }} className={styles.emptyState}>
-                    {memberSearch ? 'No members match your search' : 'No members in this room'}
-                  </div>
-                ) : filteredMembers.map(member => {
-                  const status = getStatusLabel(member.user_id);
-                  return (
-                    <React.Fragment key={member.user_id}>
-                      <div className={styles.memberName}>{member.username}</div>
-                      <div>
-                        <span className={`${styles.statusBadge} ${styles[`status_${status}`]}`}>
-                          {status === 'online' ? '●' : status === 'afk' ? '◐' : '○'} {status}
-                        </span>
-                      </div>
-                      <div>
-                        <span className={styles.roleTag}>{member.role}</span>
-                      </div>
-                      <div className={styles.buttonGroup}>
-                        {member.role === 'owner' && <span className={styles.noActions}>—</span>}
-                        {member.role === 'admin' && member.user_id !== user.id && isOwner && (
-                          <>
-                            <button onClick={() => handleDemote(member.user_id)} className={styles.actionBtn} disabled={loading}>Remove admin</button>
-                            <button onClick={() => handleBan(member.user_id)} className={`${styles.actionBtn} ${styles.dangerBtn}`} disabled={loading}>Ban</button>
-                          </>
-                        )}
-                        {member.role === 'member' && canManage && (
-                          <>
-                            {isOwner && <button onClick={() => handlePromote(member.user_id)} className={styles.actionBtn} disabled={loading}>Make admin</button>}
-                            <button onClick={() => handleBan(member.user_id)} className={`${styles.actionBtn} ${styles.dangerBtn}`} disabled={loading}>Ban</button>
-                            <button onClick={() => handleKick(member.user_id)} className={`${styles.actionBtn} ${styles.dangerBtn}`} disabled={loading}>Remove from room</button>
-                          </>
-                        )}
-                      </div>
-                    </React.Fragment>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Admins Tab */}
-          {tab === 'admins' && (
-            <div>
-              <h3>Admins</h3>
-              {admins.length === 0 ? (
-                <p className={styles.emptyState}>No admins yet</p>
+              {filteredMembers.length === 0 ? (
+                <div className={styles.emptyState}>
+                  {memberSearch ? 'No members match your search' : 'No members in this room'}
+                </div>
               ) : (
-                admins.map(admin => (
-                  <div key={admin.user_id} className={styles.memberRow}>
-                    <span className={styles.memberName}>{admin.username}</span>
-                    <span className={styles.roleTag}>admin</span>
-                    <div className={styles.buttonGroup}>
-                      {isOwner && (
-                        <button
-                          onClick={() => handleDemote(admin.user_id)}
-                          className={styles.actionBtn}
-                          disabled={loading}
-                        >
-                          Demote
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))
+                <div className={styles.memberList}>
+                  {filteredMembers.map((member) => {
+                    const status = getStatusLabel(member.user_id);
+                    return (
+                      <div key={member.user_id} className={styles.memberRow}>
+                        <div className={styles.memberAvatar}>{getAvatar(member.username)}</div>
+                        <div className={styles.memberInfo}>
+                          <div className={styles.memberName}>{member.username}</div>
+                          <div className={styles.memberMeta}>
+                            <span className={`${styles.statusBadge} ${styles[`status_${status}`]}`}>
+                              {getStatusDot(status)} {status}
+                            </span>
+                            <span className={styles.roleTag}>{member.role}</span>
+                          </div>
+                        </div>
+                        <div className={styles.memberActions}>
+                          {member.role === 'owner' && <span className={styles.noActions}>—</span>}
+                          {member.role === 'admin' && member.user_id !== user.id && isOwner && (
+                            <>
+                              <button onClick={() => handleDemote(member.user_id)} className={styles.secondaryBtn} disabled={loading}>Demote</button>
+                              <button onClick={() => handleBan(member.user_id)} className={styles.dangerBtn} disabled={loading}>Ban</button>
+                            </>
+                          )}
+                          {member.role === 'member' && canManage && (
+                            <>
+                              {isOwner && <button onClick={() => handlePromote(member.user_id)} className={styles.secondaryBtn} disabled={loading}>Make admin</button>}
+                              <button onClick={() => handleKick(member.user_id)} className={styles.secondaryBtn} disabled={loading}>Remove</button>
+                              <button onClick={() => handleBan(member.user_id)} className={styles.dangerBtn} disabled={loading}>Ban</button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
-            </div>
+            </>
           )}
 
-          {/* Banned Users Tab */}
-          {tab === 'banned' && (
-            <div>
-              <h3>Banned Users</h3>
-              {loading && <p>Loading...</p>}
-              {bannedUsers.length === 0 ? (
-                <p className={styles.emptyState}>No banned users</p>
+          {tab === 'admins' && (
+            <>
+              {admins.length === 0 ? (
+                <div className={styles.emptyState}>No admins yet</div>
               ) : (
-                <div className={styles.membersTable}>
-                  {/* Table Header */}
-                  <div className={styles.tableHeader}>Username</div>
-                  <div className={styles.tableHeader}>Banned by</div>
-                  <div className={styles.tableHeader}>Date/Time</div>
-                  <div className={styles.tableHeader}>Actions</div>
-
-                  {/* Table Rows */}
-                  {bannedUsers.map(ban => (
-                    <React.Fragment key={ban.user_id}>
-                      <div className={styles.memberName}>{ban.username}</div>
-                      <div>{ban.banned_by_username || 'Unknown'}</div>
-                      <div style={{ fontSize: '0.85rem', color: '#666' }}>
-                        {new Date(ban.created_at).toLocaleString()}
+                <div className={styles.memberList}>
+                  {admins.map((admin) => (
+                    <div key={admin.user_id} className={styles.memberRow}>
+                      <div className={styles.memberAvatar}>{getAvatar(admin.username)}</div>
+                      <div className={styles.memberInfo}>
+                        <div className={styles.memberName}>{admin.username}</div>
+                        <div className={styles.memberMeta}>
+                          <span className={styles.roleTag}>admin</span>
+                        </div>
                       </div>
-                      <div className={styles.buttonGroup}>
+                      <div className={styles.memberActions}>
+                        {isOwner && (
+                          <button onClick={() => handleDemote(admin.user_id)} className={styles.secondaryBtn} disabled={loading}>
+                            Demote
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {tab === 'banned' && (
+            <>
+              {loading && bannedUsers.length === 0 ? (
+                <div className={styles.mutedNote}>Loading…</div>
+              ) : bannedUsers.length === 0 ? (
+                <div className={styles.emptyState}>No banned users</div>
+              ) : (
+                <div className={styles.memberList}>
+                  {bannedUsers.map((ban) => (
+                    <div key={ban.user_id} className={styles.memberRow}>
+                      <div className={styles.memberAvatar}>{getAvatar(ban.username)}</div>
+                      <div className={styles.memberInfo}>
+                        <div className={styles.memberName}>{ban.username}</div>
+                        <div className={styles.memberMeta}>
+                          <span>Banned by {ban.banned_by_username || 'unknown'}</span>
+                          <span className={styles.dot}>•</span>
+                          <span>{new Date(ban.created_at).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <div className={styles.memberActions}>
                         {canManage && (
-                          <button
-                            onClick={() => handleUnban(ban.user_id)}
-                            className={styles.actionBtn}
-                            disabled={loading}
-                          >
+                          <button onClick={() => handleUnban(ban.user_id)} className={styles.secondaryBtn} disabled={loading}>
                             Unban
                           </button>
                         )}
                       </div>
-                    </React.Fragment>
+                    </div>
                   ))}
                 </div>
               )}
-            </div>
+            </>
           )}
 
-          {/* Invitations Tab */}
           {tab === 'invitations' && (
-            <div>
-              <label style={{ fontSize: '0.95rem', fontWeight: '600', display: 'block', marginBottom: '0.5rem' }}>Invite by username</label>
-              <input
-                type="text"
-                value={inviteUsername}
-                onChange={(e) => {
-                  setInviteUsername(e.target.value);
-                  setInviteSuccess('');
-                }}
-                onKeyDown={(e) => e.key === 'Enter' && !loading && handleSendInvite()}
-                placeholder="Enter username"
-                className={styles.searchInput}
-                style={{ width: '100%', boxSizing: 'border-box' }}
-                disabled={loading}
-              />
-              <button
-                onClick={handleSendInvite}
-                className={styles.primaryBtn}
-                disabled={loading || !inviteUsername.trim()}
-                style={{ whiteSpace: 'nowrap', padding: '0.5rem 1rem', marginTop: '0.5rem' }}
-              >
-                {loading ? 'Sending...' : 'Send invite'}
-              </button>
-              {inviteSuccess && (
-                <p style={{ color: '#2a9d2a', fontSize: '0.9rem', marginTop: '0.75rem' }}>
-                  {inviteSuccess}
-                </p>
-              )}
+            <div className={styles.inviteCard}>
+              <label htmlFor="inviteInput" className={styles.fieldLabel}>Invite by username</label>
+              <p className={styles.fieldHint}>They'll be added to the room immediately.</p>
+              <div className={styles.inviteRow}>
+                <input
+                  id="inviteInput"
+                  type="text"
+                  value={inviteUsername}
+                  onChange={(e) => {
+                    setInviteUsername(e.target.value);
+                    setInviteSuccess('');
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && !loading && handleSendInvite()}
+                  placeholder="username"
+                  className={styles.fieldInput}
+                  disabled={loading}
+                />
+                <button
+                  onClick={handleSendInvite}
+                  className={styles.primaryBtn}
+                  disabled={loading || !inviteUsername.trim()}
+                >
+                  {loading ? 'Sending…' : 'Send invite'}
+                </button>
+              </div>
+              {inviteSuccess && <div className={styles.success}>{inviteSuccess}</div>}
             </div>
           )}
 
-          {/* Settings Tab */}
           {tab === 'settings' && canManage && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div className={styles.field}>
-                  <label>Room Name</label>
-                  <input
-                    type="text"
-                    value={settingsName}
-                    onChange={(e) => setSettingsName(e.target.value)}
-                    placeholder="Enter room name"
-                  />
-                </div>
-
-                <div className={styles.field}>
-                  <label>Description</label>
-                  <textarea
-                    value={settingsDesc}
-                    onChange={(e) => setSettingsDesc(e.target.value)}
-                    placeholder="Enter room description"
-                  />
-                </div>
-
-                <div className={styles.field} style={{ marginBottom: 0 }}>
-                  <label>Visibility</label>
-                  <select value={settingsVis} onChange={(e) => setSettingsVis(e.target.value)}>
-                    <option value="public">Public</option>
-                    <option value="private">Private</option>
-                  </select>
-                </div>
+            <div className={styles.settings}>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Room name</label>
+                <input
+                  type="text"
+                  value={settingsName}
+                  onChange={(e) => setSettingsName(e.target.value)}
+                  placeholder="Enter room name"
+                  className={styles.fieldInput}
+                />
               </div>
 
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                <button onClick={handleSaveSettings} className={styles.primaryBtn} disabled={loading} style={{ whiteSpace: 'nowrap' }}>
-                  {loading ? 'Saving...' : 'Save changes'}
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Description</label>
+                <textarea
+                  value={settingsDesc}
+                  onChange={(e) => setSettingsDesc(e.target.value)}
+                  placeholder="What is this room about?"
+                  className={styles.fieldTextarea}
+                />
+              </div>
+
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Visibility</label>
+                <select
+                  value={settingsVis}
+                  onChange={(e) => setSettingsVis(e.target.value)}
+                  className={styles.fieldInput}
+                >
+                  <option value="public">Public — anyone can find and join</option>
+                  <option value="private">Private — invite only</option>
+                </select>
+              </div>
+
+              <div className={styles.settingsActions}>
+                <button onClick={handleSaveSettings} className={styles.primaryBtn} disabled={loading}>
+                  {loading ? 'Saving…' : 'Save changes'}
                 </button>
-                {isOwner && (
-                  <button
-                    onClick={handleDeleteRoom}
-                    className={styles.primaryBtn}
-                    style={{ background: '#d44', color: 'white', border: 'none', whiteSpace: 'nowrap' }}
-                    disabled={loading}
-                  >
+              </div>
+
+              {isOwner && (
+                <div className={styles.dangerZone}>
+                  <h4 className={styles.dangerTitle}>Danger zone</h4>
+                  <p className={styles.dangerDesc}>Delete this room and all its messages. This cannot be undone.</p>
+                  <button onClick={handleDeleteRoom} className={styles.dangerBtn} disabled={loading}>
                     Delete room
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
         </div>
