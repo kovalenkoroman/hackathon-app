@@ -1,6 +1,7 @@
 import express from 'express';
 import * as friendsService from '../services/friends.js';
 import * as friendQueries from '../db/queries/friends.js';
+import * as userQueries from '../db/queries/users.js';
 import { authMiddleware, requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -115,7 +116,9 @@ router.get('/dialogs/:userId', requireAuth, async (req, res) => {
     const otherId = parseInt(req.params.userId);
     const dialog = await friendQueries.getOrCreateDialog(req.user.id, otherId);
     const status = await friendsService.getDialogStatus(req.user.id, otherId);
-    res.json({ data: { dialogId: dialog.id, canSend: status.canSend, reason: status.reason } });
+    const other = await userQueries.findUserById(otherId);
+    const otherUser = other ? { id: other.id, username: other.username } : null;
+    res.json({ data: { dialogId: dialog.id, canSend: status.canSend, reason: status.reason, otherUser } });
   } catch (error) {
     console.error('Get dialog error:', error);
     res.status(400).json({ error: error.message });

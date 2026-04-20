@@ -141,11 +141,12 @@ export default function Friends({ user }) {
     }
   };
 
-  const handleUnblock = async (userId) => {
+  const handleUnblock = async (userId, username) => {
     try {
       const res = await fetch(`/api/v1/friends/users/${userId}/ban`, { method: 'DELETE' });
       if (res.ok) {
         setBlocked((prev) => prev.filter((b) => b.user_id !== userId));
+        setSuccessMsg(`${username} unblocked. Send them a new friend request to message again.`);
       }
     } catch (err) {
       setError('Failed to unblock user');
@@ -289,7 +290,13 @@ export default function Friends({ user }) {
                   </div>
                   <div className={styles.actions}>
                     <button
-                      onClick={() => handleUnblock(b.user_id)}
+                      onClick={() => navigate(`/dm/${b.user_id}`)}
+                      className={styles.secondaryBtn}
+                    >
+                      View chat
+                    </button>
+                    <button
+                      onClick={() => handleUnblock(b.user_id, b.username)}
                       className={styles.secondaryBtn}
                     >
                       Unblock

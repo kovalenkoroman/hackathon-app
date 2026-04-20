@@ -75,22 +75,16 @@ export default function DMChat({ user }) {
   const loadMessages = async () => {
     try {
       setLoading(true);
-      const userRes = await fetch(`/api/v1/friends`);
-      const friendsList = await userRes.json();
-      const friend = friendsList.data?.find((f) => f.friend_id === parseInt(userId) || f.id === parseInt(userId));
-      setOtherUser(friend || { id: userId, username: 'User' });
-
-      const actualUserId = friend?.friend_id || friend?.id || userId;
-
-      const dialogRes = await fetch(`/api/v1/friends/dialogs/${actualUserId}`, { credentials: 'include' });
+      const dialogRes = await fetch(`/api/v1/friends/dialogs/${userId}`, { credentials: 'include' });
       const dialogData = await dialogRes.json();
       if (dialogRes.ok) {
         setDialogId(dialogData.data.dialogId);
         setCanSend(dialogData.data.canSend !== false);
         setFrozenReason(dialogData.data.reason || null);
+        setOtherUser(dialogData.data.otherUser || { id: userId, username: 'User' });
       }
 
-      const msgRes = await fetch(`/api/v1/friends/dialogs/${actualUserId}/messages`);
+      const msgRes = await fetch(`/api/v1/friends/dialogs/${userId}/messages`);
       const json = await msgRes.json();
       setMessages(json.data || []);
     } catch (err) {
@@ -104,12 +98,7 @@ export default function DMChat({ user }) {
   const handleSend = async (msgData) => {
     setError('');
     try {
-      const friendsRes = await fetch(`/api/v1/friends`);
-      const friendsData = await friendsRes.json();
-      const friend = friendsData.data?.find((f) => f.friend_id === parseInt(userId) || f.id === parseInt(userId));
-      const actualUserId = friend?.friend_id || friend?.id || userId;
-
-      const res = await fetch(`/api/v1/friends/dialogs/${actualUserId}/messages`, {
+      const res = await fetch(`/api/v1/friends/dialogs/${userId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
