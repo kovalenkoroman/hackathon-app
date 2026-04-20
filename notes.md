@@ -141,12 +141,13 @@ This was my first time building a full application end-to-end with an agentic wo
 
 ## If I Did It Again
 
-- **Validate the spec before coding**: read the full test plan upfront so status codes, byte limits, etc. drive architecture from day 1.
-- **Sketch the WS event model first**: which events reach which recipients (presence → friends + rooms, etc.) — would have prevented the circular dep.
-- **Defer Friends/DMs until core is rock-solid**: Auth → Presence → Rooms → Messaging, *then* Friends/DMs; the rushed DM implementation hid a `require()` crash.
-- **Share one session across curl tests**: instead of logging in per test.
-- **Run the §2 requirements audit after Phase 2**, not on day 2 — would have seeded gaps (blocked-contact history, DM parity, attachment checks, unreads) as concrete tasks from the start.
-- **Set up theme variables on day 1**: avoids the end-of-project hardcoded-colour sweep.
-- **TDD from the spec**: convert `hackathon-requirements.md` into `tests/run.sh` cases *before* implementing — every gap becomes a red test instead of an audit finding.
-- **Plan before coding**: the iterative "check-requirements-then-refactor" cycle was the biggest time sink. Ten minutes of sketching saved forty-five minutes of rework, consistently.
-- **Define UI designs and style tokens up front**: wireframes + a short token list (surface/border/input/button/danger) on day 1 would have made both late theming sweeps unnecessary.
+Most of these are obvious-in-retrospect lessons from running an agentic workflow at full-project scale for the first time. Framed around how I'd drive the agent next time, not about what the code would look like.
+
+- **Start on the strongest model, always**: the single highest-leverage decision. The first half on a weaker model cost more prompts, more corrections, and frequently a second pass. Downgrade only for narrow mechanical work.
+- **Invest the first hour in CLAUDE.md + skill files, not in features**: agents reliably respect rules codified in these files and nowhere else. Conventions I added via chat dissolved within a session; rules written into CLAUDE.md held across the whole project. Extra time on day zero pays back compound interest.
+- **Hand the agent a ranked backlog on day one, not a drip-feed of next prompts**: reactive prompting is a failure mode of this workflow. Given a ranked priority list the agent executes phase by phase and asks smart clarifying questions; without one, it does what I asked and nothing more, and I end up managing every transition myself.
+- **Convert the spec into tests before writing features (TDD)**: the spec becomes an executable contract the agent can't misinterpret. Every gap becomes a red test instead of an audit finding I hunt for later. This alone would have replaced the day-2 requirements-audit scramble.
+- **Plan ten minutes before every non-trivial prompt**: data shape, error paths, UI flow — sketched before prompting. Consistently saved forty-five minutes of refactor. The iterative "check-then-refactor" cycle was the biggest time sink, and it's an under-prepared-prompt problem far more than an agent problem.
+- **Define UI designs and style tokens before any JSX**: without a brief the agent invents visuals per page. Low-fidelity wireframes plus a token list (surface / border / input / button / danger) on day one would have made both late theming sweeps unnecessary.
+- **Use planning subagents (Plan, Explore) upfront, not as a last resort**: I only reached for them after things went wrong. Upfront architectural passes would have surfaced the ProtectedLayout remount bug and the gap-sync design requirement before they became end-of-project work.
+- **Treat frequent commits as an explicit strategy, not an afterthought**: committing every 15–30 minutes makes agent mistakes cheap to reverse and lets the agent take bigger swings safely. I learned this mid-project; next time it's a habit from hour one.
