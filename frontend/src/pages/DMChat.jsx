@@ -124,6 +124,13 @@ export default function DMChat({ user }) {
 
       const json = await res.json();
       const newMessage = json.data;
+
+      // Add locally so the sender sees it immediately. handleMessageNew
+      // dedupes by id if the WS echo beats us to it.
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === newMessage.id)) return prev;
+        return [...prev, newMessage];
+      });
       setReplyingTo(null);
 
       if (msgData.file) {
