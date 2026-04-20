@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { RoomContext } from '../RoomContext';
 import * as messagesApi from '../api/messages';
@@ -22,8 +22,25 @@ export default function RoomChat({ user }) {
   const [replyingTo, setReplyingTo] = useState(null);
   const [editingMessage, setEditingMessage] = useState(null);
 
+  // Kept current so the WS reconnect-sync callback always reads the latest
+  // highest message id without being re-registered on every render.
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
+
   useEffect(() => {
     loadRoomAndMessages();
+  }, [roomId]);
+
+  // Register/unregister the gap-sync subscription for this room. On WS
+  // reconnect the client will send `{ type: 'sync', payload: { roomId, afterId } }`
+  // with the latest id we've seen so the server can stream back any dropped
+  // `message:new` events.
+  useEffect(() => {
+    const getLastId = () => {
+      const arr = messagesRef.current;
+      return arr.length ? arr[arr.length - 1].id : 0;
+    };
+    return wsClient.subscribeRoom(parseInt(roomId), getLastId);
   }, [roomId]);
 
   useEffect(() => {
@@ -81,12 +98,30 @@ export default function RoomChat({ user }) {
       }
     };
 
+    const handleSyncDelta = (payload) => {
+      if (parseInt(payload.roomId) !== parseInt(roomId)) return;
+      // Gap larger than server cap — reload the window from scratch rather
+      // than splice in a partial range.
+      if (payload.truncated) {
+        loadRoomAndMessages();
+        return;
+      }
+      if (!payload.messages?.length) return;
+      setMessages((prev) => {
+        const seen = new Set(prev.map((m) => m.id));
+        const additions = payload.messages.filter((m) => !seen.has(m.id));
+        if (additions.length === 0) return prev;
+        return [...prev, ...additions];
+      });
+    };
+
     wsClient.on('message:new', handleMessageNew);
     wsClient.on('message:edit', handleMessageEdit);
     wsClient.on('message:delete', handleMessageDelete);
     wsClient.on('room:joined', handleRoomJoined);
     wsClient.on('room:left', handleRoomLeft);
     wsClient.on('room:member_banned', handleRoomMemberBanned);
+    wsClient.on('sync:delta', handleSyncDelta);
 
     return () => {
       wsClient.off('message:new', handleMessageNew);
@@ -95,6 +130,7 @@ export default function RoomChat({ user }) {
       wsClient.off('room:joined', handleRoomJoined);
       wsClient.off('room:left', handleRoomLeft);
       wsClient.off('room:member_banned', handleRoomMemberBanned);
+      wsClient.off('sync:delta', handleSyncDelta);
     };
   }, [roomId]);
 

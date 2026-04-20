@@ -82,14 +82,15 @@ function AppContent() {
     return <div style={{ padding: '2rem' }}>Loading...</div>;
   }
 
-  const ProtectedLayout = ({ children }) => (
-    user ? (
-      <MainLayout user={user} onLogout={handleLogout} wsState={wsState} presence={presence}>
-        {children}
-      </MainLayout>
-    ) : (
-      <Navigate to="/login" />
-    )
+  // Previously this was wrapped in a locally-defined `ProtectedLayout` component,
+  // but defining a component inside the render function means a fresh component
+  // reference on every render — so every `setWsState` / `setPresence` tick was
+  // unmounting and remounting the whole routed tree (RoomChat, DMChat, etc.),
+  // wiping their state. Inline the MainLayout at each route instead.
+  const wrap = (content) => (
+    <MainLayout user={user} onLogout={handleLogout} wsState={wsState} presence={presence}>
+      {content}
+    </MainLayout>
   );
 
   return (
@@ -112,35 +113,35 @@ function AppContent() {
       <Route path="/reset-password" element={user ? <Navigate to="/" /> : <ResetPasswordConfirm />} />
       <Route
         path="/change-password"
-        element={user ? <ProtectedLayout><ChangePassword /></ProtectedLayout> : <Navigate to="/login" />}
+        element={user ? wrap(<ChangePassword />) : <Navigate to="/login" />}
       />
       <Route
         path="/delete-account"
-        element={user ? <ProtectedLayout><DeleteAccount user={user} /></ProtectedLayout> : <Navigate to="/login" />}
+        element={user ? wrap(<DeleteAccount user={user} />) : <Navigate to="/login" />}
       />
       <Route
         path="/catalog"
-        element={user ? <ProtectedLayout><RoomCatalog /></ProtectedLayout> : <Navigate to="/login" />}
+        element={user ? wrap(<RoomCatalog />) : <Navigate to="/login" />}
       />
       <Route
         path="/my-rooms"
-        element={user ? <ProtectedLayout><MyRooms /></ProtectedLayout> : <Navigate to="/login" />}
+        element={user ? wrap(<MyRooms />) : <Navigate to="/login" />}
       />
       <Route
         path="/rooms/:roomId"
-        element={user ? <ProtectedLayout><RoomChat user={user} /></ProtectedLayout> : <Navigate to="/login" />}
+        element={user ? wrap(<RoomChat user={user} />) : <Navigate to="/login" />}
       />
       <Route
         path="/sessions"
-        element={user ? <ProtectedLayout><Sessions /></ProtectedLayout> : <Navigate to="/login" />}
+        element={user ? wrap(<Sessions />) : <Navigate to="/login" />}
       />
       <Route
         path="/friends"
-        element={user ? <ProtectedLayout><Friends user={user} /></ProtectedLayout> : <Navigate to="/login" />}
+        element={user ? wrap(<Friends user={user} />) : <Navigate to="/login" />}
       />
       <Route
         path="/dm/:userId"
-        element={user ? <ProtectedLayout><DMChat user={user} /></ProtectedLayout> : <Navigate to="/login" />}
+        element={user ? wrap(<DMChat user={user} />) : <Navigate to="/login" />}
       />
     </Routes>
   );

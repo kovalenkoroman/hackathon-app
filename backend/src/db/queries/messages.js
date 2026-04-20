@@ -26,6 +26,23 @@ export async function findMessageById(messageId) {
   return result.rows[0];
 }
 
+// Gap-sync fetch: messages strictly newer than `afterId`, ordered ASC,
+// capped at `limit`. Used on WS reconnect so the client can patch any
+// `message:new` events that were dropped while the socket was down.
+export async function getMessagesAfter(parentId, afterId, limit = 200, isDialog = false) {
+  const column = isDialog ? 'dialog_id' : 'room_id';
+  const result = await pool.query(
+    `SELECT m.*, u.username, u.email
+       FROM messages m
+       JOIN users u ON m.user_id = u.id
+      WHERE m.${column} = $1 AND m.id > $2 AND m.deleted = false
+      ORDER BY m.id ASC
+      LIMIT $3`,
+    [parentId, afterId, limit]
+  );
+  return hydrateAttachments(result.rows);
+}
+
 export async function getMessagesByRoom(roomId, beforeId = null, limit = 50) {
   let query = `SELECT m.*, u.username, u.email
                FROM messages m

@@ -10,13 +10,43 @@ class WSClient {
     this.lastActivityPing = 0;
     this.activityHandler = null;
     this.visibilityHandler = null;
+
+    // Active chat subscriptions so we can fire gap-sync requests after a
+    // reconnect. Key: `room:<id>` or `dialog:<id>`. Value: `{ kind, id, getLastId }`
+    // where `getLastId()` returns the highest message id the component has
+    // locally, or 0 if none yet.
+    this.subscriptions = new Map();
+    // Flip to true after the first successful auth so we can distinguish
+    // fresh connect (no sync needed, history fetch handles it) from
+    // reconnect (must sync to close message gaps).
+    this.hasConnectedBefore = false;
+  }
+
+  subscribeRoom(roomId, getLastId) {
+    const key = `room:${roomId}`;
+    this.subscriptions.set(key, { kind: 'room', id: roomId, getLastId });
+    return () => this.subscriptions.delete(key);
+  }
+
+  subscribeDialog(dialogId, getLastId) {
+    const key = `dialog:${dialogId}`;
+    this.subscriptions.set(key, { kind: 'dialog', id: dialogId, getLastId });
+    return () => this.subscriptions.delete(key);
+  }
+
+  requestSyncForAllSubscriptions() {
+    for (const sub of this.subscriptions.values()) {
+      const afterId = Number(sub.getLastId?.() || 0);
+      const payload = sub.kind === 'room'
+        ? { roomId: sub.id, afterId }
+        : { dialogId: sub.id, afterId };
+      this.send({ type: 'sync', payload });
+    }
   }
 
   connect(token, onStateChange) {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const url = `${protocol}//${window.location.host}/ws`;
-
-    console.log('WebSocket connecting to:', url);
 
     return new Promise((resolve, reject) => {
       try {
@@ -24,7 +54,6 @@ class WSClient {
         this.onStateChange = onStateChange;
 
         this.ws.onopen = () => {
-          console.log('WebSocket connected, authenticating...');
           this.onStateChange('connecting');
           // Bypass the authenticated-only gate in send(): the auth message
           // itself must go through before authenticated is ever true.
@@ -39,13 +68,17 @@ class WSClient {
           const { type, payload } = message;
 
           if (type === 'auth:ok') {
+            const wasReconnect = this.hasConnectedBefore;
             this.authenticated = true;
+            this.hasConnectedBefore = true;
             this.reconnectAttempts = 0;
             this.reconnectDelay = 1000;
             this.onStateChange('connected');
             this.startActivityTracking();
             this.flushQueue();
-            console.log('WebSocket authenticated');
+            if (wasReconnect) {
+              this.requestSyncForAllSubscriptions();
+            }
             resolve();
           } else if (type === 'auth:error') {
             this.onStateChange('disconnected');
@@ -63,7 +96,6 @@ class WSClient {
         };
 
         this.ws.onclose = () => {
-          console.log('WebSocket disconnected');
           this.authenticated = false;
           this.stopActivityTracking();
           this.onStateChange('disconnected');
@@ -74,7 +106,6 @@ class WSClient {
               this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1),
               30000
             );
-            console.log(`Reconnecting in ${delay}ms...`);
             setTimeout(() => {
               this.connect(token, onStateChange).catch((err) => {
                 console.error('Reconnection failed:', err);
@@ -179,4 +210,13 @@ class WSClient {
 }
 
 const client = new WSClient();
+
+// Debug / integration-test hook: the singleton holds no sensitive state
+// (auth is cookie-based and already page-scoped) but it's the only way
+// for Playwright tests to simulate a transient WS drop and verify the
+// reconnect gap-sync behaviour.
+if (typeof window !== 'undefined') {
+  window.__wsClient = client;
+}
+
 export default client;

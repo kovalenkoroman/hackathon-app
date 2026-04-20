@@ -15,6 +15,7 @@ import filesRoutes from './routes/files.js';
 import { authMiddleware } from './middleware/auth.js';
 import * as presenceService from './ws/presence.js';
 import { handleAuth, handlePing } from './ws/handlers/auth.js';
+import { handleSync } from './ws/handlers/sync.js';
 
 const app = express();
 const server = createServer(app);
@@ -66,6 +67,8 @@ wss.on('connection', (ws, req) => {
       } else if (type === 'ping' && ws.userId) {
         await handlePing(ws);
         ws.send(JSON.stringify({ type: 'pong' }));
+      } else if (type === 'sync' && ws.userId) {
+        await handleSync(ws, payload);
       } else if (!ws.userId) {
         ws.send(JSON.stringify({ type: 'error', payload: { error: 'Not authenticated' } }));
       }
@@ -132,10 +135,7 @@ async function seedUploads() {
 
 // Start server
 seedUploads().catch((err) => console.error('seedUploads failed:', err)).finally(() => {
-  server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`WebSocket server listening at ws://localhost:${PORT}/ws`);
-  });
+  server.listen(PORT);
 });
 
 // Graceful shutdown

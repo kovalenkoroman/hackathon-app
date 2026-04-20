@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import wsClient from '../ws/client';
 import { useUnreads } from '../hooks/useUnreads';
@@ -20,9 +20,21 @@ export default function DMChat({ user }) {
   const [replyingTo, setReplyingTo] = useState(null);
   const [editingMessage, setEditingMessage] = useState(null);
 
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
+
   useEffect(() => {
     loadMessages();
   }, [userId]);
+
+  useEffect(() => {
+    if (!dialogId) return;
+    const getLastId = () => {
+      const arr = messagesRef.current;
+      return arr.length ? arr[arr.length - 1].id : 0;
+    };
+    return wsClient.subscribeDialog(dialogId, getLastId);
+  }, [dialogId]);
 
   useEffect(() => {
     if (messages.length > 0 && dialogId) {
@@ -46,15 +58,31 @@ export default function DMChat({ user }) {
     const handleMessageDelete = (payload) => {
       setMessages((prev) => prev.filter((m) => m.id !== payload.id));
     };
+    const handleSyncDelta = (payload) => {
+      if (payload.dialogId !== dialogId) return;
+      if (payload.truncated) {
+        loadMessages();
+        return;
+      }
+      if (!payload.messages?.length) return;
+      setMessages((prev) => {
+        const seen = new Set(prev.map((m) => m.id));
+        const additions = payload.messages.filter((m) => !seen.has(m.id));
+        if (additions.length === 0) return prev;
+        return [...prev, ...additions];
+      });
+    };
 
     wsClient.on('message:new', handleMessageNew);
     wsClient.on('message:edit', handleMessageEdit);
     wsClient.on('message:delete', handleMessageDelete);
+    wsClient.on('sync:delta', handleSyncDelta);
 
     return () => {
       wsClient.off('message:new', handleMessageNew);
       wsClient.off('message:edit', handleMessageEdit);
       wsClient.off('message:delete', handleMessageDelete);
+      wsClient.off('sync:delta', handleSyncDelta);
     };
   }, [dialogId]);
 

@@ -101,6 +101,15 @@ export async function dialogExistsBetween(userId1, userId2) {
   return result.rows[0];
 }
 
+export async function isDialogParticipant(dialogId, userId) {
+  const result = await pool.query(
+    `SELECT 1 FROM personal_dialogs
+      WHERE id = $1 AND (user_a_id = $2 OR user_b_id = $2)`,
+    [dialogId, userId]
+  );
+  return result.rowCount > 0;
+}
+
 export async function banUser(bannerId, bannedId) {
   const result = await pool.query(
     `INSERT INTO user_bans (banner_id, banned_id)
