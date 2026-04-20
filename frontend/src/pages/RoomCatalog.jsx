@@ -1,7 +1,6 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import * as roomsApi from '../api/rooms';
-import * as authApi from '../api/auth';
 import styles from './RoomCatalog.module.css';
 
 export default function RoomCatalog() {
@@ -32,22 +31,15 @@ export default function RoomCatalog() {
     try {
       const data = await roomsApi.listUserRooms();
       const roles = {};
-      data.forEach(r => {
-        roles[r.id] = r.role;
-      });
+      data.forEach((r) => { roles[r.id] = r.role; });
       setUserRoomRoles(roles);
     } catch (err) {
       console.error('Failed to fetch user rooms:', err);
     }
   };
 
-  const isUserInRoom = (room) => {
-    return userRoomRoles.hasOwnProperty(room.id);
-  };
-
-  const isUserOwner = (room) => {
-    return userRoomRoles[room.id] === 'owner';
-  };
+  const isUserInRoom = (room) => userRoomRoles.hasOwnProperty(room.id);
+  const isUserOwner = (room) => userRoomRoles[room.id] === 'owner';
 
   const loadRooms = async () => {
     setLoading(true);
@@ -94,7 +86,6 @@ export default function RoomCatalog() {
       await roomsApi.leaveRoom(roomId);
       await loadUserRooms();
       await loadRooms();
-      navigate('/');
     } catch (err) {
       setError(err.message);
     }
@@ -102,85 +93,148 @@ export default function RoomCatalog() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.catalogPanel}>
-        <h2>Public Rooms</h2>
+      <header className={styles.pageHeader}>
+        <div>
+          <h1 className={styles.pageTitle}>Public rooms</h1>
+          <p className={styles.pageSubtitle}>Browse and join open discussion rooms.</p>
+        </div>
+        <button className={styles.primaryBtn} onClick={() => setShowCreateModal(true)}>
+          + Create room
+        </button>
+      </header>
 
+      <div className={styles.searchRow}>
         <input
           type="text"
-          placeholder="Search rooms..."
+          placeholder="Search rooms by name..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className={styles.searchInput}
         />
-
-        {error && <p className={styles.error}>{error}</p>}
-        {loading && <p>Loading...</p>}
-
-        <div className={styles.roomsList}>
-          {rooms.map((room) => {
-            const userInRoom = isUserInRoom(room);
-            const isOwner = isUserOwner(room);
-            return (
-              <div key={room.id} className={styles.roomCard}>
-                <h3 onClick={() => userInRoom && navigate(`/rooms/${room.id}`)} style={{ cursor: userInRoom ? 'pointer' : 'default' }}>{room.name}</h3>
-                {room.description && <p>{room.description}</p>}
-                <p className={styles.meta}>Members: {room.member_count || 0}</p>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                  {userInRoom ? (
-                    <>
-                      <button onClick={(e) => { e.stopPropagation(); navigate(`/rooms/${room.id}`); }} style={{ flex: 1, backgroundColor: '#667eea', color: 'white', padding: '0.75rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '600' }}>Enter</button>
-                      {!isOwner && (
-                        <button onClick={(e) => handleLeave(e, room.id)} style={{ flex: 1, backgroundColor: '#ff9800', color: 'white', padding: '0.75rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '600' }}>Leave</button>
-                      )}
-                    </>
-                  ) : (
-                    <button onClick={(e) => { e.stopPropagation(); handleJoin(room.id); }} style={{ width: '100%', backgroundColor: '#28a745', color: 'white', padding: '0.75rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '600' }}>Join</button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {!loading && rooms.length === 0 && <p>No rooms found</p>}
       </div>
 
-      {/* Create Room Modal */}
+      {error && <div className={styles.error}>{error}</div>}
+
+      {loading && <div className={styles.mutedNote}>Loading rooms…</div>}
+
+      {!loading && rooms.length === 0 && (
+        <div className={styles.emptyState}>
+          <div className={styles.emptyIcon}>🔎</div>
+          <p>{search ? `No rooms match "${search}"` : 'No public rooms yet'}</p>
+          {!search && (
+            <button className={styles.primaryBtn} onClick={() => setShowCreateModal(true)}>
+              Create the first one
+            </button>
+          )}
+        </div>
+      )}
+
+      <div className={styles.roomsGrid}>
+        {rooms.map((room) => {
+          const userInRoom = isUserInRoom(room);
+          const isOwner = isUserOwner(room);
+          return (
+            <article
+              key={room.id}
+              className={`${styles.roomCard} ${userInRoom ? styles.roomCardJoined : ''}`}
+            >
+              {userInRoom && <span className={styles.joinedBadge}>Joined</span>}
+              <h3 className={styles.roomName}>{room.name}</h3>
+              {room.description && <p className={styles.roomDesc}>{room.description}</p>}
+              <div className={styles.roomMeta}>
+                <span className={styles.metaItem}>
+                  <span className={styles.metaIcon}>👥</span>
+                  {room.member_count || 0} {room.member_count === 1 ? 'member' : 'members'}
+                </span>
+              </div>
+              <div className={styles.roomActions}>
+                {userInRoom ? (
+                  <>
+                    <button
+                      className={styles.primaryBtn}
+                      onClick={() => navigate(`/rooms/${room.id}`)}
+                    >
+                      Enter
+                    </button>
+                    {!isOwner && (
+                      <button
+                        className={styles.secondaryBtn}
+                        onClick={(e) => handleLeave(e, room.id)}
+                      >
+                        Leave
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <button
+                    className={styles.primaryBtn}
+                    onClick={() => handleJoin(room.id)}
+                  >
+                    Join room
+                  </button>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
       {showCreateModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', maxWidth: '400px', width: '90%', maxHeight: '80vh', overflowY: 'auto' }}>
-            <h2>Create Room</h2>
-            <form onSubmit={handleCreate}>
-              <div style={{ marginBottom: '1rem' }}>
+        <div className={styles.modalOverlay} onClick={() => setShowCreateModal(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <header className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Create a new room</h2>
+              <button
+                className={styles.modalClose}
+                onClick={() => setShowCreateModal(false)}
+                title="Close"
+              >
+                ×
+              </button>
+            </header>
+            <form onSubmit={handleCreate} className={styles.createForm}>
+              <div className={styles.field}>
+                <label htmlFor="roomName">Room name</label>
                 <input
+                  id="roomName"
                   type="text"
-                  placeholder="Room name"
+                  placeholder="e.g. Design team"
                   value={createName}
                   onChange={(e) => setCreateName(e.target.value)}
                   required
-                  style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box', border: '1px solid #ccc', borderRadius: '4px' }}
+                  autoFocus
                 />
               </div>
-              <div style={{ marginBottom: '1rem' }}>
+              <div className={styles.field}>
+                <label htmlFor="roomDesc">Description <span className={styles.optional}>(optional)</span></label>
                 <textarea
-                  placeholder="Description (optional)"
+                  id="roomDesc"
+                  placeholder="What is this room about?"
                   value={createDesc}
                   onChange={(e) => setCreateDesc(e.target.value)}
-                  style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box', border: '1px solid #ccc', borderRadius: '4px', minHeight: '80px', fontFamily: 'inherit' }}
                 />
               </div>
-              <div style={{ marginBottom: '1rem' }}>
-                <select value={createVis} onChange={(e) => setCreateVis(e.target.value)} style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box', border: '1px solid #ccc', borderRadius: '4px' }}>
-                  <option value="public">Public</option>
-                  <option value="private">Private</option>
+              <div className={styles.field}>
+                <label htmlFor="roomVis">Visibility</label>
+                <select
+                  id="roomVis"
+                  value={createVis}
+                  onChange={(e) => setCreateVis(e.target.value)}
+                >
+                  <option value="public">Public — anyone can find and join</option>
+                  <option value="private">Private — invite only</option>
                 </select>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setShowCreateModal(false)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#f0f0f0', border: '1px solid #ccc', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: '600' }}>
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  className={styles.secondaryBtn}
+                  onClick={() => setShowCreateModal(false)}
+                >
                   Cancel
                 </button>
-                <button type="submit" style={{ padding: '0.75rem 1.5rem', backgroundColor: '#667eea', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: '600' }}>
-                  Create
+                <button type="submit" className={styles.primaryBtn}>
+                  Create room
                 </button>
               </div>
             </form>
