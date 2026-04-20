@@ -136,7 +136,6 @@ attachments (id, message_id, filename, original_name, size, mime_type, created_a
 
 ```
 DATABASE_URL=postgres://postgres:postgres@db:5432/chatapp
-SESSION_SECRET=change_me_in_production
 PORT=3000
 UPLOAD_DIR=/app/uploads
 MAX_FILE_SIZE_BYTES=20971520

@@ -2,17 +2,18 @@ import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 
-const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
-const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3 MB
+const MAX_FILE_SIZE = Number(process.env.MAX_FILE_SIZE_BYTES) || 20 * 1024 * 1024;
+const MAX_IMAGE_SIZE = Number(process.env.MAX_IMAGE_SIZE_BYTES) || 3 * 1024 * 1024;
+const UPLOAD_DIR = process.env.UPLOAD_DIR || '/app/uploads';
 
 // Create uploads directory if it doesn't exist
 import { mkdir } from 'fs/promises';
-mkdir('/app/uploads', { recursive: true }).catch(console.error);
+mkdir(UPLOAD_DIR, { recursive: true }).catch(console.error);
 
 // Multer storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, '/app/uploads');
+    cb(null, UPLOAD_DIR);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
@@ -52,7 +53,7 @@ export function validateFileSize(req, res, next) {
   const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_FILE_SIZE;
 
   if (req.file.size > maxSize) {
-    const maxMB = isImage ? 3 : 20;
+    const maxMB = Math.round(maxSize / (1024 * 1024));
     return res.status(400).json({
       error: `File too large. Maximum size: ${maxMB} MB`
     });
