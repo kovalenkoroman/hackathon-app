@@ -130,10 +130,14 @@ Framed as what I noticed from driving the agent, not about the agent itself.
 
 ## Hardest Parts
 
-- **Multi-recipient presence broadcasts**: realising AFK changes must reach *both* friends and room members needed a drawn-out broadcast graph before the two-helper solution became obvious.
-- **Ping debounce timing**: per-tab `lastAcceptedPing` with a 5 s window took a few iterations to get right.
-- **Unread system landed late**: watermark + endpoint + WS event touched rooms, DMs, and the sidebar; deferred to day 2.
-- **Frontend/backend route alignment**: keeping React Router paths, nav links, and backend routes consistent required multiple passes through `App.jsx`.
+This was my first time building a full application end-to-end with an agentic workflow — previous use had been narrow, single-task assistance. The hardest parts weren't technical; they were about the collaboration itself.
+
+- **Calibrating how much to trust vs verify**: when I write code myself I know what's in each file without re-reading it. With the agent, code appears quickly, and I have to choose between reading every diff (slow) or trusting (risk). Finding the right setting for different kinds of change — trust more on scaffolding and glue, read carefully on business-logic touch points — took most of day one to settle.
+- **Debugging code I didn't write**: normally debugging starts from "I know what I intended". Agent-produced bugs start from "first I need to understand what this code is trying to do". Early on I burned hours patching symptoms of code I hadn't read; adopting "read the file before touching it" saved real time later.
+- **Staying two steps ahead of the agent**: the agent is fast enough that it's tempting to just keep issuing the next prompt. But output quality scales with how clearly I've thought through data shape, error paths, and UI flow *before* I prompt. Every time I slipped into pure reactive mode the refactor cycle reappeared; every time I stayed ahead the features landed clean.
+- **Scope discipline when every feature feels cheap**: the agent makes "ten more minutes for X" look true for everything. Saying no became harder than usual, because the apparent cost of adding was so low. I added a few things that would have been better cut on day one.
+- **Knowing what the agent reliably remembers vs what it forgets**: CLAUDE.md and skill files held for the whole project; individual chat rules dissolved within a session or two. It took several rewrites before I had a clear sense of what must be codified as project rules vs what can live in the prompt. Got the line wrong a few times and paid for it in agent-produced code that drifted from conventions.
+- **A full-stack build with an agent is a different skill from task-level help**: chunking work, deciding where to zoom in, deciding when to hand off to the agent vs sit with the code myself, keeping mental state of what's shipped vs in-flight — none of that was a muscle I had built. Most of the "wasted time" entries above are really surface symptoms of this bigger thing, and they'd be avoidable next time.
 
 ## If I Did It Again
 
