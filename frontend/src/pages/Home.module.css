@@ -1,0 +1,95 @@
+.container {
+  padding: 3rem 2.5rem;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.hero {
+  margin-bottom: 2rem;
+}
+
+.title {
+  margin: 0 0 0.4rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a25;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 1rem;
+  color: #666;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: white;
+  border: 1px solid #ececf2;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.action:hover {
+  border-color: #d0d4ef;
+  box-shadow: 0 4px 14px rgba(30, 30, 60, 0.06);
+  transform: translateY(-1px);
+}
+
+.actionIcon {
+  font-size: 1.5rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eef0ff 0%, #f5edff 100%);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.actionBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.actionTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a25;
+  margin-bottom: 0.15rem;
+}
+
+.actionDesc {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.actionArrow {
+  font-size: 1.2rem;
+  color: #aaa;
+  transition: color 0.15s, transform 0.15s;
+}
+
+.action:hover .actionArrow {
+  color: #667eea;
+  transform: translateX(2px);
+}

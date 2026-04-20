@@ -11,21 +11,12 @@ import ChangePassword from './pages/ChangePassword';
 import ResetPasswordConfirm from './pages/ResetPasswordConfirm';
 import RoomCatalog from './pages/RoomCatalog';
 import MyRooms from './pages/MyRooms';
-import RoomDetail from './pages/RoomDetail';
 import RoomChat from './pages/RoomChat';
 import Sessions from './pages/Sessions';
 import Friends from './pages/Friends';
 import DMChat from './pages/DMChat';
 import Welcome from './pages/Welcome';
-
-function Home() {
-  return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
-      <h1>Welcome to Chat!</h1>
-      <p>Select a room from the sidebar or browse public rooms to get started.</p>
-    </div>
-  );
-}
+import Home from './pages/Home';
 
 function AppContent() {
   const location = useLocation();
@@ -118,7 +109,7 @@ function AppContent() {
         element={
           user ? (
             <MainLayout user={user} onLogout={handleLogout} wsState={wsState} presence={presence}>
-              <Home />
+              <Home user={user} />
             </MainLayout>
           ) : (
             <Welcome />
@@ -141,10 +132,6 @@ function AppContent() {
       <Route
         path="/rooms/:roomId"
         element={user ? <ProtectedLayout><RoomChat user={user} /></ProtectedLayout> : <Navigate to="/login" />}
-      />
-      <Route
-        path="/rooms/:roomId/manage"
-        element={user ? <ProtectedLayout><RoomDetail user={user} /></ProtectedLayout> : <Navigate to="/login" />}
       />
       <Route
         path="/sessions"
