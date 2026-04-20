@@ -5,9 +5,11 @@ class WSClient {
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 10;
     this.reconnectDelay = 1000;
-    this.pingInterval = null;
     this.listeners = {};
     this.messageQueue = [];
+    this.lastActivityPing = 0;
+    this.activityHandler = null;
+    this.visibilityHandler = null;
   }
 
   connect(token, onStateChange) {
@@ -39,7 +41,7 @@ class WSClient {
             this.reconnectAttempts = 0;
             this.reconnectDelay = 1000;
             this.onStateChange('connected');
-            this.startPing();
+            this.startActivityTracking();
             this.flushQueue();
             console.log('WebSocket authenticated');
             resolve();
@@ -61,7 +63,7 @@ class WSClient {
         this.ws.onclose = () => {
           console.log('WebSocket disconnected');
           this.authenticated = false;
-          this.stopPing();
+          this.stopActivityTracking();
           this.onStateChange('disconnected');
 
           if (this.reconnectAttempts < this.maxReconnectAttempts) {
@@ -99,19 +101,47 @@ class WSClient {
     }
   }
 
-  startPing() {
-    this.stopPing();
-    this.pingInterval = setInterval(() => {
-      if (this.ws && this.ws.readyState === 1) {
-        this.send({ type: 'ping' });
-      }
-    }, 30000);
+  // User-activity-driven "I'm still here" signal.
+  // Sends a ping only when the user actually interacts with the page,
+  // debounced to at most once per ACTIVITY_DEBOUNCE_MS so we don't spam.
+  startActivityTracking() {
+    this.stopActivityTracking();
+
+    const ACTIVITY_DEBOUNCE_MS = 5000;
+    const sendActivity = () => {
+      if (document.hidden) return;
+      const now = Date.now();
+      if (now - this.lastActivityPing < ACTIVITY_DEBOUNCE_MS) return;
+      this.lastActivityPing = now;
+      this.send({ type: 'ping' });
+    };
+
+    this.activityHandler = sendActivity;
+    this.visibilityHandler = () => {
+      if (!document.hidden) sendActivity();
+    };
+
+    // Seed an initial ping so we mark online immediately on connect.
+    sendActivity();
+
+    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+    for (const ev of events) {
+      window.addEventListener(ev, this.activityHandler, { passive: true });
+    }
+    document.addEventListener('visibilitychange', this.visibilityHandler);
   }
 
-  stopPing() {
-    if (this.pingInterval) {
-      clearInterval(this.pingInterval);
-      this.pingInterval = null;
+  stopActivityTracking() {
+    if (this.activityHandler) {
+      const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+      for (const ev of events) {
+        window.removeEventListener(ev, this.activityHandler);
+      }
+      this.activityHandler = null;
+    }
+    if (this.visibilityHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityHandler);
+      this.visibilityHandler = null;
     }
   }
 
@@ -137,7 +167,7 @@ class WSClient {
   }
 
   disconnect() {
-    this.stopPing();
+    this.stopActivityTracking();
     if (this.ws) {
       this.ws.close();
       this.ws = null;

@@ -107,27 +107,33 @@ export function broadcastToUserExcept(userId, tabId, event) {
   });
 }
 
-// Check for AFK connections periodically
+// Check for AFK connections periodically.
+// A user is AFK only when ALL of their tabs have been idle > AFK_TIMEOUT,
+// so we compare against the most-recently-active tab.
 export async function checkAFKStatus() {
   const now = Date.now();
 
   for (const [userId, tabs] of connections) {
+    if (tabs.size === 0) continue;
+
+    let maxLastPing = 0;
     for (const tab of tabs.values()) {
-      if (now - tab.lastPing > AFK_TIMEOUT) {
-        const currentStatus = presence.get(userId)?.status;
-        if (currentStatus === 'online') {
-          const change = updatePresence(userId, 'afk');
-          if (change) {
-            broadcastToUser(userId, {
-              type: 'presence:update',
-              payload: { userId, status: 'afk' },
-            });
-            // Notify friends and room members of AFK status
-            const broadcast = await import('./broadcast.js');
-            await broadcast.broadcastPresenceToFriends(userId);
-            await broadcast.broadcastPresenceToRoomMembers(userId);
-          }
-        }
+      if (tab.lastPing > maxLastPing) maxLastPing = tab.lastPing;
+    }
+
+    const idleMs = now - maxLastPing;
+    const currentStatus = presence.get(userId)?.status;
+
+    if (idleMs > AFK_TIMEOUT && currentStatus === 'online') {
+      const change = updatePresence(userId, 'afk');
+      if (change) {
+        broadcastToUser(userId, {
+          type: 'presence:update',
+          payload: { userId, status: 'afk' },
+        });
+        const broadcast = await import('./broadcast.js');
+        await broadcast.broadcastPresenceToFriends(userId);
+        await broadcast.broadcastPresenceToRoomMembers(userId);
       }
     }
   }
