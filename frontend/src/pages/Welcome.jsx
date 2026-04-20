@@ -16,7 +16,7 @@ export default function Welcome() {
           <span className={styles.brandName}>Hackathon Chat</span>
         </div>
         <div className={styles.navLinks}>
-          <Link to="/login-form" className={styles.navLinkGhost}>Sign in</Link>
+          <Link to="/login" className={styles.navLinkGhost}>Sign in</Link>
           <Link to="/register" className={styles.navLink}>Get started</Link>
         </div>
       </nav>
@@ -32,7 +32,7 @@ export default function Welcome() {
           </p>
           <div className={styles.ctaRow}>
             <Link to="/register" className={styles.primaryCta}>Create your account</Link>
-            <Link to="/login-form" className={styles.secondaryCta}>I already have one →</Link>
+            <Link to="/login" className={styles.secondaryCta}>I already have one →</Link>
           </div>
         </div>
 
