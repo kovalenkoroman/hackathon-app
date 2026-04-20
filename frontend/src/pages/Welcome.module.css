@@ -20,7 +20,7 @@
   align-items: center;
   gap: 0.6rem;
   font-weight: 700;
-  color: #2d2d3a;
+  color: var(--text);
 }
 
 .brandLogo {
@@ -96,7 +96,7 @@
 .title {
   font-size: 3.2rem;
   line-height: 1.1;
-  color: #1a1a25;
+  color: var(--text);
   margin: 0 0 1rem 0;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -184,13 +184,13 @@
 .featureTitle {
   font-size: 1rem;
   font-weight: 600;
-  color: #1a1a25;
+  color: var(--text);
   margin: 0 0 0.35rem 0;
 }
 
 .featureDesc {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-muted);
   line-height: 1.5;
   margin: 0;
 }

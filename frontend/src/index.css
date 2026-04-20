@@ -41,6 +41,13 @@ html, body, #root {
   --sidebar-active-text: white;
   --sidebar-input-bg: #ffffff;
   --sidebar-input-border: #dcdce3;
+  --dm-bubble: #f0f0f0;
+  --dm-bubble-text: #1a1a25;
+  --reply-bg: #f7f9ff;
+  --reply-border: #e0e6fb;
+  --chip-bg: #eef0ff;
+  --chip-text: #4c5bc4;
+  --chip-border: #dde1fa;
 }
 
 .dark {
@@ -72,6 +79,13 @@ html, body, #root {
   --sidebar-active-text: white;
   --sidebar-input-bg: rgba(0, 0, 0, 0.25);
   --sidebar-input-border: rgba(255, 255, 255, 0.12);
+  --dm-bubble: #2a2a38;
+  --dm-bubble-text: rgba(255, 255, 255, 0.9);
+  --reply-bg: rgba(124, 142, 255, 0.15);
+  --reply-border: rgba(124, 142, 255, 0.3);
+  --chip-bg: rgba(124, 142, 255, 0.18);
+  --chip-text: #9ba9ff;
+  --chip-border: rgba(124, 142, 255, 0.3);
 }
 
 body {

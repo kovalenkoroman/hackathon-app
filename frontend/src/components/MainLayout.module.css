@@ -44,7 +44,7 @@
 }
 
 .navBrand:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--bg-hover);
 }
 
 .logo {
@@ -171,7 +171,7 @@
 .logoutBtn {
   background: none;
   border: none;
-  color: #000;
+  color: var(--text);
   cursor: pointer;
   font-size: 0.95rem;
   padding: 0;
@@ -181,7 +181,7 @@
 }
 
 .logoutBtn:hover {
-  color: #666;
+  color: var(--text-muted);
 }
 
 /* Main 3-column layout */
@@ -318,27 +318,27 @@
 }
 
 .sectionAction:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--sidebar-active-text);
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text);
 }
 
 .chevron {
   font-size: 0.65rem;
-  color: var(--sidebar-text);
+  color: var(--sidebar-text-muted);
   width: 14px;
   height: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--sidebar-hover);
   border-radius: 3px;
   line-height: 1;
   flex-shrink: 0;
 }
 
 .sectionToggle:hover .chevron {
-  background: rgba(255, 255, 255, 0.18);
-  color: var(--sidebar-active-text);
+  background: var(--sidebar-input-border);
+  color: var(--sidebar-text);
 }
 
 .sectionCount {

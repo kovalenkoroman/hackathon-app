@@ -103,7 +103,7 @@
 
 .secondaryBtn:hover {
   background: var(--bg-hover);
-  border-color: #b0b0ba;
+  border-color: var(--border-strong);
 }
 
 .sessionList {
@@ -124,8 +124,8 @@
 }
 
 .sessionCard.current {
-  background: #f7f9ff;
-  border-color: #d5ddfa;
+  background: var(--accent-soft);
+  border-color: var(--accent);
 }
 
 .sessionIcon {

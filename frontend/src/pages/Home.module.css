@@ -49,7 +49,7 @@
 }
 
 .action:hover {
-  border-color: #d0d4ef;
+  border-color: var(--border-strong);
   box-shadow: 0 4px 14px rgba(30, 30, 60, 0.06);
   transform: translateY(-1px);
 }

@@ -17,7 +17,7 @@
   align-items: center;
   gap: 0.55rem;
   text-decoration: none;
-  color: #2d2d3a;
+  color: var(--text);
   font-weight: 700;
   font-size: 1.05rem;
   margin-bottom: 0.5rem;
@@ -30,11 +30,11 @@
 }
 
 .card {
-  background: white;
+  background: var(--bg-surface);
   border-radius: 12px;
   padding: 2.25rem 2rem;
   box-shadow: 0 10px 32px rgba(30, 30, 60, 0.08), 0 2px 8px rgba(30, 30, 60, 0.04);
-  border: 1px solid #ececf2;
+  border: 1px solid var(--border);
   width: 100%;
   max-width: 400px;
   box-sizing: border-box;
@@ -44,14 +44,14 @@
   margin: 0 0 0.5rem 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1a1a25;
+  color: var(--text);
   letter-spacing: -0.01em;
 }
 
 .cardSubtitle {
   margin: 0 0 1.5rem 0;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-muted);
 }
 
 .form {
@@ -81,13 +81,13 @@
 .formGroup input {
   width: 100%;
   padding: 0.65rem 0.8rem;
-  border: 1px solid #dcdce3;
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   font-size: 0.95rem;
   font-family: inherit;
   box-sizing: border-box;
   transition: border-color 0.15s, box-shadow 0.15s;
-  background: #fff;
+  background: var(--bg-surface);
 }
 
 .formGroup input:focus {
@@ -97,12 +97,12 @@
 }
 
 .formGroup input:disabled {
-  background-color: #f5f5f5;
+  background-color: var(--bg-hover);
   cursor: not-allowed;
 }
 
 .formGroup input::placeholder {
-  color: #aaa;
+  color: var(--text-faint);
 }
 
 .checkboxRow {
@@ -190,5 +190,5 @@
   border-top: 1px solid var(--border);
   text-align: center;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-muted);
 }

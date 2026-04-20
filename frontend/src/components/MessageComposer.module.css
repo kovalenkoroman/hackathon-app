@@ -14,8 +14,8 @@
   align-items: stretch;
   gap: 0.5rem;
   padding: 0.45rem 0.65rem;
-  background: #f7f9ff;
-  border: 1px solid #e0e6fb;
+  background: var(--reply-bg);
+  border: 1px solid var(--reply-border);
   border-radius: 8px;
   font-size: 0.8rem;
 }
@@ -77,11 +77,11 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.3rem 0.55rem;
-  background: #eef0ff;
-  border: 1px solid #dde1fa;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
   border-radius: 14px;
   font-size: 0.8rem;
-  color: #4c5bc4;
+  color: var(--chip-text);
   align-self: flex-start;
   max-width: 100%;
 }
@@ -197,7 +197,7 @@
 }
 
 .toolBtn:hover:not(:disabled) {
-  background: #f0f0f2;
+  background: var(--bg-hover);
 }
 
 .toolBtn:disabled {
@@ -245,7 +245,7 @@
   bottom: calc(100% + 8px);
   left: 0;
   background: var(--bg-surface);
-  border: 1px solid #ececf2;
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.5rem;
   display: grid;
@@ -268,7 +268,7 @@
 }
 
 .emojiBtn:hover {
-  background: #f0f0f2;
+  background: var(--bg-hover);
 }
 
 @media (max-width: 768px) {

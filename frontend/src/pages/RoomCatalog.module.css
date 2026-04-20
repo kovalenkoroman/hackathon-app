@@ -194,7 +194,7 @@
 
 .secondaryBtn:hover {
   background: var(--bg-hover);
-  border-color: #b0b0ba;
+  border-color: var(--border-strong);
 }
 
 .pageHeader .primaryBtn {
@@ -225,11 +225,11 @@
 }
 
 .modal {
-  background: var(--input-bg);
+  background: var(--bg-surface);
   border-radius: 12px;
   width: 100%;
   max-width: 480px;
-  box-shadow: 0 20px 48px rgba(20, 20, 50, 0.25);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
   display: flex;
   flex-direction: column;
