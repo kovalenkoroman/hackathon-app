@@ -149,3 +149,4 @@ Chronological one-liner per task / decision. Kept at the end so the retrospectiv
 | 09:15 | Agent | `.dockerignore` for both services | Prevents host `node_modules`/`dist` leaking into images on rebuild |
 | 09:25 | Agent | Drop spurious `cp .env.example .env` step | Compose injects env vars inline; the copy was a no-op |
 | 09:40 | Developer | README: correct seeded user count 5 → 50 | Seed had been extended to `alice`–`zack`; README still advertised only five |
+| 10:41 | Developer | Fix Safari login by dropping nginx `proxy_cookie_flags secure` | Nginx was re-adding `Secure` to `sessionToken` over HTTP; Chrome/Firefox accept on localhost, Safari rejects — cookie never stored |
