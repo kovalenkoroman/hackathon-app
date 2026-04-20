@@ -42,8 +42,30 @@ export async function getMessagesByRoom(roomId, beforeId = null, limit = 50) {
   params.push(limit);
 
   const result = await pool.query(query, params);
-  return result.rows.reverse();
+  return hydrateAttachments(result.rows.reverse());
 }
+
+// Attach the `attachments` array to each message in a single extra query,
+// keyed by message_id. Avoids N+1 while also avoiding a LEFT JOIN that would
+// duplicate messages with multiple attachments.
+async function hydrateAttachments(messages) {
+  if (messages.length === 0) return messages;
+  const ids = messages.map((m) => m.id);
+  const result = await pool.query(
+    `SELECT id, message_id, filename, original_name, size, mime_type, created_at
+       FROM attachments
+      WHERE message_id = ANY($1)`,
+    [ids]
+  );
+  const byMessage = new Map();
+  for (const row of result.rows) {
+    if (!byMessage.has(row.message_id)) byMessage.set(row.message_id, []);
+    byMessage.get(row.message_id).push(row);
+  }
+  return messages.map((m) => ({ ...m, attachments: byMessage.get(m.id) || [] }));
+}
+
+export { hydrateAttachments };
 
 export async function updateMessage(messageId, content) {
   const result = await pool.query(

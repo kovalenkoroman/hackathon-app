@@ -1,8 +1,16 @@
 import * as attachmentQueries from '../db/queries/attachments.js';
 import * as messageQueries from '../db/queries/messages.js';
 import * as roomQueries from '../db/queries/rooms.js';
-import * as friendQueries from '../db/queries/friends.js';
 import { unlink } from 'fs/promises';
+import pool from '../db/index.js';
+
+async function isDialogParticipant(dialogId, userId) {
+  const result = await pool.query(
+    'SELECT 1 FROM personal_dialogs WHERE id = $1 AND (user_a_id = $2 OR user_b_id = $2)',
+    [dialogId, userId]
+  );
+  return result.rows.length > 0;
+}
 
 export async function saveAttachment(messageId, file) {
   if (!file) {
@@ -31,25 +39,20 @@ export async function getAttachment(attachmentId, userId) {
     throw new Error('Message not found');
   }
 
-  // Check access: user must be a member of the room or participant in the dialog
+  // Access (req 2.6.4):
+  // - Dialog: either of the two participants can download. We check participation
+  //   in the dialog itself rather than friendship, so attachments remain viewable
+  //   after a user-to-user block (req 2.3.5 "history remains visible but frozen").
+  // - Room: must be a current member and not banned.
   if (message.dialog_id) {
-    // Personal dialog - check if user is a participant
-    const friendship = await friendQueries.getFriendshipBetween(userId, message.user_id);
-    if (!friendship || friendship.status !== 'accepted') {
-      throw new Error('Access denied');
-    }
+    const participant = await isDialogParticipant(message.dialog_id, userId);
+    if (!participant) throw new Error('Access denied');
   } else {
-    // Room message - check membership
     const member = await roomQueries.getRoomMember(message.room_id, userId);
-    if (!member) {
-      throw new Error('Access denied');
-    }
+    if (!member) throw new Error('Access denied');
 
-    // Check if user is banned
     const isBanned = await roomQueries.isRoomMemberBanned(message.room_id, userId);
-    if (isBanned) {
-      throw new Error('Access denied');
-    }
+    if (isBanned) throw new Error('Access denied');
   }
 
   return attachment;
@@ -57,31 +60,36 @@ export async function getAttachment(attachmentId, userId) {
 
 export async function deleteAttachment(attachmentId, userId) {
   const attachment = await attachmentQueries.findAttachmentById(attachmentId);
-  if (!attachment) {
-    throw new Error('Attachment not found');
-  }
+  if (!attachment) throw new Error('Attachment not found');
 
   const message = await messageQueries.findMessageById(attachment.message_id);
-  if (!message) {
-    throw new Error('Message not found');
-  }
+  if (!message) throw new Error('Message not found');
 
-  // Only the message author or room admin can delete attachments
-  if (message.user_id !== userId) {
+  // Req 2.6.5: a user who has lost access to a room "can no longer see,
+  // download, or manage" the file. So also require current access, not just
+  // authorship/role.
+  if (message.room_id) {
     const member = await roomQueries.getRoomMember(message.room_id, userId);
-    if (!member || (member.role !== 'admin' && member.role !== 'owner')) {
+    if (!member) throw new Error('Access denied');
+    const isBanned = await roomQueries.isRoomMemberBanned(message.room_id, userId);
+    if (isBanned) throw new Error('Access denied');
+
+    if (message.user_id !== userId && member.role !== 'admin' && member.role !== 'owner') {
+      throw new Error('You can only delete your own attachments');
+    }
+  } else if (message.dialog_id) {
+    const participant = await isDialogParticipant(message.dialog_id, userId);
+    if (!participant) throw new Error('Access denied');
+    if (message.user_id !== userId) {
       throw new Error('You can only delete your own attachments');
     }
   }
 
-  // Delete file from disk
   try {
     await unlink(`/app/uploads/${attachment.filename}`);
   } catch (err) {
     console.error('Error deleting file from disk:', err);
-    // Continue even if file deletion fails
   }
 
-  // Delete from database
   return await attachmentQueries.deleteAttachment(attachmentId);
 }

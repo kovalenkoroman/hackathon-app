@@ -3,6 +3,8 @@ import { readFile } from 'fs/promises';
 import { upload, validateFileSize } from '../middleware/upload.js';
 import * as filesService from '../services/files.js';
 import * as attachmentQueries from '../db/queries/attachments.js';
+import * as messageQueries from '../db/queries/messages.js';
+import * as broadcast from '../ws/broadcast.js';
 import { authMiddleware, requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -22,6 +24,20 @@ router.post('/upload', requireAuth, upload.single('file'), validateFileSize, asy
     }
 
     const attachment = await filesService.saveAttachment(parseInt(messageId), req.file);
+
+    // Re-fetch the enriched message (with all its attachments) and broadcast
+    // a message:edit so other participants update their view.
+    const message = await messageQueries.findMessageById(parseInt(messageId));
+    if (message) {
+      const [hydrated] = await messageQueries.hydrateAttachments([message]);
+      const payload = hydrated;
+      if (message.room_id) {
+        await broadcast.broadcastToRoom(message.room_id, { type: 'message:edit', payload });
+      } else if (message.dialog_id) {
+        await broadcast.broadcastToDialog(message.dialog_id, { type: 'message:edit', payload });
+      }
+    }
+
     res.status(201).json({ data: attachment });
   } catch (error) {
     console.error('Upload error:', error);

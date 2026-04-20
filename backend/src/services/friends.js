@@ -141,7 +141,7 @@ export async function getDMHistory(userId, otherId, beforeId = null, limit = 50)
   params.push(limit);
 
   const result = await pool.query(query, params);
-  return result.rows.reverse();
+  return await messageQueries.hydrateAttachments(result.rows.reverse());
 }
 
 // Used by the DMChat page to decide whether the composer should be shown.
