@@ -55,7 +55,10 @@ export function useUnreads() {
     return 0;
   };
 
-  const markRoomAsRead = async (roomId, lastMessageId) => {
+  // Memoise so callers can safely depend on them in useEffect without
+  // triggering a render loop (the caller's effect re-fires on every render
+  // otherwise, spamming mark-read and re-broadcasting unread:update).
+  const markRoomAsRead = useCallback(async (roomId, lastMessageId) => {
     try {
       await fetch(`/api/v1/rooms/${roomId}/mark-read`, {
         method: 'POST',
@@ -66,9 +69,9 @@ export function useUnreads() {
     } catch (err) {
       console.error('Failed to mark room as read:', err);
     }
-  };
+  }, []);
 
-  const markDialogAsRead = async (dialogId, lastMessageId) => {
+  const markDialogAsRead = useCallback(async (dialogId, lastMessageId) => {
     try {
       await fetch(`/api/v1/dialogs/${dialogId}/mark-read`, {
         method: 'POST',
@@ -79,7 +82,7 @@ export function useUnreads() {
     } catch (err) {
       console.error('Failed to mark dialog as read:', err);
     }
-  };
+  }, []);
 
   return {
     unreads,

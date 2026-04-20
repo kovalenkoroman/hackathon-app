@@ -1,6 +1,8 @@
 import pool from '../index.js';
 
 export async function getUnreadCountsForUser(userId) {
+  // Compare by message id, not created_at — edits can push created_at backward
+  // or the seed can backdate rows, leaving old messages counted forever.
   const result = await pool.query(
     `
     SELECT
@@ -12,11 +14,9 @@ export async function getUnreadCountsForUser(userId) {
     LEFT JOIN room_members rm ON r.id = rm.room_id AND rm.user_id = $1
     LEFT JOIN messages m ON r.id = m.room_id
       AND m.deleted = false
-      AND m.created_at > (
-        SELECT COALESCE(MAX(m2.created_at), '1900-01-01'::timestamptz)
-        FROM messages m2
-        WHERE m2.room_id = r.id
-          AND m2.id = (SELECT last_read_message_id FROM user_room_read WHERE user_id = $1 AND room_id = r.id)
+      AND m.id > COALESCE(
+        (SELECT last_read_message_id FROM user_room_read WHERE user_id = $1 AND room_id = r.id),
+        0
       )
     WHERE rm.user_id = $1
     GROUP BY r.id, r.name, r.visibility
@@ -38,11 +38,9 @@ export async function getUnreadCountsForUser(userId) {
     FROM personal_dialogs pd
     LEFT JOIN messages m ON pd.id = m.dialog_id
       AND m.deleted = false
-      AND m.created_at > (
-        SELECT COALESCE(MAX(m2.created_at), '1900-01-01'::timestamptz)
-        FROM messages m2
-        WHERE m2.dialog_id = pd.id
-          AND m2.id = (SELECT last_read_message_id FROM user_dialog_read WHERE user_id = $1 AND dialog_id = pd.id)
+      AND m.id > COALESCE(
+        (SELECT last_read_message_id FROM user_dialog_read WHERE user_id = $1 AND dialog_id = pd.id),
+        0
       )
     JOIN users u ON CASE
       WHEN pd.user_a_id = $1 THEN u.id = pd.user_b_id
