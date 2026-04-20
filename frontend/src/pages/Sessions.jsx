@@ -1,31 +1,57 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import * as authApi from '../api/auth';
+import styles from './Sessions.module.css';
+
+function formatRelative(dateStr) {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.floor((now - date) / 1000);
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 2592000) return `${Math.floor(diff / 86400)}d ago`;
+  return date.toLocaleDateString();
+}
+
+function parseAgent(ua) {
+  if (!ua) return { device: 'Unknown device', icon: '💻' };
+  const lower = ua.toLowerCase();
+  let device = 'Browser';
+  let icon = '💻';
+  if (lower.includes('iphone') || lower.includes('ipad')) { device = 'iOS device'; icon = '📱'; }
+  else if (lower.includes('android')) { device = 'Android device'; icon = '📱'; }
+  else if (lower.includes('mac')) { device = 'Mac'; icon = '🖥️'; }
+  else if (lower.includes('windows')) { device = 'Windows'; icon = '🖥️'; }
+  else if (lower.includes('linux')) { device = 'Linux'; icon = '🖥️'; }
+
+  let browser = '';
+  if (lower.includes('chrome') && !lower.includes('edg')) browser = 'Chrome';
+  else if (lower.includes('safari') && !lower.includes('chrome')) browser = 'Safari';
+  else if (lower.includes('firefox')) browser = 'Firefox';
+  else if (lower.includes('edg')) browser = 'Edge';
+
+  return { device: browser ? `${browser} on ${device}` : device, icon };
+}
 
 export default function Sessions() {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentSessionToken] = useState(() => {
-    const cookies = document.cookie.split('; ');
-    const tokenCookie = cookies.find((row) => row.startsWith('sessionToken='));
-    return tokenCookie ? tokenCookie.split('=')[1] : null;
-  });
 
   useEffect(() => {
-    const fetchSessions = async () => {
-      try {
-        const response = await fetch('/api/v1/auth/sessions');
-        const json = await response.json();
-        setSessions(json.data || []);
-      } catch (error) {
-        console.error('Failed to fetch sessions:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchSessions();
   }, []);
+
+  const fetchSessions = async () => {
+    try {
+      const response = await fetch('/api/v1/auth/sessions');
+      const json = await response.json();
+      setSessions(json.data || []);
+    } catch (error) {
+      console.error('Failed to fetch sessions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleRevoke = async (sessionId) => {
     try {
@@ -37,7 +63,7 @@ export default function Sessions() {
   };
 
   const handleLogoutAll = async () => {
-    if (confirm('This will sign you out of all sessions. Continue?')) {
+    if (confirm('This will sign you out of all other sessions. Continue?')) {
       try {
         await fetch('/api/v1/auth/sessions', { method: 'DELETE' });
         window.location.href = '/login';
@@ -48,12 +74,8 @@ export default function Sessions() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm('Are you sure you want to delete your account? This cannot be undone. All rooms you own will be deleted along with their messages and files.')) {
-      return;
-    }
-    if (!window.confirm('This is your final warning. Delete account?')) {
-      return;
-    }
+    if (!window.confirm('Are you sure you want to delete your account? This cannot be undone. All rooms you own will be deleted along with their messages and files.')) return;
+    if (!window.confirm('This is your final warning. Delete account?')) return;
     try {
       const response = await fetch('/api/v1/auth/account', { method: 'DELETE' });
       if (response.ok) {
@@ -68,95 +90,89 @@ export default function Sessions() {
     }
   };
 
-  if (loading) return <div style={{ padding: '2rem' }}>Loading sessions...</div>;
+  if (loading) {
+    return <div className={styles.container}><p className={styles.mutedNote}>Loading…</p></div>;
+  }
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Account Settings</h1>
+    <div className={styles.container}>
+      <header className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>Account settings</h1>
+        <p className={styles.pageSubtitle}>Manage your security, devices, and account.</p>
+      </header>
 
-      <div style={{ marginBottom: '2rem', paddingBottom: '1.5rem', borderBottom: '1px solid #ddd' }}>
-        <h2 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Password Management</h2>
-        <Link to="/change-password" style={{ display: 'inline-block', marginRight: '1rem', padding: '0.5rem 1rem', backgroundColor: '#0066cc', color: 'white', textDecoration: 'none', borderRadius: '4px' }}>
-          Change Password
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Password</h2>
+        <p className={styles.sectionDesc}>Update the password you use to sign in.</p>
+        <Link to="/change-password" className={styles.primaryBtn}>
+          Change password
         </Link>
-      </div>
+      </section>
 
-      <h2 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Active Sessions</h2>
-      <p>You have {sessions.length} active session(s)</p>
+      <section className={styles.section}>
+        <div className={styles.sectionHeaderRow}>
+          <div>
+            <h2 className={styles.sectionTitle}>Active sessions</h2>
+            <p className={styles.sectionDesc}>
+              {sessions.length} active {sessions.length === 1 ? 'session' : 'sessions'}.
+            </p>
+          </div>
+          {sessions.length > 1 && (
+            <button onClick={handleLogoutAll} className={styles.secondaryBtn}>
+              Sign out everywhere else
+            </button>
+          )}
+        </div>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '2rem' }}>
-        <thead>
-          <tr style={{ borderBottom: '1px solid #ccc' }}>
-            <th style={{ textAlign: 'left', padding: '0.5rem' }}>IP Address</th>
-            <th style={{ textAlign: 'left', padding: '0.5rem' }}>User Agent</th>
-            <th style={{ textAlign: 'left', padding: '0.5rem' }}>Created</th>
-            <th style={{ textAlign: 'left', padding: '0.5rem' }}>Last Seen</th>
-            <th style={{ textAlign: 'center', padding: '0.5rem' }}>Action</th>
-          </tr>
-        </thead>
-        <tbody>
+        <div className={styles.sessionList}>
           {sessions.map((session) => {
-            const isCurrent = session.id === currentSessionToken;
+            const { device, icon } = parseAgent(session.userAgent);
+            const isCurrent = session.isCurrent;
             return (
-              <tr key={session.id} style={{ borderBottom: '1px solid #eee', backgroundColor: isCurrent ? '#f0f8ff' : 'transparent' }}>
-                <td style={{ padding: '0.5rem' }}>{session.ip || 'Unknown'}</td>
-                <td style={{ padding: '0.5rem', fontSize: '0.85rem' }}>{session.userAgent?.slice(0, 50) || 'Unknown'}...</td>
-                <td style={{ padding: '0.5rem', fontSize: '0.85rem' }}>
-                  {new Date(session.createdAt).toLocaleDateString()}
-                </td>
-                <td style={{ padding: '0.5rem', fontSize: '0.85rem' }}>
-                  {new Date(session.lastSeen).toLocaleString()}
-                </td>
-                <td style={{ textAlign: 'center', padding: '0.5rem' }}>
-                  {isCurrent ? (
-                    <span style={{ color: '#999', fontSize: '0.85rem' }}>Current</span>
-                  ) : (
-                    <button onClick={() => handleRevoke(session.id)} style={{ padding: '0.25rem 0.75rem' }}>
-                      Revoke
-                    </button>
-                  )}
-                </td>
-              </tr>
+              <div
+                key={session.id}
+                className={`${styles.sessionCard} ${isCurrent ? styles.current : ''}`}
+              >
+                <div className={styles.sessionIcon}>{icon}</div>
+                <div className={styles.sessionInfo}>
+                  <div className={styles.sessionTop}>
+                    <strong className={styles.sessionDevice}>{device}</strong>
+                    {isCurrent && <span className={styles.currentBadge}>This device</span>}
+                  </div>
+                  <div className={styles.sessionMeta}>
+                    <span>{session.ip || 'Unknown IP'}</span>
+                    <span className={styles.dot}>•</span>
+                    <span>Active {formatRelative(session.lastSeen)}</span>
+                    <span className={styles.dot}>•</span>
+                    <span>Signed in {new Date(session.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
+                {!isCurrent && (
+                  <button
+                    onClick={() => handleRevoke(session.id)}
+                    className={styles.revokeBtn}
+                  >
+                    Revoke
+                  </button>
+                )}
+              </div>
             );
           })}
-        </tbody>
-      </table>
+        </div>
+      </section>
 
-      <div style={{ marginTop: '2rem' }}>
-        <button onClick={handleLogoutAll} style={{ padding: '0.5rem 1rem', backgroundColor: '#ff4444', color: 'white', border: 'none', cursor: 'pointer' }}>
-          Logout All Sessions
+      <section className={`${styles.section} ${styles.dangerSection}`}>
+        <h2 className={styles.dangerTitle}>Danger zone</h2>
+        <p className={styles.sectionDesc}>Deleting your account is permanent.</p>
+        <ul className={styles.dangerList}>
+          <li>All your personal data will be removed</li>
+          <li>All rooms you own (with their messages and files) will be deleted</li>
+          <li>You will be removed from all rooms you've joined</li>
+        </ul>
+        <button onClick={handleDeleteAccount} className={styles.dangerBtn}>
+          Delete account
         </button>
-      </div>
-
-      <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid #ddd' }}>
-        <h3 style={{ color: '#d32f2f' }}>Danger Zone</h3>
-        <p style={{ color: '#666', fontSize: '0.9rem' }}>
-          Delete your account permanently. This will:
-          <ul style={{ marginTop: '0.5rem', marginBottom: '1rem' }}>
-            <li>Remove your account and all personal data</li>
-            <li>Delete all rooms you own (including messages and files)</li>
-            <li>Remove you from all other rooms</li>
-            <li>This action cannot be undone</li>
-          </ul>
-        </p>
-        <button
-          onClick={handleDeleteAccount}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: '#d32f2f',
-            color: 'white',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          Delete Account
-        </button>
-      </div>
-
-      <div style={{ marginTop: '2rem' }}>
-        <a href="/" style={{ color: '#0066cc', textDecoration: 'none' }}>← Back to home</a>
-      </div>
+      </section>
     </div>
   );
 }
