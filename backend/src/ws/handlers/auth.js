@@ -4,7 +4,7 @@ import * as broadcast from '../broadcast.js';
 
 export async function handleAuth(ws, data, tabId) {
   try {
-    const { token } = data;
+    const token = data?.token || ws.cookieSessionToken;
     if (!token) {
       ws.send(JSON.stringify({ type: 'auth:error', payload: { error: 'Token required' } }));
       ws.close();
@@ -25,6 +25,10 @@ export async function handleAuth(ws, data, tabId) {
     presenceService.addConnection(userId, tabId, ws);
 
     ws.send(JSON.stringify({ type: 'auth:ok', payload: { user: result.user } }));
+
+    // Push current presence of the user's friends and room-mates so the
+    // sidebar can render initial online/AFK dots without waiting for a change.
+    await broadcast.sendPresenceSnapshot(userId, ws);
 
     // Notify friends and room members of user coming online
     await broadcast.broadcastPresenceToFriends(userId);

@@ -33,30 +33,19 @@ function AppContent() {
         const currentUser = await authApi.getMe();
         setUser(currentUser);
 
-        // Try to connect WebSocket if authenticated
+        // Try to connect WebSocket if authenticated. The session cookie is
+        // httpOnly, so we don't pass a token from JS — the backend reads it
+        // from the upgrade request's Cookie header.
         if (currentUser) {
+          // Register the presence listener BEFORE connect() resolves — the
+          // server pushes a batch of presence:update events right after
+          // auth:ok, and if the listener isn't attached yet they're dropped.
+          wsClient.on('presence:update', (payload) => {
+            setPresence(prev => ({ ...prev, [payload.userId]: payload.status }));
+          });
           try {
-            // Extract token from cookies
-            const cookies = document.cookie.split('; ');
-            const tokenCookie = cookies.find((row) => row.startsWith('sessionToken='));
-            const token = tokenCookie ? tokenCookie.split('=')[1] : null;
-
-            console.log('Session token found:', !!token);
-            console.log('Cookies:', cookies);
-
-            if (token) {
-              console.log('Attempting WebSocket connection with token...');
-              await wsClient.connect(token, setWsState);
-              setPresence(prev => ({ ...prev, [currentUser.id]: 'online' }));
-
-              // Listen for presence updates
-              wsClient.on('presence:update', (payload) => {
-                setPresence(prev => ({ ...prev, [payload.userId]: payload.status }));
-              });
-            } else {
-              console.warn('No session token found in cookies');
-              setWsState('disconnected');
-            }
+            await wsClient.connect(null, setWsState);
+            setPresence(prev => ({ ...prev, [currentUser.id]: 'online' }));
           } catch (wsError) {
             console.error('WebSocket connection failed:', wsError);
             setWsState('disconnected');

@@ -26,10 +26,12 @@ class WSClient {
         this.ws.onopen = () => {
           console.log('WebSocket connected, authenticating...');
           this.onStateChange('connecting');
-          this.send({
+          // Bypass the authenticated-only gate in send(): the auth message
+          // itself must go through before authenticated is ever true.
+          this.ws.send(JSON.stringify({
             type: 'auth',
             payload: { token },
-          });
+          }));
         };
 
         this.ws.onmessage = (event) => {

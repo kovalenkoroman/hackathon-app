@@ -72,3 +72,31 @@ export async function broadcastPresenceToRoomMembers(userId) {
     await broadcastToRoom(room.id, event, userId);
   }
 }
+
+// Send the newly-connected client a snapshot of every relevant user's current
+// presence, so the UI doesn't have to wait for the next presence change to
+// start showing non-offline dots.
+export async function sendPresenceSnapshot(userId, ws) {
+  const result = await pool.query(
+    `SELECT requester_id AS id FROM friendships WHERE addressee_id = $1 AND status = 'accepted'
+     UNION
+     SELECT addressee_id AS id FROM friendships WHERE requester_id = $1 AND status = 'accepted'
+     UNION
+     SELECT rm.user_id AS id
+       FROM room_members rm
+       JOIN room_members me ON me.room_id = rm.room_id
+      WHERE me.user_id = $1 AND rm.user_id <> $1`,
+    [userId]
+  );
+
+  if (ws.readyState !== 1) return;
+  // Send status for every relevant user (including offline) so the client's
+  // state replaces any stale values it held from before a reconnect.
+  for (const row of result.rows) {
+    const { status } = presenceService.getPresence(row.id);
+    ws.send(JSON.stringify({
+      type: 'presence:update',
+      payload: { userId: row.id, status },
+    }));
+  }
+}

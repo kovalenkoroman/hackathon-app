@@ -46,8 +46,15 @@ app.use('/api/v1/friends', friendsRoutes);
 app.use('/api/v1/files', filesRoutes);
 
 // WebSocket connection handler
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
   const tabId = uuidv4();
+
+  // The session cookie is httpOnly (not JS-readable), so we parse it from
+  // the WebSocket upgrade request and stash it on the ws for handleAuth to
+  // fall back on when the auth message doesn't carry an explicit token.
+  const cookieHeader = req.headers?.cookie || '';
+  const match = cookieHeader.match(/sessionToken=([^;]+)/);
+  ws.cookieSessionToken = match ? match[1] : null;
 
   ws.on('message', async (data) => {
     try {
