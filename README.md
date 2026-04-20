@@ -14,7 +14,7 @@ The PostgreSQL volume is named; drop it with `docker compose down -v` if you wan
 
 ## Test accounts
 
-On a fresh database, five users are seeded, all with password `password123`:
+On a fresh database, 50 users are seeded (`alice` through `zack`), all with password `password123` and emails of the form `<username>@example.com`. Any of them works for login; the first few have the richest seeded state (rooms owned, friendships, DM history, attachments):
 
 | Email | Username |
 |---|---|
@@ -24,7 +24,7 @@ On a fresh database, five users are seeded, all with password `password123`:
 | `diana@example.com` | diana |
 | `eve@example.com` | eve |
 
-Rooms, memberships, friendships and some sample messages are also seeded so reviewers can click around immediately.
+Rooms, memberships, friendships and sample messages (with real attachments) are all seeded so reviewers can click around immediately.
 
 ## Running the test suite
 
