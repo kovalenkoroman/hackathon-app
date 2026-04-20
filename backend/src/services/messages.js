@@ -47,8 +47,15 @@ export async function editMessage(messageId, userId, content) {
   }
 
   const updated = await messageQueries.updateMessage(messageId, content.trim());
-  await broadcast.broadcastToRoom(message.room_id, { type: 'message:edit', payload: updated });
-  return updated;
+  const enriched = { ...updated, username: message.username };
+
+  if (message.room_id) {
+    await broadcast.broadcastToRoom(message.room_id, { type: 'message:edit', payload: enriched });
+  } else if (message.dialog_id) {
+    await broadcast.broadcastToDialog(message.dialog_id, { type: 'message:edit', payload: enriched });
+  }
+
+  return enriched;
 }
 
 export async function deleteMessage(messageId, userId) {
@@ -57,7 +64,11 @@ export async function deleteMessage(messageId, userId) {
   if (message.deleted) throw new Error('Message is already deleted');
 
   if (message.user_id !== userId) {
-    // Allow admin/owner to delete other users' messages
+    // Per spec 2.5.5, only room admins/owners can delete other users' messages.
+    // Dialogs have no admin concept (spec 2.5.1), so only the author can delete.
+    if (!message.room_id) {
+      throw new Error('You can only delete your own messages');
+    }
     const member = await roomQueries.getRoomMember(message.room_id, userId);
     if (!member || (member.role !== 'admin' && member.role !== 'owner')) {
       throw new Error('You can only delete your own messages');
@@ -65,7 +76,13 @@ export async function deleteMessage(messageId, userId) {
   }
 
   const deleted = await messageQueries.softDeleteMessage(messageId);
-  await broadcast.broadcastToRoom(message.room_id, { type: 'message:delete', payload: { id: messageId } });
+
+  if (message.room_id) {
+    await broadcast.broadcastToRoom(message.room_id, { type: 'message:delete', payload: { id: messageId } });
+  } else if (message.dialog_id) {
+    await broadcast.broadcastToDialog(message.dialog_id, { type: 'message:delete', payload: { id: messageId } });
+  }
+
   return deleted;
 }
 

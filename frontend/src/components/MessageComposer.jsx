@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styles from './MessageComposer.module.css';
 
 const EMOJIS = [
@@ -8,16 +8,31 @@ const EMOJIS = [
   '💻', '⚽', '🏀', '🎯', '🍕', '🍔', '🌮', '☕'
 ];
 
-export default function MessageComposer({ onSend, replyTo, onClearReply, disabled = false }) {
+export default function MessageComposer({ onSend, replyTo, onClearReply, editing, onCancelEdit, disabled = false }) {
   const [content, setContent] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
   const textareaRef = useRef(null);
 
+  useEffect(() => {
+    if (editing) {
+      setContent(editing.content || '');
+      setSelectedFile(null);
+      textareaRef.current?.focus();
+    } else {
+      setContent('');
+    }
+  }, [editing]);
+
   const handleSend = (e) => {
     e.preventDefault();
     if (!content.trim()) return;
+
+    if (editing) {
+      onSend({ content: content.trim(), editingId: editing.id });
+      return;
+    }
 
     onSend({
       content: content.trim(),
@@ -70,7 +85,24 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, disable
 
   return (
     <form onSubmit={handleSend} className={styles.composer}>
-      {replyTo && (
+      {editing && (
+        <div className={styles.replyBanner}>
+          <div className={styles.replyAccent} />
+          <div className={styles.replyBody}>
+            <div className={styles.replyLabel}>Editing message</div>
+            <div className={styles.replyPreview}>Press Send to save your changes</div>
+          </div>
+          <button
+            type="button"
+            onClick={onCancelEdit}
+            className={styles.replyClose}
+            title="Cancel edit"
+          >
+            ×
+          </button>
+        </div>
+      )}
+      {replyTo && !editing && (
         <div className={styles.replyBanner}>
           <div className={styles.replyAccent} />
           <div className={styles.replyBody}>
@@ -164,7 +196,7 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, disable
               className={styles.sendBtn}
               disabled={!canSend}
             >
-              Send
+              {editing ? 'Save' : 'Send'}
             </button>
           </div>
         </div>

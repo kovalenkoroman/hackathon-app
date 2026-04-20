@@ -33,56 +33,6 @@
   border-left: 4px solid #d32f2f;
 }
 
-.messageList {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.noMessages {
-  text-align: center;
-  color: #999;
-  padding: 2rem;
-  font-style: italic;
-}
-
-.message {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding: 0.5rem 0.85rem;
-  background: #f0f0f0;
-  border-radius: 14px 14px 14px 4px;
-  max-width: 60%;
-  word-wrap: break-word;
-  align-self: flex-start;
-}
-
-.message.own {
-  align-self: flex-end;
-  background: #667eea;
-  color: white;
-  border-radius: 14px 14px 4px 14px;
-}
-
-.content {
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-.timestamp {
-  font-size: 0.7rem;
-  color: #999;
-  align-self: flex-end;
-}
-
-.message.own .timestamp {
-  color: rgba(255, 255, 255, 0.75);
-}
-
 .frozenBanner {
   padding: 0.85rem 1.25rem;
   background: #fafafb;

@@ -20,6 +20,7 @@ export default function RoomChat({ user }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
+  const [editingMessage, setEditingMessage] = useState(null);
 
   useEffect(() => {
     loadRoomAndMessages();
@@ -116,6 +117,13 @@ export default function RoomChat({ user }) {
   const handleSend = async (msgData) => {
     setError('');
     try {
+      if (msgData.editingId) {
+        const updated = await messagesApi.editMessage(msgData.editingId, msgData.content);
+        setMessages((prev) => prev.map((m) => (m.id === updated.id ? { ...m, ...updated } : m)));
+        setEditingMessage(null);
+        return;
+      }
+
       const newMessage = await messagesApi.sendMessage(roomId, msgData.content, msgData.replyToId);
       setMessages([...messages, newMessage]);
       setReplyingTo(null);
@@ -223,14 +231,18 @@ export default function RoomChat({ user }) {
         loading={false}
         onLoadMore={handleLoadMore}
         onReply={setReplyingTo}
+        onEdit={setEditingMessage}
         onDelete={handleDelete}
         currentUserId={user?.id}
+        currentUserRole={members.find((m) => m.user_id === user?.id)?.role}
       />
 
       <MessageComposer
         onSend={handleSend}
         replyTo={replyingTo}
         onClearReply={() => setReplyingTo(null)}
+        editing={editingMessage}
+        onCancelEdit={() => setEditingMessage(null)}
       />
 
       {/* Pass room info to MainLayout via props */}

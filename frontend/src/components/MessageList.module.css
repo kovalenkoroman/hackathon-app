@@ -184,3 +184,84 @@
 .fileLink:hover {
   background: #ececec;
 }
+
+/* DM variant — messenger-style bubbles */
+.variantDm {
+  gap: 0.4rem;
+}
+
+.variantDm .messageWrapper {
+  padding: 0;
+}
+
+.variantDm .message {
+  width: auto;
+  max-width: 70%;
+  padding: 0.5rem 0.85rem;
+  background: #f0f0f0;
+  border-radius: 14px 14px 14px 4px;
+  align-self: flex-start;
+}
+
+.variantDm .messageWrapper {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.variantDm .messageWrapper.own {
+  justify-content: flex-end;
+}
+
+.variantDm .messageWrapper.own .message {
+  background: #667eea;
+  color: white;
+  border-radius: 14px 14px 4px 14px;
+}
+
+.variantDm .header {
+  display: none;
+}
+
+.variantDm .content {
+  color: inherit;
+  font-size: 0.95rem;
+}
+
+.variantDm .messageWrapper.own .content {
+  color: white;
+}
+
+.variantDm .reply {
+  border-left-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin: -0.2rem -0.4rem 0.3rem -0.4rem;
+}
+
+.variantDm .messageWrapper:not(.own) .reply {
+  border-left-color: #667eea;
+  background: rgba(102, 126, 234, 0.08);
+}
+
+.variantDm .replyAuthor,
+.variantDm .replyContent {
+  color: inherit;
+}
+
+.variantDm .messageWrapper.own .replyAuthor,
+.variantDm .messageWrapper.own .replyContent {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.variantDm .actions {
+  font-size: 0.7rem;
+}
+
+.variantDm .messageWrapper.own .actionBtn {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.variantDm .messageWrapper.own .actionBtn:hover {
+  color: white;
+}

@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import wsClient from '../ws/client';
 import { useUnreads } from '../hooks/useUnreads';
+import * as messagesApi from '../api/messages';
+import MessageList from '../components/MessageList';
 import MessageComposer from '../components/MessageComposer';
 import styles from './DMChat.module.css';
 
@@ -15,25 +17,12 @@ export default function DMChat({ user }) {
   const [frozenReason, setFrozenReason] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const messagesEndRef = useRef(null);
-  const messageListRef = useRef(null);
-  const hasInitialScrolled = useRef(false);
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [editingMessage, setEditingMessage] = useState(null);
 
   useEffect(() => {
     loadMessages();
   }, [userId]);
-
-  useEffect(() => {
-    const list = messageListRef.current;
-    if (!list || messages.length === 0) return;
-
-    if (!hasInitialScrolled.current) {
-      list.scrollTop = list.scrollHeight;
-      hasInitialScrolled.current = true;
-    } else {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
 
   useEffect(() => {
     if (messages.length > 0 && dialogId) {
@@ -44,21 +33,18 @@ export default function DMChat({ user }) {
 
   useEffect(() => {
     const handleMessageNew = (payload) => {
-      if ((payload.room_id === null || payload.room_id === undefined)) {
-        setMessages(prev => [...prev, payload]);
+      if (payload.dialog_id && payload.dialog_id === dialogId) {
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === payload.id)) return prev;
+          return [...prev, payload];
+        });
       }
     };
-
     const handleMessageEdit = (payload) => {
-      setMessages(prev =>
-        prev.map(m => m.id === payload.id ? payload : m)
-      );
+      setMessages((prev) => prev.map((m) => (m.id === payload.id ? { ...m, ...payload } : m)));
     };
-
     const handleMessageDelete = (payload) => {
-      setMessages(prev =>
-        prev.filter(m => m.id !== payload.id)
-      );
+      setMessages((prev) => prev.filter((m) => m.id !== payload.id));
     };
 
     wsClient.on('message:new', handleMessageNew);
@@ -70,7 +56,7 @@ export default function DMChat({ user }) {
       wsClient.off('message:edit', handleMessageEdit);
       wsClient.off('message:delete', handleMessageDelete);
     };
-  }, [userId]);
+  }, [dialogId]);
 
   const loadMessages = async () => {
     try {
@@ -95,29 +81,82 @@ export default function DMChat({ user }) {
     }
   };
 
+  const handleLoadMore = async () => {
+    if (messages.length === 0) return;
+    try {
+      const res = await fetch(
+        `/api/v1/friends/dialogs/${userId}/messages?before=${messages[0].id}&limit=50`
+      );
+      const json = await res.json();
+      if (json.data?.length) {
+        setMessages((prev) => [...json.data, ...prev]);
+      }
+    } catch (err) {
+      console.error('Failed to load older messages:', err);
+    }
+  };
+
   const handleSend = async (msgData) => {
     setError('');
     try {
+      if (msgData.editingId) {
+        const updated = await messagesApi.editMessage(msgData.editingId, msgData.content);
+        setMessages((prev) => prev.map((m) => (m.id === updated.id ? { ...m, ...updated } : m)));
+        setEditingMessage(null);
+        return;
+      }
+
       const res = await fetch(`/api/v1/friends/dialogs/${userId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ content: msgData.content })
+        body: JSON.stringify({
+          content: msgData.content,
+          replyToId: msgData.replyToId || null,
+        }),
       });
 
-      if (res.ok) {
-        const json = await res.json();
-        setMessages((prev) => [...prev, json.data]);
-      } else {
-        setError('Failed to send message');
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || 'Failed to send message');
+        return;
+      }
+
+      const json = await res.json();
+      const newMessage = json.data;
+      setReplyingTo(null);
+
+      if (msgData.file) {
+        const formData = new FormData();
+        formData.append('file', msgData.file);
+        formData.append('messageId', newMessage.id);
+        try {
+          await fetch('/api/v1/files/upload', {
+            method: 'POST',
+            body: formData,
+          });
+        } catch (err) {
+          console.error('File upload failed:', err);
+          setError('Message sent, but file upload failed');
+        }
       }
     } catch (err) {
       setError('Error sending message');
     }
   };
 
+  const handleDelete = async (messageId) => {
+    if (!window.confirm('Delete this message?')) return;
+    try {
+      await messagesApi.deleteMessage(messageId);
+      setMessages((prev) => prev.filter((m) => m.id !== messageId));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   if (loading) {
-    return <div className={styles.container}><p className={styles.loading}>Loading...</p></div>;
+    return <div className={styles.container}><p className={styles.loading}>Loading…</p></div>;
   }
 
   return (
@@ -128,30 +167,25 @@ export default function DMChat({ user }) {
 
       {error && <div className={styles.error}>{error}</div>}
 
-      <div className={styles.messageList} ref={messageListRef}>
-        {messages.length === 0 ? (
-          <div className={styles.noMessages}>No messages yet. Start a conversation!</div>
-        ) : (
-          messages.map((msg) => {
-            const isOwn = msg.user_id === user?.id;
-            return (
-              <div
-                key={msg.id}
-                className={`${styles.message} ${isOwn ? styles.own : ''}`}
-              >
-                <div className={styles.content}>{msg.content}</div>
-                <div className={styles.timestamp}>
-                  {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
-            );
-          })
-        )}
-        <div ref={messagesEndRef} />
-      </div>
+      <MessageList
+        messages={messages}
+        loading={false}
+        onLoadMore={handleLoadMore}
+        onReply={canSend ? setReplyingTo : undefined}
+        onEdit={canSend ? setEditingMessage : undefined}
+        onDelete={handleDelete}
+        currentUserId={user?.id}
+        variant="dm"
+      />
 
       {canSend ? (
-        <MessageComposer onSend={handleSend} />
+        <MessageComposer
+          onSend={handleSend}
+          replyTo={replyingTo}
+          onClearReply={() => setReplyingTo(null)}
+          editing={editingMessage}
+          onCancelEdit={() => setEditingMessage(null)}
+        />
       ) : (
         <div className={styles.frozenBanner}>
           {frozenReason === 'you-blocked' && 'You blocked this user. Unblock them in Contacts to continue the conversation.'}

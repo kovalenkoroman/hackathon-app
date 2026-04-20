@@ -145,8 +145,13 @@ router.get('/dialogs/:userId/messages', requireAuth, async (req, res) => {
 // Send DM
 router.post('/dialogs/:userId/messages', requireAuth, async (req, res) => {
   try {
-    const { content } = req.body;
-    const message = await friendsService.sendDM(req.user.id, parseInt(req.params.userId), content);
+    const { content, replyToId } = req.body;
+    const message = await friendsService.sendDM(
+      req.user.id,
+      parseInt(req.params.userId),
+      content,
+      replyToId ? parseInt(replyToId) : null
+    );
     res.status(201).json({ data: message });
   } catch (error) {
     console.error('Send DM error:', error);

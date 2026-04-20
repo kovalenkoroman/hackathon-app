@@ -17,6 +17,17 @@ export async function broadcastToUser(userId, event) {
   presenceService.broadcastToUser(userId, event);
 }
 
+export async function broadcastToDialog(dialogId, event) {
+  const result = await pool.query(
+    'SELECT user_a_id, user_b_id FROM personal_dialogs WHERE id = $1',
+    [dialogId]
+  );
+  if (!result.rows[0]) return;
+  const { user_a_id, user_b_id } = result.rows[0];
+  presenceService.broadcastToUser(user_a_id, event);
+  presenceService.broadcastToUser(user_b_id, event);
+}
+
 export async function broadcastToFriends(userId, event, exceptUserId = null) {
   const result = await pool.query(
     `SELECT requester_id as friend_id FROM friendships WHERE addressee_id = $1 AND status = 'accepted'

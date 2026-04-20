@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './MessageList.module.css';
 
-export default function MessageList({ messages, loading, onLoadMore, onReply, onDelete, currentUserId }) {
+export default function MessageList({ messages, loading, onLoadMore, onReply, onDelete, onEdit, currentUserId, currentUserRole, variant = 'room' }) {
+  const canModerate = currentUserRole === 'owner' || currentUserRole === 'admin';
+  const listClass = variant === 'dm' ? `${styles.messageList} ${styles.variantDm}` : styles.messageList;
   const [autoScroll, setAutoScroll] = useState(true);
   const messagesEndRef = useRef(null);
   const messagesStartRef = useRef(null);
@@ -54,7 +56,7 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
   }
 
   return (
-    <div className={styles.messageList} ref={containerRef}>
+    <div className={listClass} ref={containerRef}>
       {loading && (
         <div className={styles.loadingIndicator}>
           <span>Loading older messages...</span>
@@ -116,7 +118,16 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
                 >
                   ↩️ Reply
                 </button>
-                {isOwn && (
+                {isOwn && onEdit && (
+                  <button
+                    onClick={() => onEdit?.(msg)}
+                    className={styles.actionBtn}
+                    title="Edit"
+                  >
+                    ✏️ Edit
+                  </button>
+                )}
+                {(isOwn || (!isOwn && canModerate)) && (
                   <button
                     onClick={() => onDelete?.(msg.id)}
                     className={styles.actionBtn}

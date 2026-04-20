@@ -82,11 +82,11 @@ export async function unbanUser(bannerId, bannedId) {
   return await friendQueries.unbanUser(bannerId, bannedId);
 }
 
-export async function sendDM(senderId, recipientId, content) {
+export async function sendDM(senderId, recipientId, content, replyToId = null) {
   if (!content || content.trim().length === 0) {
     throw new Error('Message content is required');
   }
-  if (content.length > 5000) {
+  if (Buffer.byteLength(content) > 3072) {
     throw new Error('Message is too long');
   }
 
@@ -101,9 +101,22 @@ export async function sendDM(senderId, recipientId, content) {
     throw new Error('You are not friends with this user');
   }
 
-  const dialog = await friendQueries.getOrCreateDialog(senderId, recipientId);
+  if (replyToId) {
+    const replyMsg = await messageQueries.findMessageById(replyToId);
+    if (!replyMsg) throw new Error('Reply message not found');
+  }
 
-  return await messageQueries.createMessage(dialog.id, senderId, content.trim(), null, true);
+  const dialog = await friendQueries.getOrCreateDialog(senderId, recipientId);
+  const message = await messageQueries.createMessage(dialog.id, senderId, content.trim(), replyToId, true);
+
+  // Hydrate with username so recipients see the author immediately (rooms pattern).
+  const sender = await userQueries.findUserById(senderId);
+  const enriched = { ...message, username: sender?.username, email: sender?.email };
+
+  const { broadcastToDialog } = await import('../ws/broadcast.js');
+  await broadcastToDialog(dialog.id, { type: 'message:new', payload: enriched });
+
+  return enriched;
 }
 
 // Per requirement 2.3.5, existing dialog history must stay visible even after
