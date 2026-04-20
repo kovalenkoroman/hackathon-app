@@ -2,13 +2,14 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #fff;
+  background: var(--bg-surface);
+  color: var(--text);
 }
 
 .roomHeader {
   padding: 1rem;
-  border-bottom: 1px solid #ccc;
-  background: #fafafa;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-raised);
   flex-shrink: 0;
 }
 
@@ -16,13 +17,13 @@
   margin: 0 0 0.5rem 0;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #333;
+  color: var(--text);
 }
 
 .roomDescription {
   margin: 0;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-muted);
 }
 
 .error {

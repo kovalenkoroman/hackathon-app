@@ -10,3 +10,52 @@ html, body, #root {
   margin: 0;
   padding: 0;
 }
+
+/* Theme variables. Components read these via var(--name). */
+:root {
+  --bg-page: #f5f5f5;
+  --bg-surface: #ffffff;
+  --bg-raised: #fafafb;
+  --bg-inset: #f5f5f7;
+  --bg-hover: #ececec;
+  --border: #ececf2;
+  --border-strong: #dcdce3;
+  --text: #1a1a25;
+  --text-muted: #666;
+  --text-faint: #999;
+  --text-softer: #888;
+  --input-bg: #ffffff;
+  --accent: #667eea;
+  --accent-soft: #e4e8ff;
+  --danger: #d32f2f;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(30, 30, 60, 0.06);
+  --shadow-lg: 0 10px 32px rgba(30, 30, 60, 0.08);
+}
+
+.dark {
+  --bg-page: #14141a;
+  --bg-surface: #1d1d26;
+  --bg-raised: #23232f;
+  --bg-inset: #191920;
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --text: rgba(255, 255, 255, 0.92);
+  --text-muted: rgba(255, 255, 255, 0.65);
+  --text-faint: rgba(255, 255, 255, 0.4);
+  --text-softer: rgba(255, 255, 255, 0.55);
+  --input-bg: rgba(0, 0, 0, 0.25);
+  --accent: #7c8eff;
+  --accent-soft: rgba(124, 142, 255, 0.15);
+  --danger: #ff6b6b;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 32px rgba(0, 0, 0, 0.55);
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}

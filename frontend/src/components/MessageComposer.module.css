@@ -3,8 +3,8 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.75rem 1rem 1rem;
-  background: #fff;
-  border-top: 1px solid #ececf2;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
 
@@ -120,9 +120,9 @@
 .inputShell {
   display: flex;
   flex-direction: column;
-  border: 1px solid #dcdce3;
+  border: 1px solid var(--border-strong);
   border-radius: 10px;
-  background: #fff;
+  background: var(--bg-surface);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
@@ -142,7 +142,7 @@
   min-height: 44px;
   max-height: 200px;
   line-height: 1.45;
-  color: #222;
+  color: var(--text);
   box-sizing: border-box;
 }
 

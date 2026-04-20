@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation, matchPath } from 'react-router-dom';
-import { Hash, Lock, Plus } from 'lucide-react';
+import { Hash, Lock, Plus, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../hooks/useTheme';
 import RoomPanel from './RoomPanel';
 import ManageRoomModal from './ManageRoomModal';
 import { RoomContext } from '../RoomContext';
@@ -37,6 +38,7 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
   const [loading, setLoading] = useState(true);
   const [showManageModal, setShowManageModal] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const { theme, toggle: toggleTheme } = useTheme();
 
   const fetchRooms = async () => {
     try {
@@ -125,6 +127,13 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
           <a href="/sessions">Sessions</a>
         </div>
         <div className={styles.navRight}>
+          <button
+            className={styles.themeToggle}
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
           <div className={styles.profileDropdown}>
             <button
               className={styles.profileBtn}
