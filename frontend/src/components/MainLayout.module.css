@@ -352,23 +352,17 @@
   transition: background 0.12s, color 0.12s;
 }
 
-.roomItem::before {
-  color: rgba(255, 255, 255, 0.4);
-  font-weight: 500;
+.roomIcon {
+  color: rgba(255, 255, 255, 0.45);
   flex-shrink: 0;
-  width: 14px;
-  text-align: center;
-  font-size: 0.85rem;
-  line-height: 1;
 }
 
-.roomPublic::before {
-  content: '#';
+.roomItem:hover .roomIcon {
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.roomPrivate::before {
-  content: '🔒';
-  font-size: 0.75rem;
+.roomItem.active .roomIcon {
+  color: white;
 }
 
 .roomItem:hover,
@@ -384,9 +378,6 @@
   font-weight: 500;
 }
 
-.roomItem.active::before {
-  color: white;
-}
 
 .itemName {
   flex: 1;

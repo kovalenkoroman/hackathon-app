@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
+import { MessageSquare, Lock, Paperclip } from 'lucide-react';
 import styles from './Welcome.module.css';
 
 const FEATURES = [
-  { icon: '💬', title: 'Real-time chat', desc: 'Messages delivered instantly via WebSocket' },
-  { icon: '🔒', title: 'Private rooms', desc: 'Create invite-only spaces for your team' },
-  { icon: '📎', title: 'File sharing', desc: 'Drop images and files right into conversations' },
+  { Icon: MessageSquare, title: 'Real-time chat', desc: 'Messages delivered instantly via WebSocket' },
+  { Icon: Lock, title: 'Private rooms', desc: 'Create invite-only spaces for your team' },
+  { Icon: Paperclip, title: 'File sharing', desc: 'Drop images and files right into conversations' },
 ];
 
 export default function Welcome() {
@@ -37,13 +38,16 @@ export default function Welcome() {
         </div>
 
         <div className={styles.features}>
-          {FEATURES.map((f) => (
-            <div key={f.title} className={styles.feature}>
-              <div className={styles.featureIcon}>{f.icon}</div>
-              <h3 className={styles.featureTitle}>{f.title}</h3>
-              <p className={styles.featureDesc}>{f.desc}</p>
-            </div>
-          ))}
+          {FEATURES.map((f) => {
+            const { Icon } = f;
+            return (
+              <div key={f.title} className={styles.feature}>
+                <Icon size={24} strokeWidth={1.75} className={styles.featureIcon} />
+                <h3 className={styles.featureTitle}>{f.title}</h3>
+                <p className={styles.featureDesc}>{f.desc}</p>
+              </div>
+            );
+          })}
         </div>
       </main>
     </div>

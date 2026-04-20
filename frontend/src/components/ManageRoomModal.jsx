@@ -1,4 +1,5 @@
 import { useState, useEffect, Fragment } from 'react';
+import { X } from 'lucide-react';
 import styles from './ManageRoomModal.module.css';
 
 export default function ManageRoomModal({ room, members, user, presence, onClose, onMembersChanged }) {
@@ -177,7 +178,7 @@ export default function ManageRoomModal({ room, members, user, presence, onClose
             <h2 className={styles.title}>Manage room</h2>
             <p className={styles.subtitle}>{room.name}</p>
           </div>
-          <button onClick={onClose} className={styles.closeBtn} title="Close">×</button>
+          <button onClick={onClose} className={styles.closeBtn} title="Close"><X size={18} /></button>
         </header>
 
         <div className={styles.tabs}>

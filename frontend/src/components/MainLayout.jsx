@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation, matchPath } from 'react-router-dom';
+import { Hash, Lock, Plus } from 'lucide-react';
 import RoomPanel from './RoomPanel';
 import ManageRoomModal from './ManageRoomModal';
 import { RoomContext } from '../RoomContext';
@@ -210,7 +211,7 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                       onClick={() => navigate('/catalog?create=true')}
                       title="Create room"
                     >
-                      +
+                      <Plus size={14} strokeWidth={2.5} />
                     </button>
                   </div>
                   {roomsOpen && (
@@ -227,9 +228,10 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                               <div
                                 key={room.id}
                                 onClick={() => handleRoomClick(room.id)}
-                                className={`${styles.roomItem} ${styles[room.visibility === 'private' ? 'roomPrivate' : 'roomPublic']} ${isActive ? styles.active : ''}`}
+                                className={`${styles.roomItem} ${isActive ? styles.active : ''}`}
                                 title={room.name}
                               >
+                                <Hash size={14} className={styles.roomIcon} strokeWidth={2} />
                                 <span className={styles.itemName}>{room.name}</span>
                                 {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
                               </div>
@@ -249,9 +251,10 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                               <div
                                 key={room.id}
                                 onClick={() => handleRoomClick(room.id)}
-                                className={`${styles.roomItem} ${styles[room.visibility === 'private' ? 'roomPrivate' : 'roomPublic']} ${isActive ? styles.active : ''}`}
+                                className={`${styles.roomItem} ${isActive ? styles.active : ''}`}
                                 title={room.name}
                               >
+                                <Lock size={13} className={styles.roomIcon} strokeWidth={2} />
                                 <span className={styles.itemName}>{room.name}</span>
                                 {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
                               </div>

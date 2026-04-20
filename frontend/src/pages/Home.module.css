@@ -55,7 +55,6 @@
 }
 
 .actionIcon {
-  font-size: 1.5rem;
   width: 44px;
   height: 44px;
   display: flex;
@@ -64,6 +63,7 @@
   background: linear-gradient(135deg, #eef0ff 0%, #f5edff 100%);
   border-radius: 10px;
   flex-shrink: 0;
+  color: #4c5bc4;
 }
 
 .actionBody {
@@ -84,9 +84,9 @@
 }
 
 .actionArrow {
-  font-size: 1.2rem;
   color: #aaa;
   transition: color 0.15s, transform 0.15s;
+  flex-shrink: 0;
 }
 
 .action:hover .actionArrow {

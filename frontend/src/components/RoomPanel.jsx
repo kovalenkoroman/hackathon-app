@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Send, Settings, LogOut, Globe, Lock, X } from 'lucide-react';
 import styles from './RoomPanel.module.css';
 
 export default function RoomPanel({ room, members, user, onInvite, onManage, onBan, onRemove, onPromote, onDemote, onLeave }) {
@@ -124,7 +125,8 @@ export default function RoomPanel({ room, members, user, onInvite, onManage, onB
       <div className={styles.header}>
         <h2 className={styles.roomName}>{room.name}</h2>
         <span className={`${styles.visibilityBadge} ${room.visibility === 'public' ? styles.public : styles.private}`}>
-          {room.visibility === 'public' ? '🌍 Public' : '🔒 Private'}
+          {room.visibility === 'public' ? <Globe size={11} /> : <Lock size={11} />}
+          {room.visibility === 'public' ? 'Public' : 'Private'}
         </span>
       </div>
 
@@ -166,19 +168,19 @@ export default function RoomPanel({ room, members, user, onInvite, onManage, onB
       <div className={styles.actions}>
         {canManage && (
           <button onClick={openInviteModal} className={styles.actionBtn}>
-            <span className={styles.actionIcon}>✉️</span>
+            <Send size={15} className={styles.actionIcon} />
             <span>Invite by link</span>
           </button>
         )}
         {canManage && (
           <button onClick={onManage} className={styles.actionBtn}>
-            <span className={styles.actionIcon}>⚙️</span>
+            <Settings size={15} className={styles.actionIcon} />
             <span>Manage room</span>
           </button>
         )}
         {!isOwner && (
           <button onClick={handleLeave} className={`${styles.actionBtn} ${styles.dangerAction}`}>
-            <span className={styles.actionIcon}>👋</span>
+            <LogOut size={15} className={styles.actionIcon} />
             <span>Leave room</span>
           </button>
         )}
@@ -194,7 +196,7 @@ export default function RoomPanel({ room, members, user, onInvite, onManage, onB
                 onClick={() => setShowInviteModal(false)}
                 title="Close"
               >
-                ×
+                <X size={18} />
               </button>
             </header>
             <div className={styles.modalBody}>

@@ -79,6 +79,9 @@
   font-weight: 500;
   color: #667eea;
   font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .replyContent {
@@ -122,6 +125,10 @@
   width: auto;
   flex: 0 0 auto;
   align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: inherit;
 }
 
 .actionBtn:hover {
@@ -141,6 +148,10 @@
   font-size: 0.85rem;
   font-weight: 500;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: inherit;
 }
 
 .scrollDownBtn:hover {
@@ -171,7 +182,9 @@
 }
 
 .fileLink {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.3rem 0.6rem;
   background: #f5f5f5;
   border-radius: 3px;

@@ -129,7 +129,6 @@
 }
 
 .sessionIcon {
-  font-size: 1.5rem;
   flex-shrink: 0;
   width: 40px;
   height: 40px;
@@ -139,6 +138,7 @@
   background: white;
   border-radius: 8px;
   border: 1px solid #ececf2;
+  color: #667eea;
 }
 
 .sessionInfo {

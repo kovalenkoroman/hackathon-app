@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Smile, Paperclip, X } from 'lucide-react';
 import styles from './MessageComposer.module.css';
 
 const EMOJIS = [
@@ -98,7 +99,7 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, editing
             className={styles.replyClose}
             title="Cancel edit"
           >
-            ×
+            <X size={14} strokeWidth={2.5} />
           </button>
         </div>
       )}
@@ -115,14 +116,14 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, editing
             className={styles.replyClose}
             title="Cancel reply"
           >
-            ×
+            <X size={14} strokeWidth={2.5} />
           </button>
         </div>
       )}
 
       {selectedFile && (
         <div className={styles.fileChip}>
-          <span className={styles.fileIcon}>📎</span>
+          <Paperclip size={14} className={styles.fileIcon} />
           <span className={styles.fileName}>{selectedFile.name}</span>
           <button type="button" onClick={clearFile} className={styles.fileClear} title="Remove file">×</button>
         </div>
@@ -151,7 +152,7 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, editing
                 title="Insert emoji"
                 disabled={disabled}
               >
-                😀
+                <Smile size={18} />
               </button>
               {showEmojiPicker && (
                 <div className={styles.emojiPicker}>
@@ -179,7 +180,7 @@ export default function MessageComposer({ onSend, replyTo, onClearReply, editing
               disabled={disabled}
               onClick={() => fileInputRef.current?.click()}
             >
-              📎
+              <Paperclip size={18} />
             </button>
             <input
               ref={fileInputRef}

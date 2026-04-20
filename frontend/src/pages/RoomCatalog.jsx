@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Users, X, Plus, Search } from 'lucide-react';
 import * as roomsApi from '../api/rooms';
 import styles from './RoomCatalog.module.css';
 
@@ -99,7 +100,7 @@ export default function RoomCatalog() {
           <p className={styles.pageSubtitle}>Browse and join open discussion rooms.</p>
         </div>
         <button className={styles.primaryBtn} onClick={() => setShowCreateModal(true)}>
-          + Create room
+          <Plus size={16} /> Create room
         </button>
       </header>
 
@@ -119,7 +120,7 @@ export default function RoomCatalog() {
 
       {!loading && rooms.length === 0 && (
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>🔎</div>
+          <Search size={32} className={styles.emptyIcon} strokeWidth={1.5} />
           <p>{search ? `No rooms match "${search}"` : 'No public rooms yet'}</p>
           {!search && (
             <button className={styles.primaryBtn} onClick={() => setShowCreateModal(true)}>
@@ -143,7 +144,7 @@ export default function RoomCatalog() {
               {room.description && <p className={styles.roomDesc}>{room.description}</p>}
               <div className={styles.roomMeta}>
                 <span className={styles.metaItem}>
-                  <span className={styles.metaIcon}>👥</span>
+                  <Users size={13} className={styles.metaIcon} />
                   {room.member_count || 0} {room.member_count === 1 ? 'member' : 'members'}
                 </span>
               </div>
@@ -189,7 +190,7 @@ export default function RoomCatalog() {
                 onClick={() => setShowCreateModal(false)}
                 title="Close"
               >
-                ×
+                <X size={18} />
               </button>
             </header>
             <form onSubmit={handleCreate} className={styles.createForm}>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Monitor, Smartphone, Laptop } from 'lucide-react';
 import styles from './Sessions.module.css';
 
 function formatRelative(dateStr) {
@@ -13,15 +14,15 @@ function formatRelative(dateStr) {
 }
 
 function parseAgent(ua) {
-  if (!ua) return { device: 'Unknown device', icon: '💻' };
+  if (!ua) return { device: 'Unknown device', Icon: Laptop };
   const lower = ua.toLowerCase();
   let device = 'Browser';
-  let icon = '💻';
-  if (lower.includes('iphone') || lower.includes('ipad')) { device = 'iOS device'; icon = '📱'; }
-  else if (lower.includes('android')) { device = 'Android device'; icon = '📱'; }
-  else if (lower.includes('mac')) { device = 'Mac'; icon = '🖥️'; }
-  else if (lower.includes('windows')) { device = 'Windows'; icon = '🖥️'; }
-  else if (lower.includes('linux')) { device = 'Linux'; icon = '🖥️'; }
+  let Icon = Laptop;
+  if (lower.includes('iphone') || lower.includes('ipad')) { device = 'iOS device'; Icon = Smartphone; }
+  else if (lower.includes('android')) { device = 'Android device'; Icon = Smartphone; }
+  else if (lower.includes('mac')) { device = 'Mac'; Icon = Monitor; }
+  else if (lower.includes('windows')) { device = 'Windows'; Icon = Monitor; }
+  else if (lower.includes('linux')) { device = 'Linux'; Icon = Monitor; }
 
   let browser = '';
   if (lower.includes('chrome') && !lower.includes('edg')) browser = 'Chrome';
@@ -29,7 +30,7 @@ function parseAgent(ua) {
   else if (lower.includes('firefox')) browser = 'Firefox';
   else if (lower.includes('edg')) browser = 'Edge';
 
-  return { device: browser ? `${browser} on ${device}` : device, icon };
+  return { device: browser ? `${browser} on ${device}` : device, Icon };
 }
 
 export default function Sessions() {
@@ -95,14 +96,16 @@ export default function Sessions() {
 
       <div className={styles.sessionList}>
         {sessions.map((session) => {
-          const { device, icon } = parseAgent(session.userAgent);
+          const { device, Icon } = parseAgent(session.userAgent);
           const isCurrent = session.isCurrent;
           return (
             <div
               key={session.id}
               className={`${styles.sessionCard} ${isCurrent ? styles.current : ''}`}
             >
-              <div className={styles.sessionIcon}>{icon}</div>
+              <div className={styles.sessionIcon}>
+                <Icon size={20} strokeWidth={1.75} />
+              </div>
               <div className={styles.sessionInfo}>
                 <div className={styles.sessionTop}>
                   <strong className={styles.sessionDevice}>{device}</strong>

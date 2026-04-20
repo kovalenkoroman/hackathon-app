@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Users, Lock, Plus } from 'lucide-react';
 import styles from './RoomCatalog.module.css';
 
 export default function MyRooms() {
@@ -38,7 +39,7 @@ export default function MyRooms() {
           className={styles.primaryBtn}
           onClick={() => navigate('/catalog?create=true')}
         >
-          + Create room
+          <Plus size={16} /> Create room
         </button>
       </header>
 
@@ -47,7 +48,7 @@ export default function MyRooms() {
 
       {!loading && rooms.length === 0 && (
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>🔒</div>
+          <Lock size={32} className={styles.emptyIcon} strokeWidth={1.5} />
           <p>You don't have any private rooms yet.</p>
           <button
             className={styles.primaryBtn}
@@ -69,7 +70,7 @@ export default function MyRooms() {
             {room.description && <p className={styles.roomDesc}>{room.description}</p>}
             <div className={styles.roomMeta}>
               <span className={styles.metaItem}>
-                <span className={styles.metaIcon}>👥</span>
+                <Users size={13} className={styles.metaIcon} />
                 {room.member_count || 0} {room.member_count === 1 ? 'member' : 'members'}
               </span>
             </div>

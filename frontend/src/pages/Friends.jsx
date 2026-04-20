@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserPlus, Inbox, UserX } from 'lucide-react';
 import styles from './Friends.module.css';
 
 const TABS = [
@@ -188,7 +189,7 @@ export default function Friends({ user }) {
             <div className={styles.mutedNote}>Loading…</div>
           ) : friends.length === 0 ? (
             <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>👋</div>
+              <UserPlus size={32} className={styles.emptyIcon} strokeWidth={1.5} />
               <p>You don't have any friends yet.</p>
               <button className={styles.primaryBtn} onClick={() => setTab('find')}>
                 Send a friend request
@@ -236,7 +237,7 @@ export default function Friends({ user }) {
             <div className={styles.mutedNote}>Loading…</div>
           ) : pending.length === 0 ? (
             <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>📭</div>
+              <Inbox size={32} className={styles.emptyIcon} strokeWidth={1.5} />
               <p>No pending requests.</p>
             </div>
           ) : (
@@ -276,7 +277,7 @@ export default function Friends({ user }) {
             <div className={styles.mutedNote}>Loading…</div>
           ) : blocked.length === 0 ? (
             <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>🚫</div>
+              <UserX size={32} className={styles.emptyIcon} strokeWidth={1.5} />
               <p>You haven't blocked anyone.</p>
             </div>
           ) : (

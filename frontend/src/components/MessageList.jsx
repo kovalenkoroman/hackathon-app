@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { CornerDownLeft, Pencil, Trash2, FileText, ArrowDown } from 'lucide-react';
 import styles from './MessageList.module.css';
 
 export default function MessageList({ messages, loading, onLoadMore, onReply, onDelete, onEdit, currentUserId, currentUserRole, variant = 'room' }) {
@@ -82,7 +83,10 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
 
               {repliedToMessage && (
                 <div className={styles.reply}>
-                  <div className={styles.replyAuthor}>↪ Reply to {repliedToMessage.username}</div>
+                  <div className={styles.replyAuthor}>
+                    <CornerDownLeft size={11} strokeWidth={2.5} style={{ transform: 'scaleX(-1)' }} />
+                    Reply to {repliedToMessage.username}
+                  </div>
                   <div className={styles.replyContent}>{repliedToMessage.content}</div>
                 </div>
               )}
@@ -101,7 +105,8 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
                           </a>
                         ) : (
                           <a href={`/api/v1/files/${att.id}`} download={att.original_name} className={styles.fileLink}>
-                            📄 {att.original_name} ({Math.round(att.size / 1024)} KB)
+                            <FileText size={14} />
+                            {att.original_name} ({Math.round(att.size / 1024)} KB)
                           </a>
                         )}
                       </div>
@@ -116,7 +121,7 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
                   className={styles.actionBtn}
                   title="Reply"
                 >
-                  ↩️ Reply
+                  <CornerDownLeft size={13} /> Reply
                 </button>
                 {isOwn && onEdit && (
                   <button
@@ -124,7 +129,7 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
                     className={styles.actionBtn}
                     title="Edit"
                   >
-                    ✏️ Edit
+                    <Pencil size={13} /> Edit
                   </button>
                 )}
                 {(isOwn || (!isOwn && canModerate)) && (
@@ -133,7 +138,7 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
                     className={styles.actionBtn}
                     title="Delete"
                   >
-                    🗑️ Delete
+                    <Trash2 size={13} /> Delete
                   </button>
                 )}
               </div>
@@ -152,7 +157,7 @@ export default function MessageList({ messages, loading, onLoadMore, onReply, on
           }}
           className={styles.scrollDownBtn}
         >
-          ⬇️ New messages
+          <ArrowDown size={14} /> New messages
         </button>
       )}
     </div>
