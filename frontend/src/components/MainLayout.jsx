@@ -133,16 +133,6 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                   className={styles.dropdownItem}
                   onClick={() => {
                     setProfileDropdownOpen(false);
-                    navigate('/sessions');
-                  }}
-                >
-                  Sessions
-                </button>
-                <button
-                  type="button"
-                  className={styles.dropdownItem}
-                  onClick={() => {
-                    setProfileDropdownOpen(false);
                     navigate('/change-password');
                   }}
                 >
@@ -314,7 +304,7 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
         </main>
 
         {/* Right Sidebar - Room Context & Members */}
-        {roomInfo && (
+        {activeRoomId && roomInfo && (
           <aside className={styles.rightSidebar}>
             <div className={styles.sidebarContent}>
               <RoomPanel
