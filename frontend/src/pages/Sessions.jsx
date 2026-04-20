@@ -62,14 +62,13 @@ export default function Sessions() {
     }
   };
 
-  const handleLogoutAll = async () => {
-    if (confirm('This will sign you out of all other sessions. Continue?')) {
-      try {
-        await fetch('/api/v1/auth/sessions', { method: 'DELETE' });
-        window.location.href = '/login';
-      } catch (error) {
-        console.error('Failed to logout all:', error);
-      }
+  const handleLogoutOthers = async () => {
+    if (!confirm('This will sign you out of all other devices. Continue?')) return;
+    try {
+      await fetch('/api/v1/auth/sessions', { method: 'DELETE' });
+      await fetchSessions();
+    } catch (error) {
+      console.error('Failed to sign out other sessions:', error);
     }
   };
 
@@ -118,7 +117,7 @@ export default function Sessions() {
             </p>
           </div>
           {sessions.length > 1 && (
-            <button onClick={handleLogoutAll} className={styles.secondaryBtn}>
+            <button onClick={handleLogoutOthers} className={styles.secondaryBtn}>
               Sign out everywhere else
             </button>
           )}

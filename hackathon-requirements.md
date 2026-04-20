@@ -25,7 +25,7 @@ The system shall allow self-registration using:
 • Username must be unique.
 • Username is immutable after registration.
 • Email verification is not required.
-2.1.3 Authentication
+2.1.3 Authenticationok
 The system shall support:
 • sign in with email and password
 • sign out (logs out the current browser session only; other active sessions are not

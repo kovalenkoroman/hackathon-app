@@ -60,6 +60,9 @@ export async function updateSessionLastSeen(sessionId) {
   return result.rows[0];
 }
 
-export async function deleteAllSessionsByUserId(userId) {
-  await pool.query('DELETE FROM sessions WHERE user_id = $1', [userId]);
+export async function deleteOtherSessionsByUserId(userId, keepSessionId) {
+  await pool.query(
+    'DELETE FROM sessions WHERE user_id = $1 AND id <> $2',
+    [userId, keepSessionId]
+  );
 }

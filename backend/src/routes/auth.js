@@ -83,24 +83,6 @@ router.post('/password/change', authMiddleware, requireAuth, async (req, res) =>
   }
 });
 
-router.post('/password/reset', async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
-    }
-
-    // In a real app, you'd send an email with a reset link.
-    // For now, just log it and return success.
-    console.log(`[PASSWORD RESET] Reset token requested for: ${email}`);
-
-    res.json({ data: { message: 'If an account exists, a reset email will be sent' } });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 router.delete('/account', authMiddleware, requireAuth, async (req, res) => {
   try {
     await authService.deleteAccount(req.user.id);
@@ -114,6 +96,7 @@ router.delete('/account', authMiddleware, requireAuth, async (req, res) => {
 router.get('/sessions', authMiddleware, requireAuth, async (req, res) => {
   try {
     const sessions = await sessionQueries.listSessionsByUserId(req.user.id);
+    const currentSessionId = req.session?.id;
     const data = sessions.map(s => ({
       id: s.id,
       ip: s.ip,
@@ -121,6 +104,7 @@ router.get('/sessions', authMiddleware, requireAuth, async (req, res) => {
       createdAt: s.created_at,
       expiresAt: s.expires_at,
       lastSeen: s.last_seen,
+      isCurrent: s.id === currentSessionId,
     }));
     res.json({ data });
   } catch (error) {
@@ -145,17 +129,13 @@ router.delete('/sessions/:id', authMiddleware, requireAuth, async (req, res) => 
 
 router.patch('/users/me', authMiddleware, requireAuth, async (req, res) => {
   try {
-    const { username, email } = req.body;
+    const { email } = req.body;
 
-    if (!username && !email) {
-      return res.status(400).json({ error: 'At least one field is required' });
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
     }
 
-    const fields = {};
-    if (username) fields.username = username;
-    if (email) fields.email = email;
-
-    const user = await authService.updateUser(req.user.id, fields);
+    const user = await authService.updateUser(req.user.id, { email });
     res.json({ data: user });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -194,8 +174,7 @@ router.post('/password-reset/confirm', async (req, res) => {
 
 router.delete('/sessions', authMiddleware, requireAuth, async (req, res) => {
   try {
-    await authService.logoutAll(req.user.id);
-    res.clearCookie('sessionToken');
+    await authService.logoutOtherSessions(req.user.id, req.session.id);
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });

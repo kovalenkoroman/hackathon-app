@@ -120,8 +120,8 @@ export async function deleteAccount(userId) {
   }
 }
 
-export async function logoutAll(userId) {
-  await sessionQueries.deleteAllSessionsByUserId(userId);
+export async function logoutOtherSessions(userId, currentSessionId) {
+  await sessionQueries.deleteOtherSessionsByUserId(userId, currentSessionId);
 }
 
 export async function requestPasswordReset(email) {
