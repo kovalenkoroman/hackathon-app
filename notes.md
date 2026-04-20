@@ -98,46 +98,46 @@ Stack chosen: Node.js + Express + WebSocket (`ws`) + PostgreSQL + React (Vite)
 
 ## What Worked Well
 
-- **Pre-hackathon scaffolding with Claude**: Having CLAUDE.md, DB schema, migration structure, and API conventions pre-written saved ~30min of setup time. The agent understood the architecture immediately and wrote code consistently with the established patterns.
-- **Migrations-first approach**: Creating numbered SQL migrations (002, 003) instead of altering the initial schema made changes reversible and documented. Applying them via docker exec was fast.
-- **Tight feedback loops**: Each feature (Auth→Presence→Rooms→Friends→Messaging) was tested end-to-end in the browser immediately after implementation. Caught issues like circular dependencies and route ordering early.
-- **Avoiding over-abstraction**: Raw parameterized `pg` queries stayed readable and made it easy to spot N+1 problems. No ORM to fight.
-- **WS broadcast pattern**: After implementing `broadcastToRoom`, `broadcastToUser`, `broadcastToFriends`, the agent reused these consistently across all event types (presence, rooms, messages).
-- **Error code discipline**: Spending 5 min to map all authorization errors to 403 (instead of 400) saved time debugging test failures later.
+- **Pre-hackathon scaffolding**: CLAUDE.md + DB schema + API conventions pre-written; the agent matched the patterns immediately.
+- **Migrations-first**: numbered SQL files kept schema changes reversible and documented.
+- **Tight feedback loops**: end-to-end browser check after each feature caught circular deps and route-ordering bugs early.
+- **No ORM**: raw parameterised `pg` queries stayed readable and made N+1 problems visible.
+- **Shared WS broadcast helpers**: `broadcastToRoom` / `ToUser` / `ToFriends` were reused consistently across presence, rooms, and messages.
+- **Early error-code discipline**: mapping every auth failure to 403 upfront saved debugging later.
 
 ## What Didn't Work / Wasted Time
 
-- **Circular dependency in WS broadcasts**: First attempt had `broadcast.js` → `presence.js` → `broadcast.js`. Fixed with dynamic `await import()` but consumed 10 min debugging. Should have spotted this in code review before testing.
-- **Session cookie visibility**: Spent time trying to extract sessionToken from Playwright's `document.cookie` before remembering httpOnly flag hides it. Used curl + manual login instead.
-- **Content length validation inconsistency**: Initially had `content.length > 5000` (character count) instead of `Buffer.byteLength(content) > 3072` (bytes). One test failure caught it but should have matched spec from the start.
-- **Forgetting route ordering matters**: PUT `/rooms/:id/invitations` endpoint matching before `/rooms/mine` caused 404s until I reordered it. Express matches routes top-to-bottom; parameterized routes should come last.
+- **Circular dep in WS broadcasts**: `broadcast.js ↔ presence.js`; fixed with dynamic `await import()` — would have been caught by a quick dep-graph sketch.
+- **httpOnly session cookie**: wasted time trying to read it from `document.cookie` before switching to curl.
+- **Content-length mismatch**: initial `content.length > 5000` vs spec's `Buffer.byteLength > 3072` — a test caught it but it shouldn't have shipped.
+- **Express route ordering**: parameterised `/rooms/:id/...` shadowed `/rooms/mine` until static routes were moved first.
 
 ## Observations on Agentic Development
 
-> This is what the organizers actually care about. Be honest.
+> This is what the organizers actually care about.
 
-- **The agent understood context quickly but needed explicit direction on failures**: After each task (Auth, Presence, Rooms, Friends, Messaging), the agent asked "should we do X next?" instead of assuming. This was good — it forced explicit prioritization. On actual failures (e.g., circular dependencies), the agent debugged and fixed but didn't pro-actively refactor adjacent code, which kept scope tight and reduced risk.
-- **Writing test-adjacent code (not tests) was the right call**: Instead of writing Playwright or Jest tests that consume time writing selectors/mocks, the agent wrote code that matched the spec, then verified manually in the browser. This felt like 70% of the test coverage benefit at 30% of the effort. For a hackathon, this is correct.
-- **Spec ambiguity forced prioritization**: The test plan had 30+ individual test cases. The agent triaged them into 5 priorities (Auth, Presence, Rooms, Friends, Messaging) and focused on the "likely fails" (marked as such in the plan). This meant skipping low-impact improvements like infinite scroll (pagination exists, just not auto-load) and unread counters (schema exists, no UI).
-- **The agent's constraint-following was critical**: CLAUDE.md said "no ORM, raw queries only" — the agent never wavered, kept code flat and readable. Said "skip tests" after user declined — never pushed back. This discipline prevented scope creep that often kills hackathon projects.
-- **Error handling was minimal but correct**: No defensive coding against impossible states. If a room doesn't exist, throw. If user isn't a member, throw. This made the code concise and the error messages clear. Test failures pointed directly to the problem.
-- **Model choice mattered more than I expected**: I spent roughly the first half of the hackathon on Haiku before switching to the larger model. For coding specifically — writing non-trivial features, spotting bugs in existing code, keeping multiple constraints in mind at once — the gap was large. Haiku needed much more hand-holding per feature and produced code that required a second pass; the larger model got closer to final on the first try. For future hackathons I'd default to the stronger model for feature work and only drop to a cheaper tier for narrowly-scoped mechanical tasks.
+- **Agent asked before assuming**: after each phase it asked "what next?" — forced explicit prioritisation and kept scope contained.
+- **Test-adjacent code beat formal tests**: code-to-spec + manual browser verification gave ~70% of the coverage value at ~30% of the cost for a hackathon.
+- **Prioritisation via "likely fails"**: triaging 30+ test cases into 5 priorities (Auth/Presence/Rooms/Friends/Messaging) kept day 1 focused.
+- **Constraint-following was critical**: no wavering on "no ORM", no pushback when tests were declined — discipline prevented scope creep.
+- **Minimal error handling**: no defensive code for impossible states; throws pointed directly at failures.
+- **Model choice mattered**: first half on Haiku needed much more hand-holding per feature; the stronger model produced closer-to-final code on first pass. Default to the stronger model for feature work; drop to cheaper only for narrow mechanical tasks.
 
 ## Hardest Parts
 
-- **Presence broadcasts to multiple recipients**: Understanding that AFK state changes need to reach *both* friends *and* room members simultaneously required mapping out the broadcast graph. Once I drew it out, the solution (separate `broadcastPresenceToFriends` and `broadcastPresenceToRoomMembers` functions) was obvious, but took 15 min to conceptualize.
-- **Ping debouncing without over-engineering**: Tracking `lastAcceptedPing` per tab in the WS connection Map was simple, but thinking through the timing (5s window, per-tab not per-user) and async/await flow took a few tries.
-- **The unread message system was the last feature to land**: The spec mentions unread counts but has no endpoint for them. Adding `unread_cursors`-style tracking, a watermark update on open, and a GET endpoint for badges was a deceptively large piece of work because it had to weave into both rooms and DMs and into the WS event stream. It was deprioritized on day 1 and implemented on day 2 after the other §2 gaps were closed (see migration `004_unread_tracking.sql` and Phase 9).
-- **Frontend routing discipline**: Making sure the React Router components matched the backend routes (e.g., `/friends` page, `/dm/:userId` page) and that navigation wasn't hardcoded required careful alignment. The agent did this but it required multiple passes through App.jsx.
+- **Multi-recipient presence broadcasts**: realising AFK changes must reach *both* friends and room members needed a drawn-out broadcast graph before the two-helper solution became obvious.
+- **Ping debounce timing**: per-tab `lastAcceptedPing` with a 5 s window took a few iterations to get right.
+- **Unread system landed late**: watermark + endpoint + WS event touched rooms, DMs, and the sidebar; deferred to day 2.
+- **Frontend/backend route alignment**: keeping React Router paths, nav links, and backend routes consistent required multiple passes through `App.jsx`.
 
 ## If I Did It Again
 
-- **Would validate the spec before coding**: Read the test plan carefully (UT-, IT-, E2E-, LOAD-, SEC- tests) upfront and use that to drive architecture decisions instead of reading it after the fact. This would have avoided surprises like "oh, status codes matter" and "oh, 3072 bytes not 5000 characters".
-- **Would sketch the WS event model**: Before writing any broadcast code, draw out which events reach which recipients (presence → friends + rooms, messages → room members, friend requests → target user, etc.). Would have saved time on the circular dependency issue.
-- **Would defer Friends/DMs until other features were rock solid**: The require() crash in getDMHistory was caught late because the feature was rushed. Should have implemented Auth → Presence → Rooms → Messaging first, then done Friends/DMs as polish.
-- **Would use a single shared session token across curl tests**: Instead of logging in three separate times for three tests, set up a single test user and reuse their session. Would have saved 5 min on setup.
-- **Would run the requirements audit earlier**: The section-by-section §2.1–2.7 re-read happened on day 2, which is when I found most of the behavioral gaps (blocked-contact history, DM feature parity with rooms, attachment access checks, unread indicators). Doing that audit after Phase 2 would have seeded the work queue with concrete gaps instead of having to retrofit them late.
-- **Would set up the theme variable system on day 1**: The light/dark toggle was added late and forced a sweep through every CSS module to replace hardcoded colors with variables. Introducing `--bg-surface`, `--text`, `--border` etc. at the start would have cost nothing then and saved a few hours of grep-and-replace at the end.
-- **Would write tests from requirements before writing features (TDD)**: The section-by-section §2.1–2.7 audit on day 2 caught gaps that end-to-end tests would have caught the moment each feature was implemented. Converting `hackathon-requirements.md` into `tests/run.sh` cases *first* would have turned "does the spec say X works?" into a green/red signal at every step instead of a retrofit pass at the end — and would have caught the attachment access checks, blocked-contact history, and DM feature parity gaps without needing a dedicated audit day.
-- **Would spend more time planning before coding**: The features that landed in one pass and the features that required two or three refactor loops differed almost entirely in how clearly I'd thought through the data shape, the error paths, and the UI flow before asking the agent to implement. A 10-minute sketch upfront is cheaper than a 45-minute refactor after. The iterative "double-check against requirements, then refactor" cycle was the single biggest time sink; better planning collapses it to a single pass.
-- **Would define UI designs and layouts before implementation**: Two late sweeps unified the visual language and extracted theme variables — that work would have been near-zero cost if wireframes (or at least component-level style tokens: surface, border, input, button, danger) had been decided on day 1. Even low-fidelity sketches for each page, and a short list of reusable components with their intended states, before touching JSX would have prevented the retrofit. For next time I'd allocate an explicit design-phase block before any frontend code.
+- **Validate the spec before coding**: read the full test plan upfront so status codes, byte limits, etc. drive architecture from day 1.
+- **Sketch the WS event model first**: which events reach which recipients (presence → friends + rooms, etc.) — would have prevented the circular dep.
+- **Defer Friends/DMs until core is rock-solid**: Auth → Presence → Rooms → Messaging, *then* Friends/DMs; the rushed DM implementation hid a `require()` crash.
+- **Share one session across curl tests**: instead of logging in per test.
+- **Run the §2 requirements audit after Phase 2**, not on day 2 — would have seeded gaps (blocked-contact history, DM parity, attachment checks, unreads) as concrete tasks from the start.
+- **Set up theme variables on day 1**: avoids the end-of-project hardcoded-colour sweep.
+- **TDD from the spec**: convert `hackathon-requirements.md` into `tests/run.sh` cases *before* implementing — every gap becomes a red test instead of an audit finding.
+- **Plan before coding**: the iterative "check-requirements-then-refactor" cycle was the biggest time sink. Ten minutes of sketching saved forty-five minutes of rework, consistently.
+- **Define UI designs and style tokens up front**: wireframes + a short token list (surface/border/input/button/danger) on day 1 would have made both late theming sweeps unnecessary.
