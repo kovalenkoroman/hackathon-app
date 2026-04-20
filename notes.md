@@ -34,7 +34,63 @@ Stack chosen: Node.js + Express + WebSocket (`ws`) + PostgreSQL + React (Vite)
 
 ---
 
+## What Worked Well
+
+- **Pre-hackathon scaffolding** — CLAUDE.md + DB schema + API conventions pre-written; the agent matched the patterns immediately.
+- **Migrations-first** — numbered SQL files kept schema changes reversible and documented.
+- **Tight feedback loops** — end-to-end browser check after each feature caught bugs early.
+- **No ORM** — raw `pg` queries stayed readable and made N+1 problems visible.
+- **Shared WS broadcast helpers** — `broadcastToRoom` / `ToUser` / `ToFriends` reused across presence, rooms, and messages.
+- **Early error-code discipline** — every auth failure mapped to 403 upfront, which saved debugging later.
+
+## What Didn't Work / Wasted Time
+
+What *I* got wrong as the agent's operator, not what the agent did.
+
+- **Ran the first half on the weaker model** — every feature cost more prompts and often a second pass.
+- **Wrote requirements to the agent as prose, not as tests** — behavioural gaps only surfaced when I re-read `hackathon-requirements.md` on day 2.
+- **Prompted before thinking** — "implement X" before nailing data shape / error paths / UI flow triggered a check-then-refactor cycle every time.
+- **Let the agent invent the visual language** — no wireframes or design tokens on day 1, so the app needed a late theming sweep.
+- **Accepted "done" without cross-checking the spec** — silent gaps (attachment access, blocked-contact history, DM parity) accumulated until the audit day.
+
+## Observations on Agentic Development
+
+What I noticed from driving the agent — patterns that worked.
+
+- **Welcomed clarifying questions** — a thirty-second answer beat ten minutes of undoing a wrong assumption.
+- **Project rules only stuck when codified** — anything in CLAUDE.md or skill files held across the whole project; anything said in chat dissolved within a session or two.
+- **Live browser verification beat formal tests during feature work** — Playwright MCP right after each implementation gave most of the test value at a fraction of the cost. (An API regression suite came later, once features stabilised.)
+- **Had to steer the agent off defensive coding** — its default is try/catch around everything; saying "throw, don't check — validate at the boundary" once, early, stuck for the whole project.
+- **Fed scope deliberately** — pasting the full spec made the agent sprawl; a ranked shortlist of 4–5 current priorities made it focus.
+- **Delegated but verified** — the agent's summary describes what it *intended*; the diff shows what it *did*. Read the diff before saying yes.
+
+## Hardest Parts
+
+First time building a full application end-to-end with an agentic workflow. The hard parts weren't technical — they were about the collaboration itself.
+
+- **Calibrating trust vs verify** — read every diff (slow) or trust (risk). Getting the right setting per change type — trust scaffolding, read business logic — took most of day one to settle.
+- **Debugging code I didn't write** — normal debugging starts from "I know what I intended"; agent-produced bugs start from "first I need to understand this code". Several hours burned patching symptoms before I learned to read first.
+- **Staying two steps ahead, not reactive** — agent speed tempts constant next-prompting, but output quality depends on me having data shape / error paths / UI flow sketched first. Every slip into reactive mode produced a refactor cycle.
+- **Scope discipline when everything feels cheap** — "ten more minutes for X" looks true for everything, which makes cuts hard. I added features that should have been cut on day one.
+- **Full-stack with an agent is a different skill from task-level help** — chunking, zoom-in moments, handoff decisions, tracking in-flight vs shipped — none of those were muscles I had. Most of the "wasted time" bullets are surface symptoms of this underlying inexperience.
+
+## If I Did It Again
+
+Obvious-in-retrospect lessons from running an agentic workflow at full-project scale for the first time — framed as how I'd drive the agent next time.
+
+- **Start on the strongest model, always** — single highest-leverage decision. Downgrade only for narrow mechanical work.
+- **Hand the agent a ranked backlog on day one** — reactive prompting is a failure mode of this workflow. A ranked list lets the agent execute phase by phase and ask smart clarifying questions.
+- **TDD from the spec** — convert requirements into `tests/run.sh` before writing features. Every gap becomes a red test instead of an audit finding.
+- **Plan ten minutes before every non-trivial prompt** — data shape, error paths, UI flow, sketched first. Ten minutes up front consistently saved forty-five of refactor.
+- **Define UI wireframes and style tokens before any JSX** — a token list (surface / border / input / button / danger) plus low-fidelity sketches on day one.
+- **Use planning subagents (Plan, Explore) upfront, not as a last resort** — upfront architectural passes would have surfaced the ProtectedLayout remount bug and the gap-sync requirement before they became end-of-project work.
+- **Commit every 15–30 minutes as explicit strategy** — makes agent mistakes cheap to reverse and lets the agent take bigger swings safely.
+
+---
+
 ## Decisions Log
+
+Chronological one-liner per task / decision. Kept at the end so the retrospective reads first; this is a reference appendix.
 
 | Time | Initiator | Decision | Why |
 |------|-----------|----------|-----|
@@ -93,61 +149,3 @@ Stack chosen: Node.js + Express + WebSocket (`ws`) + PostgreSQL + React (Vite)
 | 09:15 | Agent | `.dockerignore` for both services | Prevents host `node_modules`/`dist` leaking into images on rebuild |
 | 09:25 | Agent | Drop spurious `cp .env.example .env` step | Compose injects env vars inline; the copy was a no-op |
 | 09:40 | Developer | README: correct seeded user count 5 → 50 | Seed had been extended to `alice`–`zack`; README still advertised only five |
-
----
-
-## What Worked Well
-
-- **Pre-hackathon scaffolding**: CLAUDE.md + DB schema + API conventions pre-written; the agent matched the patterns immediately.
-- **Migrations-first**: numbered SQL files kept schema changes reversible and documented.
-- **Tight feedback loops**: end-to-end browser check after each feature caught circular deps and route-ordering bugs early.
-- **No ORM**: raw parameterised `pg` queries stayed readable and made N+1 problems visible.
-- **Shared WS broadcast helpers**: `broadcastToRoom` / `ToUser` / `ToFriends` were reused consistently across presence, rooms, and messages.
-- **Early error-code discipline**: mapping every auth failure to 403 upfront saved debugging later.
-
-## What Didn't Work / Wasted Time
-
-Framed as what *I* got wrong as the person driving the agent, not what the agent itself did.
-
-- **Underpowered model for the first half**: I ran a lot of features through Haiku before switching. Every feature took more prompts, more corrections, and frequently a second pass to fix subtle misses. Picking the strongest model on day 1 and downgrading only for narrow mechanical tasks would have recovered hours.
-- **Prose requirements instead of executable tests**: I described features to the agent in prose, the agent implemented to the prose, and behavioural gaps only surfaced when I re-read `hackathon-requirements.md` on day 2 myself. Converting §2.1–2.7 into `tests/run.sh` *before* any feature prompts would have turned every gap into a red test instead of an audit finding.
-- **Under-planning before prompting**: repeatedly I said "implement X" before nailing down the data shape, error paths, and UI flow. The agent implemented something reasonable, I re-read, said "actually no", refactor. That check-then-refactor loop was the single biggest time sink — ten minutes of planning consistently saved forty-five minutes of rework.
-- **Letting the agent invent the visual language**: no wireframes, no token list, no component brief — each page's look was improvised as the agent wrote it. A late sweep unified everything, but it would have been near-zero cost with even low-fidelity sketches and a short style-token list agreed on day 1.
-- **Over-trusting "done"**: when the agent reported a feature complete I often moved on without cross-checking against the requirements doc. Gaps (attachment access checks, blocked-contact history visibility, DM feature parity) accumulated silently until the day-2 audit. A two-minute "does this match §2.X?" self-check per feature would have kept the backlog honest.
-
-## Observations on Agentic Development
-
-Framed as what I noticed from driving the agent, not about the agent itself.
-
-- **Welcomed clarifying questions instead of pushing through them**: when the agent paused between phases and asked "what next?" I treated that as a feature. A thirty-second answer consistently beat ten minutes of undoing an assumption-driven diversion.
-- **Wrote the rules down where the agent could read them**: CLAUDE.md + skill files were the only reliable way to keep conventions sticky across long sessions. Saying "by the way, use raw `pg`" in chat held for one prompt; codified in CLAUDE.md it held across twenty.
-- **Traded formal tests for live browser verification during feature work**: rather than ask for Jest/Playwright suites per feature I had the agent run each feature in the browser via Playwright MCP right after implementing. For a hackathon this bought most of the test value at a fraction of the cost. (An end-of-day API regression suite came later, once features had stabilised.)
-- **Steered the agent away from defensive coding**: the default is belt-and-braces try/catch around every call. Saying "throw, don't check — we validate at the boundary" once, early, stuck for the rest of the project and left error messages pointing at real problems instead of being swallowed.
-- **Fed scope deliberately, not by dumping the whole spec**: pasting the full requirements doc made the agent sprawl; handing it a ranked shortlist of four or five current priorities made it focus. Scope management is a prompt-design choice, not a post-hoc cleanup.
-- **Delegated but verified**: when the agent reported "done" I formed the habit of reading the diff before saying yes. The agent's summary describes what it *intended* to do; the diff shows what it *did* — not always the same, often enough to matter.
-- **Model choice was the highest-leverage decision**: first half on Haiku needed far more hand-holding per feature; the stronger model produced closer-to-final code on first pass. Default to the strongest model for feature work; only drop to a cheaper tier for narrow mechanical tasks.
-- **Frequent commits as a safety net**: committing every 15–30 minutes made it cheap to say "that refactor was wrong, `git reset` and rethink" without losing adjacent work. Agents take bigger swings when the undo button is cheap, and that's usually a net positive.
-
-## Hardest Parts
-
-This was my first time building a full application end-to-end with an agentic workflow — previous use had been narrow, single-task assistance. The hardest parts weren't technical; they were about the collaboration itself.
-
-- **Calibrating how much to trust vs verify**: when I write code myself I know what's in each file without re-reading it. With the agent, code appears quickly, and I have to choose between reading every diff (slow) or trusting (risk). Finding the right setting for different kinds of change — trust more on scaffolding and glue, read carefully on business-logic touch points — took most of day one to settle.
-- **Debugging code I didn't write**: normally debugging starts from "I know what I intended". Agent-produced bugs start from "first I need to understand what this code is trying to do". Early on I burned hours patching symptoms of code I hadn't read; adopting "read the file before touching it" saved real time later.
-- **Staying two steps ahead of the agent**: the agent is fast enough that it's tempting to just keep issuing the next prompt. But output quality scales with how clearly I've thought through data shape, error paths, and UI flow *before* I prompt. Every time I slipped into pure reactive mode the refactor cycle reappeared; every time I stayed ahead the features landed clean.
-- **Scope discipline when every feature feels cheap**: the agent makes "ten more minutes for X" look true for everything. Saying no became harder than usual, because the apparent cost of adding was so low. I added a few things that would have been better cut on day one.
-- **Knowing what the agent reliably remembers vs what it forgets**: CLAUDE.md and skill files held for the whole project; individual chat rules dissolved within a session or two. It took several rewrites before I had a clear sense of what must be codified as project rules vs what can live in the prompt. Got the line wrong a few times and paid for it in agent-produced code that drifted from conventions.
-- **A full-stack build with an agent is a different skill from task-level help**: chunking work, deciding where to zoom in, deciding when to hand off to the agent vs sit with the code myself, keeping mental state of what's shipped vs in-flight — none of that was a muscle I had built. Most of the "wasted time" entries above are really surface symptoms of this bigger thing, and they'd be avoidable next time.
-
-## If I Did It Again
-
-Most of these are obvious-in-retrospect lessons from running an agentic workflow at full-project scale for the first time. Framed around how I'd drive the agent next time, not about what the code would look like.
-
-- **Start on the strongest model, always**: the single highest-leverage decision. The first half on a weaker model cost more prompts, more corrections, and frequently a second pass. Downgrade only for narrow mechanical work.
-- **Invest the first hour in CLAUDE.md + skill files, not in features**: agents reliably respect rules codified in these files and nowhere else. Conventions I added via chat dissolved within a session; rules written into CLAUDE.md held across the whole project. Extra time on day zero pays back compound interest.
-- **Hand the agent a ranked backlog on day one, not a drip-feed of next prompts**: reactive prompting is a failure mode of this workflow. Given a ranked priority list the agent executes phase by phase and asks smart clarifying questions; without one, it does what I asked and nothing more, and I end up managing every transition myself.
-- **Convert the spec into tests before writing features (TDD)**: the spec becomes an executable contract the agent can't misinterpret. Every gap becomes a red test instead of an audit finding I hunt for later. This alone would have replaced the day-2 requirements-audit scramble.
-- **Plan ten minutes before every non-trivial prompt**: data shape, error paths, UI flow — sketched before prompting. Consistently saved forty-five minutes of refactor. The iterative "check-then-refactor" cycle was the biggest time sink, and it's an under-prepared-prompt problem far more than an agent problem.
-- **Define UI designs and style tokens before any JSX**: without a brief the agent invents visuals per page. Low-fidelity wireframes plus a token list (surface / border / input / button / danger) on day one would have made both late theming sweeps unnecessary.
-- **Use planning subagents (Plan, Explore) upfront, not as a last resort**: I only reached for them after things went wrong. Upfront architectural passes would have surfaced the ProtectedLayout remount bug and the gap-sync design requirement before they became end-of-project work.
-- **Treat frequent commits as an explicit strategy, not an afterthought**: committing every 15–30 minutes makes agent mistakes cheap to reverse and lets the agent take bigger swings safely. I learned this mid-project; next time it's a habit from hour one.
