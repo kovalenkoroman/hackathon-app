@@ -1,0 +1,11 @@
+Dashboard mockups — notes
+=========================
+
+- Primary palette: #4F46E5, #10B981, #F59E0B
+- Typography: Inter for body, Fraunces for display
+- Spacing: 8px base grid
+
+Next steps:
+  1. Iterate on empty states
+  2. Review dark-mode contrast
+  3. Export assets to Figma component library

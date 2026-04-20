@@ -4,6 +4,8 @@ import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import cookieParser from 'cookie-parser';
 import { v4 as uuidv4 } from 'uuid';
+import { readdir, copyFile, mkdir, access } from 'fs/promises';
+import path from 'path';
 import pool from './db/index.js';
 import authRoutes from './routes/auth.js';
 import roomsRoutes from './routes/rooms.js';
@@ -98,10 +100,35 @@ app.use((err, req, res, next) => {
 // Start AFK check
 presenceService.startAFKCheck(10000);
 
+// Copy bundled seed-upload files into UPLOAD_DIR on startup so that
+// seeded attachment rows resolve to real files on disk. Idempotent:
+// files already present in UPLOAD_DIR (including real user uploads) are skipped.
+async function seedUploads() {
+  const seedDir = path.resolve('seed-uploads');
+  const uploadDir = process.env.UPLOAD_DIR || '/app/uploads';
+  try {
+    await access(seedDir);
+  } catch {
+    return;
+  }
+  await mkdir(uploadDir, { recursive: true });
+  const files = await readdir(seedDir);
+  for (const name of files) {
+    const dest = path.join(uploadDir, name);
+    try {
+      await access(dest);
+    } catch {
+      await copyFile(path.join(seedDir, name), dest);
+    }
+  }
+}
+
 // Start server
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`WebSocket server listening at ws://localhost:${PORT}/ws`);
+seedUploads().catch((err) => console.error('seedUploads failed:', err)).finally(() => {
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`WebSocket server listening at ws://localhost:${PORT}/ws`);
+  });
 });
 
 // Graceful shutdown

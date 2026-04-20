@@ -1,0 +1,10 @@
+Auth middleware — changelog
+===========================
+
+- Split session lookup into its own function (readability)
+- Added fast-path for unauthenticated health-check endpoint
+- Normalised error responses to { data: null, error: "..." } shape
+- Added integration test covering expired-session branch
+
+Coverage on critical paths: 100%.
+No user-visible behaviour change.

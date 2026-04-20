@@ -1,0 +1,14 @@
+Spring Campaign — Brief
+=======================
+
+Objective:  Drive sign-ups ahead of the Q2 product refresh.
+Audience:   Existing free-tier users + lookalike segment.
+Channels:   Email, organic social, in-app banners.
+Timeline:   Kickoff April 25, launch May 10, retrospective May 28.
+
+Key metrics:
+  - New activations (primary)
+  - Free-to-paid conversion (secondary)
+  - CAC variance vs prior campaigns
+
+Owner: marketing team lead.
