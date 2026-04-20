@@ -1,4 +1,0 @@
-- generic [ref=e3]:
-  - heading "Online Chat Server" [level=1] [ref=e4]
-  - paragraph [ref=e5]: Welcome, bob!
-  - button "Logout" [ref=e6] [cursor=pointer]

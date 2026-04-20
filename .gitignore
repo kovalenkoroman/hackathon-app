@@ -9,3 +9,9 @@ uploads/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Playwright MCP snapshots / console logs
+.playwright-mcp/
+
+# Ad-hoc screenshots saved to the repo root
+/*.png
