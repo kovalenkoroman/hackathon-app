@@ -108,10 +108,15 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
     <div className={styles.layoutContainer}>
       {/* Top Navigation - Wireframe style */}
       <nav className={styles.topNav}>
-        <div className={styles.navBrand}>
-          <img src="/logo.svg" alt="Hackathon Chat" className={styles.logo} />
+        <button
+          type="button"
+          className={styles.navBrand}
+          onClick={() => navigate('/')}
+          title="Home"
+        >
+          <img src="/logo.svg" alt="" className={styles.logo} />
           Hackathon Chat
-        </div>
+        </button>
         <div className={styles.navLinks}>
           <a href="/catalog">Public Rooms</a>
           <a href="/my-rooms">Private Rooms</a>
@@ -187,17 +192,27 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                 </div>
 
                 <div className={styles.sidebarSection}>
-                  <button
-                    type="button"
-                    className={styles.sectionToggle}
-                    onClick={() => setRoomsOpen((v) => !v)}
-                  >
-                    <span className={styles.chevron}>{roomsOpen ? '▾' : '▸'}</span>
-                    <span className={styles.sectionTitle}>Rooms</span>
-                    {!roomsOpen && filteredPublic.length + filteredPrivate.length > 0 && (
-                      <span className={styles.sectionCount}>{filteredPublic.length + filteredPrivate.length}</span>
-                    )}
-                  </button>
+                  <div className={styles.sectionHeader}>
+                    <button
+                      type="button"
+                      className={styles.sectionToggle}
+                      onClick={() => setRoomsOpen((v) => !v)}
+                    >
+                      <span className={styles.chevron}>{roomsOpen ? '▾' : '▸'}</span>
+                      <span className={styles.sectionTitle}>Rooms</span>
+                      {!roomsOpen && filteredPublic.length + filteredPrivate.length > 0 && (
+                        <span className={styles.sectionCount}>{filteredPublic.length + filteredPrivate.length}</span>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.sectionAction}
+                      onClick={() => navigate('/catalog?create=true')}
+                      title="Create room"
+                    >
+                      +
+                    </button>
+                  </div>
                   {roomsOpen && (
                     <div className={styles.roomsSection}>
                       <div className={styles.categoryHeader}>Public</div>
@@ -251,17 +266,27 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                 </div>
 
                 <div className={styles.sidebarSection}>
-                  <button
-                    type="button"
-                    className={styles.sectionToggle}
-                    onClick={() => setContactsOpen((v) => !v)}
-                  >
-                    <span className={styles.chevron}>{contactsOpen ? '▾' : '▸'}</span>
-                    <span className={styles.sectionTitle}>Contacts</span>
-                    {!contactsOpen && filteredContacts.length > 0 && (
-                      <span className={styles.sectionCount}>{filteredContacts.length}</span>
-                    )}
-                  </button>
+                  <div className={styles.sectionHeader}>
+                    <button
+                      type="button"
+                      className={styles.sectionToggle}
+                      onClick={() => setContactsOpen((v) => !v)}
+                    >
+                      <span className={styles.chevron}>{contactsOpen ? '▾' : '▸'}</span>
+                      <span className={styles.sectionTitle}>Contacts</span>
+                      {!contactsOpen && filteredContacts.length > 0 && (
+                        <span className={styles.sectionCount}>{filteredContacts.length}</span>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.sectionAction}
+                      onClick={() => navigate('/friends')}
+                      title="Add contact"
+                    >
+                      +
+                    </button>
+                  </div>
                   {contactsOpen && (
                     <div className={styles.contactList} id="contact-list">
                       {filteredContacts.length > 0 ? (
@@ -290,9 +315,6 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                   )}
                 </div>
 
-                <button className={styles.createRoomBtn} onClick={() => navigate('/catalog?create=true')}>
-                  Create room
-                </button>
               </div>
             );
           })()}
