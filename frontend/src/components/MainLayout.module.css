@@ -195,15 +195,15 @@
 /* Left Sidebar - Slack-inspired dark theme */
 .leftSidebar {
   width: 240px;
-  background: #20202e;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  transition: width 0.25s ease;
+  transition: width 0.25s ease, background-color 0.2s ease;
   flex-shrink: 0;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--sidebar-text);
 }
 
 .leftSidebar.collapsed {
@@ -212,38 +212,45 @@
 
 .sidebarContent {
   flex: 1;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sidebarScroll {
+  flex: 1;
   overflow-y: auto;
   padding: 0.75rem;
   padding-right: 1.75rem;
-  display: flex;
-  flex-direction: column;
 }
 
 .searchBar {
-  margin-bottom: 1rem;
+  padding: 0.5rem 0.75rem 0.75rem;
+  border-top: 1px solid var(--sidebar-border);
+  flex-shrink: 0;
 }
 
 .searchInput {
   width: 100%;
   padding: 0.4rem 0.6rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--sidebar-input-border);
   border-radius: 5px;
   font-size: 0.85rem;
   font-family: inherit;
-  background: rgba(0, 0, 0, 0.25);
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--sidebar-input-bg);
+  color: var(--sidebar-text);
   box-sizing: border-box;
   transition: background 0.15s, border-color 0.15s;
 }
 
 .searchInput::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--sidebar-text-faint);
 }
 
 .searchInput:focus {
   outline: none;
-  background: rgba(0, 0, 0, 0.35);
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--accent);
 }
 
 .sidebarSection {
@@ -254,7 +261,7 @@
   margin: 0;
   font-size: 0.72rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--sidebar-text-muted);
   letter-spacing: 0.02em;
 }
 
@@ -283,11 +290,11 @@
 }
 
 .sectionToggle:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--sidebar-hover);
 }
 
 .sectionToggle:hover .sectionTitle {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--sidebar-text);
 }
 
 .sectionAction {
@@ -296,7 +303,7 @@
   padding: 0;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--sidebar-text-muted);
   font-size: 1.05rem;
   line-height: 1;
   cursor: pointer;
@@ -312,12 +319,12 @@
 
 .sectionAction:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: white;
+  color: var(--sidebar-active-text);
 }
 
 .chevron {
   font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--sidebar-text);
   width: 14px;
   height: 14px;
   display: inline-flex;
@@ -331,14 +338,14 @@
 
 .sectionToggle:hover .chevron {
   background: rgba(255, 255, 255, 0.18);
-  color: white;
+  color: var(--sidebar-active-text);
 }
 
 .sectionCount {
   margin-left: auto;
   font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.65);
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--sidebar-text-muted);
+  background: var(--sidebar-hover);
   padding: 0.05rem 0.4rem;
   border-radius: 10px;
   font-weight: 600;
@@ -347,7 +354,7 @@
 .categoryHeader {
   padding: 0.3rem 0.4rem;
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--sidebar-text-faint);
   user-select: none;
   margin-top: 0.2rem;
   margin-bottom: 0.05rem;
@@ -368,35 +375,35 @@
   gap: 0.45rem;
   padding: 0.3rem 0.5rem;
   font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--sidebar-text);
   cursor: pointer;
   border-radius: 4px;
   transition: background 0.12s, color 0.12s;
 }
 
 .roomIcon {
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--sidebar-text-faint);
   flex-shrink: 0;
 }
 
 .roomItem:hover .roomIcon {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--sidebar-text);
 }
 
 .roomItem.active .roomIcon {
-  color: white;
+  color: var(--sidebar-active-text);
 }
 
 .roomItem:hover,
 .contactItem:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text);
 }
 
 .roomItem.active,
 .contactItem.active {
-  background: #667eea;
-  color: white;
+  background: var(--sidebar-active-bg);
+  color: var(--sidebar-active-text);
   font-weight: 500;
 }
 
@@ -410,12 +417,12 @@
 
 .presenceDot {
   font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--sidebar-text-faint);
   flex-shrink: 0;
 }
 
 .contactItem.active .presenceDot {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--sidebar-text);
 }
 
 .unreadBadge {
@@ -430,7 +437,7 @@
 
 .mutedNote {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--sidebar-text-faint);
   padding: 0.4rem 0.5rem;
   font-style: italic;
 }
@@ -443,9 +450,9 @@
   width: 22px;
   height: 22px;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--sidebar-input-border);
+  background: var(--sidebar-input-bg);
+  color: var(--sidebar-text-muted);
   cursor: pointer;
   font-size: 0.7rem;
   border-radius: 3px;
@@ -454,8 +461,8 @@
 }
 
 .toggleBtn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text);
 }
 
 /* Chat Area */

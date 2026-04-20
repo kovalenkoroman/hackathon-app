@@ -17,7 +17,7 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1a1a25;
+  color: var(--text);
   letter-spacing: -0.01em;
   word-break: break-word;
 }
@@ -47,10 +47,10 @@
 .description {
   margin: 0;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-muted);
   line-height: 1.45;
   padding: 0.5rem 0;
-  border-top: 1px solid #f0f0f2;
+  border-top: 1px solid var(--border);
 }
 
 .section {
@@ -69,14 +69,14 @@
   margin: 0;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #888;
+  color: var(--text-softer);
   text-transform: none;
 }
 
 .count {
   font-size: 0.7rem;
-  color: #999;
-  background: #ececf2;
+  color: var(--text-faint);
+  background: var(--bg-hover);
   padding: 0.05rem 0.45rem;
   border-radius: 10px;
   font-weight: 600;
@@ -84,7 +84,7 @@
 
 .mutedNote {
   font-size: 0.8rem;
-  color: #aaa;
+  color: var(--text-faint);
   font-style: italic;
   padding: 0.25rem 0;
 }
@@ -101,13 +101,13 @@
   gap: 0.5rem;
   padding: 0.3rem 0.25rem;
   font-size: 0.85rem;
-  color: #333;
+  color: var(--text);
   border-radius: 4px;
   transition: background 0.15s;
 }
 
 .memberRow:hover {
-  background: #f5f5f7;
+  background: var(--bg-hover);
 }
 
 .memberAvatar {
@@ -136,8 +136,8 @@
   height: 22px;
   padding: 0;
   border: 1px solid #dcdce3;
-  background: white;
-  color: #667eea;
+  background: var(--bg-surface);
+  color: var(--accent);
   border-radius: 50%;
   cursor: pointer;
   font-size: 0.9rem;
@@ -157,7 +157,7 @@
 
 .addFriendBtn:hover {
   background: #eef0ff;
-  border-color: #667eea;
+  border-color: var(--accent);
 }
 
 .requestedBadge {
@@ -172,7 +172,7 @@
   gap: 0.3rem;
   margin-top: auto;
   padding-top: 1rem;
-  border-top: 1px solid #ececf2;
+  border-top: 1px solid var(--border);
 }
 
 .actionBtn {
@@ -180,20 +180,19 @@
   align-items: center;
   gap: 0.6rem;
   padding: 0.5rem 0.65rem;
-  background: white;
-  border: 1px solid #dcdce3;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.85rem;
   font-family: inherit;
-  color: #333;
+  color: var(--text);
   text-align: left;
   transition: background 0.15s, border-color 0.15s;
 }
 
 .actionBtn:hover {
-  background: #f5f5f7;
-  border-color: #b0b0ba;
+  background: var(--bg-hover);
 }
 
 .actionIcon {
@@ -228,7 +227,7 @@
 }
 
 .modal {
-  background: white;
+  background: var(--bg-surface);
   border-radius: 12px;
   width: 100%;
   max-width: 460px;
@@ -241,21 +240,21 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.1rem 1.5rem;
-  border-bottom: 1px solid #f0f0f2;
+  border-bottom: 1px solid var(--border);
 }
 
 .modalTitle {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 600;
-  color: #1a1a25;
+  color: var(--text);
 }
 
 .modalClose {
   background: none;
   border: none;
   font-size: 1.6rem;
-  color: #999;
+  color: var(--text-faint);
   cursor: pointer;
   width: 32px;
   height: 32px;
@@ -269,7 +268,7 @@
 
 .modalClose:hover {
   background: #f5f5f7;
-  color: #333;
+  color: var(--text);
 }
 
 .modalBody {
@@ -282,14 +281,14 @@
 .modalDesc {
   margin: 0;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-muted);
   line-height: 1.5;
 }
 
 .primaryBtn {
   width: 100%;
   padding: 0.6rem 1rem;
-  background: #667eea;
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 6px;
@@ -316,18 +315,18 @@
   border-radius: 6px;
   font-size: 0.85rem;
   font-family: monospace;
-  background: #fafafb;
-  color: #333;
+  background: var(--bg-raised);
+  color: var(--text);
 }
 
 .linkInput:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--accent);
 }
 
 .copyBtn {
   padding: 0.55rem 0.9rem;
-  background: #667eea;
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 6px;

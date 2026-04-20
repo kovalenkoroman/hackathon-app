@@ -16,21 +16,21 @@
   margin: 0 0 0.25rem 0;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1a1a25;
+  color: var(--text);
   letter-spacing: -0.01em;
 }
 
 .pageSubtitle {
   margin: 0;
   font-size: 0.9rem;
-  color: #777;
+  color: var(--text-muted);
 }
 
 .tabs {
   display: flex;
   gap: 0;
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid #ececf2;
+  border-bottom: 1px solid var(--border);
 }
 
 .tab {
@@ -39,7 +39,7 @@
   background: none;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #777;
+  color: var(--text-muted);
   font-family: inherit;
   transition: color 0.15s;
   position: relative;
@@ -49,11 +49,11 @@
 }
 
 .tab:hover {
-  color: #444;
+  color: var(--text);
 }
 
 .tab.active {
-  color: #1a1a25;
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -64,7 +64,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: #667eea;
+  background: var(--accent);
   border-radius: 2px 2px 0 0;
 }
 
@@ -80,7 +80,7 @@
 }
 
 .mutedNote {
-  color: #999;
+  color: var(--text-faint);
   font-style: italic;
   padding: 1rem 0;
 }
@@ -92,14 +92,14 @@
   justify-content: center;
   gap: 0.75rem;
   padding: 3rem 1rem;
-  color: #777;
-  background: white;
+  color: var(--text-muted);
+  background: var(--input-bg);
   border: 1px dashed #ddd;
   border-radius: 10px;
 }
 
 .emptyIcon {
-  color: #aaa;
+  color: var(--text-faint);
 }
 
 .error {
@@ -133,8 +133,8 @@
   align-items: center;
   gap: 1rem;
   padding: 0.85rem 1rem;
-  background: white;
-  border: 1px solid #ececf2;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
   border-radius: 10px;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -168,12 +168,12 @@
 
 .name {
   font-size: 0.95rem;
-  color: #1a1a25;
+  color: var(--text);
 }
 
 .email {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-softer);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -187,7 +187,7 @@
 
 .primaryBtn {
   padding: 0.45rem 0.9rem;
-  background: #667eea;
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 6px;
@@ -209,9 +209,9 @@
 
 .secondaryBtn {
   padding: 0.45rem 0.9rem;
-  background: white;
-  color: #555;
-  border: 1px solid #dcdce3;
+  background: var(--input-bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.85rem;
@@ -221,13 +221,13 @@
 }
 
 .secondaryBtn:hover {
-  background: #f5f5f7;
+  background: var(--bg-hover);
   border-color: #b0b0ba;
 }
 
 .dangerBtn {
   padding: 0.45rem 0.9rem;
-  background: white;
+  background: var(--input-bg);
   color: #c33;
   border: 1px solid #f4c4c4;
   border-radius: 6px;
@@ -245,14 +245,14 @@
 .requestMessage {
   margin: 0.3rem 0 0 0;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-muted);
   font-style: italic;
   line-height: 1.4;
 }
 
 .findCard {
-  background: white;
-  border: 1px solid #ececf2;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1.5rem;
   max-width: 500px;
@@ -262,13 +262,13 @@
   margin: 0 0 0.25rem 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #1a1a25;
+  color: var(--text);
 }
 
 .findSubtitle {
   margin: 0 0 1.25rem 0;
   font-size: 0.85rem;
-  color: #777;
+  color: var(--text-muted);
 }
 
 .findForm {
@@ -282,11 +282,11 @@
 .findTextarea {
   width: 100%;
   padding: 0.6rem 0.8rem;
-  border: 1px solid #dcdce3;
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   font-size: 0.95rem;
   font-family: inherit;
-  background: white;
+  background: var(--input-bg);
   box-sizing: border-box;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -300,7 +300,7 @@
 .findInput:focus,
 .findTextarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 

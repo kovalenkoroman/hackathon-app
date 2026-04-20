@@ -75,7 +75,7 @@
 .formGroup label {
   font-size: 0.85rem;
   font-weight: 500;
-  color: #444;
+  color: var(--text);
 }
 
 .formGroup input {
@@ -92,7 +92,7 @@
 
 .formGroup input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
@@ -110,7 +110,7 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.85rem;
-  color: #555;
+  color: var(--text-muted);
   cursor: pointer;
   user-select: none;
   margin: 0.25rem 0;
@@ -120,13 +120,13 @@
   width: auto;
   margin: 0;
   cursor: pointer;
-  accent-color: #667eea;
+  accent-color: var(--accent);
 }
 
 .primaryBtn {
   width: 100%;
   padding: 0.75rem;
-  background: #667eea;
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 6px;
@@ -172,7 +172,7 @@
 }
 
 .inlineLink {
-  color: #667eea;
+  color: var(--accent);
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 500;
@@ -187,7 +187,7 @@
 .footer {
   margin-top: 1.5rem;
   padding-top: 1.25rem;
-  border-top: 1px solid #f0f0f2;
+  border-top: 1px solid var(--border);
   text-align: center;
   font-size: 0.9rem;
   color: #666;

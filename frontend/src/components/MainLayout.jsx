@@ -191,16 +191,7 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
 
             return (
               <div className={styles.sidebarContent}>
-                <div className={styles.searchBar}>
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className={styles.searchInput}
-                  />
-                </div>
-
+                <div className={styles.sidebarScroll}>
                 <div className={styles.sidebarSection}>
                   <div className={styles.sectionHeader}>
                     <button
@@ -327,6 +318,16 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                   )}
                 </div>
 
+                </div>
+                <div className={styles.searchBar}>
+                  <input
+                    type="text"
+                    placeholder="Search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={styles.searchInput}
+                  />
+                </div>
               </div>
             );
           })()}

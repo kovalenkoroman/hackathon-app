@@ -41,7 +41,7 @@
 
 .navLinkGhost {
   padding: 0.5rem 1rem;
-  color: #444;
+  color: var(--text);
   text-decoration: none;
   border-radius: 6px;
   font-weight: 500;
@@ -55,7 +55,7 @@
 
 .navLink {
   padding: 0.55rem 1.1rem;
-  background: #667eea;
+  background: var(--accent);
   color: white;
   text-decoration: none;
   border-radius: 6px;
@@ -111,7 +111,7 @@
 
 .subtitle {
   font-size: 1.15rem;
-  color: #555;
+  color: var(--text-muted);
   margin: 0 0 2rem 0;
   line-height: 1.55;
 }
@@ -126,7 +126,7 @@
 
 .primaryCta {
   padding: 0.85rem 1.75rem;
-  background: #667eea;
+  background: var(--accent);
   color: white;
   text-decoration: none;
   border-radius: 8px;
@@ -143,7 +143,7 @@
 }
 
 .secondaryCta {
-  color: #555;
+  color: var(--text-muted);
   text-decoration: none;
   font-weight: 500;
   font-size: 0.95rem;
@@ -151,7 +151,7 @@
 }
 
 .secondaryCta:hover {
-  color: #667eea;
+  color: var(--accent);
 }
 
 .features {
@@ -177,7 +177,7 @@
 }
 
 .featureIcon {
-  color: #667eea;
+  color: var(--accent);
   margin-bottom: 0.6rem;
 }
 

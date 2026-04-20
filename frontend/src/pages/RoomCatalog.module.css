@@ -21,14 +21,14 @@
   margin: 0 0 0.25rem 0;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1a1a25;
+  color: var(--text);
   letter-spacing: -0.01em;
 }
 
 .pageSubtitle {
   margin: 0;
   font-size: 0.9rem;
-  color: #777;
+  color: var(--text-muted);
 }
 
 .searchRow {
@@ -39,23 +39,23 @@
   width: 100%;
   max-width: 400px;
   padding: 0.65rem 0.9rem;
-  border: 1px solid #dcdce3;
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 0.95rem;
   font-family: inherit;
-  background: #fff;
+  background: var(--bg-surface);
   box-sizing: border-box;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .searchInput:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
 .mutedNote {
-  color: #999;
+  color: var(--text-faint);
   font-style: italic;
   padding: 1rem 0;
 }
@@ -67,14 +67,14 @@
   justify-content: center;
   gap: 0.75rem;
   padding: 3rem 1rem;
-  color: #777;
-  background: white;
+  color: var(--text-muted);
+  background: var(--input-bg);
   border: 1px dashed #ddd;
   border-radius: 10px;
 }
 
 .emptyIcon {
-  color: #aaa;
+  color: var(--text-faint);
 }
 
 .roomsGrid {
@@ -85,8 +85,8 @@
 
 .roomCard {
   position: relative;
-  background: white;
-  border: 1px solid #ececf2;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1.25rem;
   display: flex;
@@ -122,14 +122,14 @@
   margin: 0;
   font-size: 1.05rem;
   font-weight: 600;
-  color: #1a1a25;
+  color: var(--text);
   padding-right: 4rem;
 }
 
 .roomDesc {
   margin: 0;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-muted);
   line-height: 1.4;
   flex: 1;
 }
@@ -138,7 +138,7 @@
   display: flex;
   gap: 0.75rem;
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-softer);
   margin-top: 0.25rem;
 }
 
@@ -161,7 +161,7 @@
 .primaryBtn {
   flex: 1;
   padding: 0.55rem 1rem;
-  background: #667eea;
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 6px;
@@ -181,9 +181,9 @@
 .secondaryBtn {
   flex: 1;
   padding: 0.55rem 1rem;
-  background: white;
-  color: #555;
-  border: 1px solid #dcdce3;
+  background: var(--input-bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
@@ -193,7 +193,7 @@
 }
 
 .secondaryBtn:hover {
-  background: #f5f5f7;
+  background: var(--bg-hover);
   border-color: #b0b0ba;
 }
 
@@ -225,7 +225,7 @@
 }
 
 .modal {
-  background: white;
+  background: var(--input-bg);
   border-radius: 12px;
   width: 100%;
   max-width: 480px;
@@ -240,21 +240,21 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.1rem 1.5rem;
-  border-bottom: 1px solid #f0f0f2;
+  border-bottom: 1px solid var(--border);
 }
 
 .modalTitle {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #1a1a25;
+  color: var(--text);
 }
 
 .modalClose {
   background: none;
   border: none;
   font-size: 1.6rem;
-  color: #999;
+  color: var(--text-faint);
   cursor: pointer;
   width: 32px;
   height: 32px;
@@ -267,8 +267,8 @@
 }
 
 .modalClose:hover {
-  background: #f5f5f7;
-  color: #333;
+  background: var(--bg-hover);
+  color: var(--text);
 }
 
 .createForm {
@@ -287,11 +287,11 @@
 .field label {
   font-size: 0.85rem;
   font-weight: 500;
-  color: #444;
+  color: var(--text);
 }
 
 .optional {
-  color: #aaa;
+  color: var(--text-faint);
   font-weight: 400;
 }
 
@@ -300,11 +300,11 @@
 .field select {
   width: 100%;
   padding: 0.6rem 0.8rem;
-  border: 1px solid #dcdce3;
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   font-size: 0.95rem;
   font-family: inherit;
-  background: white;
+  background: var(--input-bg);
   box-sizing: border-box;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -318,7 +318,7 @@
 .field textarea:focus,
 .field select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
@@ -328,7 +328,7 @@
   justify-content: flex-end;
   margin-top: 0.5rem;
   padding-top: 1rem;
-  border-top: 1px solid #f0f0f2;
+  border-top: 1px solid var(--border);
 }
 
 .modalActions .primaryBtn,

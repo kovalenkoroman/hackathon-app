@@ -52,7 +52,7 @@
 }
 
 .messageWrapper.own .username {
-  color: #667eea;
+  color: var(--accent);
 }
 
 .timestamp {
@@ -77,7 +77,7 @@
 
 .replyAuthor {
   font-weight: 500;
-  color: #667eea;
+  color: var(--accent);
   font-size: 0.75rem;
   display: inline-flex;
   align-items: center;
@@ -132,7 +132,7 @@
 }
 
 .actionBtn:hover {
-  color: #667eea;
+  color: var(--accent);
 }
 
 .scrollDownBtn {
@@ -140,7 +140,7 @@
   bottom: 10px;
   align-self: center;
   padding: 0.5rem 1rem;
-  background: #667eea;
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 16px;
@@ -189,7 +189,7 @@
   background: #f5f5f5;
   border-radius: 3px;
   text-decoration: none;
-  color: #667eea;
+  color: var(--accent);
   font-size: 0.85rem;
   transition: background 0.15s;
 }
@@ -226,7 +226,7 @@
 }
 
 .variantDm .messageWrapper.own .message {
-  background: #667eea;
+  background: var(--accent);
   color: white;
   border-radius: 14px 14px 4px 14px;
 }
@@ -253,7 +253,7 @@
 }
 
 .variantDm .messageWrapper:not(.own) .reply {
-  border-left-color: #667eea;
+  border-left-color: var(--accent);
   background: rgba(102, 126, 234, 0.08);
 }
 

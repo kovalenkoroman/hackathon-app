@@ -11,7 +11,8 @@
 }
 
 .modal {
-  background: white;
+  background: var(--bg-surface);
+  color: var(--text);
   border-radius: 12px;
   width: 100%;
   max-width: 640px;
@@ -19,7 +20,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 20px 48px rgba(20, 20, 50, 0.25);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
 }
 
 .header {
@@ -27,7 +29,7 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 1.1rem 1.5rem;
-  border-bottom: 1px solid #f0f0f2;
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 
@@ -35,13 +37,13 @@
   margin: 0 0 0.15rem 0;
   font-size: 1.15rem;
   font-weight: 700;
-  color: #1a1a25;
+  color: var(--text);
 }
 
 .subtitle {
   margin: 0;
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-muted);
 }
 
 .closeBtn {
@@ -49,7 +51,7 @@
   border: none;
   font-size: 1.6rem;
   cursor: pointer;
-  color: #999;
+  color: var(--text-faint);
   padding: 0;
   width: 32px;
   height: 32px;
@@ -63,13 +65,13 @@
 }
 
 .closeBtn:hover {
-  background: #f5f5f7;
-  color: #333;
+  background: var(--bg-hover);
+  color: var(--text);
 }
 
 .tabs {
   display: flex;
-  border-bottom: 1px solid #ececf2;
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   padding: 0 1.25rem;
   overflow-x: auto;
@@ -81,7 +83,7 @@
   background: none;
   cursor: pointer;
   font-size: 0.85rem;
-  color: #777;
+  color: var(--text-muted);
   font-family: inherit;
   transition: color 0.15s;
   position: relative;
@@ -89,11 +91,11 @@
 }
 
 .tab:hover {
-  color: #333;
+  color: var(--text);
 }
 
 .tab.active {
-  color: #1a1a25;
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -104,7 +106,7 @@
   left: 0.9rem;
   right: 0.9rem;
   height: 2px;
-  background: #667eea;
+  background: var(--accent);
   border-radius: 2px 2px 0 0;
 }
 
@@ -118,11 +120,12 @@
 .searchInput {
   width: 100%;
   padding: 0.55rem 0.8rem;
-  border: 1px solid #dcdce3;
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   font-size: 0.9rem;
   font-family: inherit;
-  background: white;
+  background: var(--input-bg);
+  color: var(--text);
   box-sizing: border-box;
   transition: border-color 0.15s, box-shadow 0.15s;
   margin-bottom: 1rem;
@@ -130,7 +133,7 @@
 
 .searchInput:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
@@ -146,14 +149,15 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.6rem 0.75rem;
-  background: #fafafb;
-  border: 1px solid #ececf2;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
   border-radius: 8px;
   transition: border-color 0.15s;
+  color: var(--text);
 }
 
 .memberRow:hover {
-  border-color: #d5d5df;
+  border-color: var(--border-strong);
 }
 
 .memberAvatar {
@@ -178,7 +182,7 @@
 .memberName {
   font-size: 0.95rem;
   font-weight: 500;
-  color: #1a1a25;
+  color: var(--text);
   margin-bottom: 0.15rem;
 }
 
@@ -187,7 +191,7 @@
   align-items: center;
   gap: 0.45rem;
   font-size: 0.75rem;
-  color: #777;
+  color: var(--text-muted);
   flex-wrap: wrap;
 }
 
@@ -202,12 +206,12 @@
 
 .status_online { color: #2a9d2a; }
 .status_afk { color: #e07b00; }
-.status_offline { color: #999; }
+.status_offline { color: var(--text-faint); }
 
 .roleTag {
   font-size: 0.7rem;
-  background: #ececf2;
-  color: #555;
+  background: var(--bg-hover);
+  color: var(--text-muted);
   padding: 0.1rem 0.5rem;
   border-radius: 10px;
   font-weight: 600;
@@ -223,7 +227,7 @@
 /* Buttons */
 .primaryBtn {
   padding: 0.5rem 1rem;
-  background: #667eea;
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 6px;
@@ -246,9 +250,9 @@
 
 .secondaryBtn {
   padding: 0.4rem 0.8rem;
-  background: white;
-  color: #555;
-  border: 1px solid #dcdce3;
+  background: var(--bg-surface);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.8rem;
@@ -259,8 +263,7 @@
 }
 
 .secondaryBtn:hover:not(:disabled) {
-  background: #f5f5f7;
-  border-color: #b0b0ba;
+  background: var(--bg-hover);
 }
 
 .secondaryBtn:disabled {
@@ -270,7 +273,7 @@
 
 .dangerBtn {
   padding: 0.4rem 0.8rem;
-  background: white;
+  background: var(--bg-surface);
   color: #c33;
   border: 1px solid #f4c4c4;
   border-radius: 6px;
@@ -300,16 +303,16 @@
 .emptyState {
   text-align: center;
   padding: 2.5rem 1rem;
-  color: #999;
+  color: var(--text-faint);
   font-style: italic;
   font-size: 0.9rem;
-  background: #fafafb;
+  background: var(--bg-raised);
   border: 1px dashed #ddd;
   border-radius: 8px;
 }
 
 .mutedNote {
-  color: #999;
+  color: var(--text-faint);
   font-style: italic;
   padding: 1rem 0;
   font-size: 0.9rem;
@@ -337,7 +340,7 @@
 
 /* Invite tab */
 .inviteCard {
-  background: #fafafb;
+  background: var(--bg-raised);
   border: 1px solid #ececf2;
   border-radius: 10px;
   padding: 1.25rem;
@@ -347,14 +350,14 @@
   display: block;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #1a1a25;
+  color: var(--text);
   margin-bottom: 0.25rem;
 }
 
 .fieldHint {
   margin: 0 0 0.75rem 0;
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-softer);
 }
 
 .inviteRow {
@@ -369,14 +372,14 @@
   border-radius: 6px;
   font-size: 0.9rem;
   font-family: inherit;
-  background: white;
+  background: var(--bg-surface);
   box-sizing: border-box;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .fieldInput:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
@@ -400,7 +403,7 @@
   border-radius: 6px;
   font-size: 0.9rem;
   font-family: inherit;
-  background: white;
+  background: var(--bg-surface);
   box-sizing: border-box;
   resize: vertical;
   min-height: 80px;
@@ -409,7 +412,7 @@
 
 .fieldTextarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
@@ -437,7 +440,7 @@
 .dangerDesc {
   margin: 0 0 0.85rem 0;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-muted);
 }
 
 .dangerZone .dangerBtn {

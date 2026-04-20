@@ -22,7 +22,7 @@
 
 .loading {
   padding: 2rem;
-  color: #999;
+  color: var(--text-faint);
 }
 
 .error {
@@ -36,9 +36,9 @@
 
 .frozenBanner {
   padding: 0.85rem 1.25rem;
-  background: #fafafb;
-  border-top: 1px solid #ececf2;
-  color: #777;
+  background: var(--bg-raised);
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
   font-size: 0.85rem;
   text-align: center;
   font-style: italic;

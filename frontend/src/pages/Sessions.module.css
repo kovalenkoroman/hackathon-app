@@ -24,24 +24,24 @@
   margin: 0 0 0.25rem 0;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1a1a25;
+  color: var(--text);
   letter-spacing: -0.01em;
 }
 
 .pageSubtitle {
   margin: 0;
   font-size: 0.9rem;
-  color: #777;
+  color: var(--text-muted);
 }
 
 .mutedNote {
-  color: #999;
+  color: var(--text-faint);
   font-style: italic;
 }
 
 .section {
-  background: white;
-  border: 1px solid #ececf2;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1.5rem;
   margin-bottom: 1rem;
@@ -59,19 +59,19 @@
   margin: 0 0 0.25rem 0;
   font-size: 1.05rem;
   font-weight: 600;
-  color: #1a1a25;
+  color: var(--text);
 }
 
 .sectionDesc {
   margin: 0 0 1rem 0;
   font-size: 0.85rem;
-  color: #777;
+  color: var(--text-muted);
 }
 
 .primaryBtn {
   display: inline-block;
   padding: 0.5rem 1rem;
-  background: #667eea;
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 6px;
@@ -89,9 +89,9 @@
 
 .secondaryBtn {
   padding: 0.5rem 1rem;
-  background: white;
-  color: #555;
-  border: 1px solid #dcdce3;
+  background: var(--input-bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.85rem;
@@ -102,7 +102,7 @@
 }
 
 .secondaryBtn:hover {
-  background: #f5f5f7;
+  background: var(--bg-hover);
   border-color: #b0b0ba;
 }
 
@@ -118,8 +118,8 @@
   align-items: center;
   gap: 1rem;
   padding: 0.85rem 1rem;
-  background: #fafafb;
-  border: 1px solid #ececf2;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
   border-radius: 8px;
 }
 
@@ -135,10 +135,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: var(--input-bg);
   border-radius: 8px;
-  border: 1px solid #ececf2;
-  color: #667eea;
+  border: 1px solid var(--border);
+  color: var(--accent);
 }
 
 .sessionInfo {
@@ -155,7 +155,7 @@
 
 .sessionDevice {
   font-size: 0.95rem;
-  color: #1a1a25;
+  color: var(--text);
 }
 
 .currentBadge {
@@ -169,7 +169,7 @@
 
 .sessionMeta {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-softer);
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -182,7 +182,7 @@
 
 .revokeBtn {
   padding: 0.4rem 0.85rem;
-  background: white;
+  background: var(--input-bg);
   color: #c33;
   border: 1px solid #f4c4c4;
   border-radius: 6px;
@@ -215,7 +215,7 @@
   margin: 0 0 1.25rem 0;
   padding-left: 1.1rem;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-muted);
   line-height: 1.6;
 }
 
