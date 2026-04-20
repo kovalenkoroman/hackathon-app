@@ -1,6 +1,6 @@
 # Hackathon Notes — Online Chat Server
 
-> Keep this updated as you go. Denis said organizers love this and almost no one does it.
+> Keep this updated as you go. Organizers love this and almost no one does it.
 > Log decisions in real time — even a few bullet points per phase is valuable.
 
 ---
@@ -107,14 +107,15 @@ Stack chosen: Node.js + Express + WebSocket (`ws`) + PostgreSQL + React (Vite)
 
 ## What Didn't Work / Wasted Time
 
-- **Circular dep in WS broadcasts**: `broadcast.js ↔ presence.js`; fixed with dynamic `await import()` — would have been caught by a quick dep-graph sketch.
-- **httpOnly session cookie**: wasted time trying to read it from `document.cookie` before switching to curl.
-- **Content-length mismatch**: initial `content.length > 5000` vs spec's `Buffer.byteLength > 3072` — a test caught it but it shouldn't have shipped.
-- **Express route ordering**: parameterised `/rooms/:id/...` shadowed `/rooms/mine` until static routes were moved first.
+Framed as what *I* got wrong as the person driving the agent, not what the agent itself did.
+
+- **Underpowered model for the first half**: I ran a lot of features through Haiku before switching. Every feature took more prompts, more corrections, and frequently a second pass to fix subtle misses. Picking the strongest model on day 1 and downgrading only for narrow mechanical tasks would have recovered hours.
+- **Prose requirements instead of executable tests**: I described features to the agent in prose, the agent implemented to the prose, and behavioural gaps only surfaced when I re-read `hackathon-requirements.md` on day 2 myself. Converting §2.1–2.7 into `tests/run.sh` *before* any feature prompts would have turned every gap into a red test instead of an audit finding.
+- **Under-planning before prompting**: repeatedly I said "implement X" before nailing down the data shape, error paths, and UI flow. The agent implemented something reasonable, I re-read, said "actually no", refactor. That check-then-refactor loop was the single biggest time sink — ten minutes of planning consistently saved forty-five minutes of rework.
+- **Letting the agent invent the visual language**: no wireframes, no token list, no component brief — each page's look was improvised as the agent wrote it. A late sweep unified everything, but it would have been near-zero cost with even low-fidelity sketches and a short style-token list agreed on day 1.
+- **Over-trusting "done"**: when the agent reported a feature complete I often moved on without cross-checking against the requirements doc. Gaps (attachment access checks, blocked-contact history visibility, DM feature parity) accumulated silently until the day-2 audit. A two-minute "does this match §2.X?" self-check per feature would have kept the backlog honest.
 
 ## Observations on Agentic Development
-
-> This is what the organizers actually care about.
 
 - **Agent asked before assuming**: after each phase it asked "what next?" — forced explicit prioritisation and kept scope contained.
 - **Test-adjacent code beat formal tests**: code-to-spec + manual browser verification gave ~70% of the coverage value at ~30% of the cost for a hackathon.
@@ -123,7 +124,7 @@ Stack chosen: Node.js + Express + WebSocket (`ws`) + PostgreSQL + React (Vite)
 - **Minimal error handling**: no defensive code for impossible states; throws pointed directly at failures.
 - **Model choice mattered**: first half on Haiku needed much more hand-holding per feature; the stronger model produced closer-to-final code on first pass. Default to the stronger model for feature work; drop to cheaper only for narrow mechanical tasks.
 
-## Hardest Parts
+## Hardest Parts (for Agent)
 
 - **Multi-recipient presence broadcasts**: realising AFK changes must reach *both* friends and room members needed a drawn-out broadcast graph before the two-helper solution became obvious.
 - **Ping debounce timing**: per-tab `lastAcceptedPing` with a 5 s window took a few iterations to get right.
