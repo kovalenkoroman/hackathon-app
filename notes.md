@@ -117,14 +117,18 @@ Framed as what *I* got wrong as the person driving the agent, not what the agent
 
 ## Observations on Agentic Development
 
-- **Agent asked before assuming**: after each phase it asked "what next?" — forced explicit prioritisation and kept scope contained.
-- **Test-adjacent code beat formal tests**: code-to-spec + manual browser verification gave ~70% of the coverage value at ~30% of the cost for a hackathon.
-- **Prioritisation via "likely fails"**: triaging 30+ test cases into 5 priorities (Auth/Presence/Rooms/Friends/Messaging) kept day 1 focused.
-- **Constraint-following was critical**: no wavering on "no ORM", no pushback when tests were declined — discipline prevented scope creep.
-- **Minimal error handling**: no defensive code for impossible states; throws pointed directly at failures.
-- **Model choice mattered**: first half on Haiku needed much more hand-holding per feature; the stronger model produced closer-to-final code on first pass. Default to the stronger model for feature work; drop to cheaper only for narrow mechanical tasks.
+Framed as what I noticed from driving the agent, not about the agent itself.
 
-## Hardest Parts (for Agent)
+- **Welcomed clarifying questions instead of pushing through them**: when the agent paused between phases and asked "what next?" I treated that as a feature. A thirty-second answer consistently beat ten minutes of undoing an assumption-driven diversion.
+- **Wrote the rules down where the agent could read them**: CLAUDE.md + skill files were the only reliable way to keep conventions sticky across long sessions. Saying "by the way, use raw `pg`" in chat held for one prompt; codified in CLAUDE.md it held across twenty.
+- **Traded formal tests for live browser verification during feature work**: rather than ask for Jest/Playwright suites per feature I had the agent run each feature in the browser via Playwright MCP right after implementing. For a hackathon this bought most of the test value at a fraction of the cost. (An end-of-day API regression suite came later, once features had stabilised.)
+- **Steered the agent away from defensive coding**: the default is belt-and-braces try/catch around every call. Saying "throw, don't check — we validate at the boundary" once, early, stuck for the rest of the project and left error messages pointing at real problems instead of being swallowed.
+- **Fed scope deliberately, not by dumping the whole spec**: pasting the full requirements doc made the agent sprawl; handing it a ranked shortlist of four or five current priorities made it focus. Scope management is a prompt-design choice, not a post-hoc cleanup.
+- **Delegated but verified**: when the agent reported "done" I formed the habit of reading the diff before saying yes. The agent's summary describes what it *intended* to do; the diff shows what it *did* — not always the same, often enough to matter.
+- **Model choice was the highest-leverage decision**: first half on Haiku needed far more hand-holding per feature; the stronger model produced closer-to-final code on first pass. Default to the strongest model for feature work; only drop to a cheaper tier for narrow mechanical tasks.
+- **Frequent commits as a safety net**: committing every 15–30 minutes made it cheap to say "that refactor was wrong, `git reset` and rethink" without losing adjacent work. Agents take bigger swings when the undo button is cheap, and that's usually a net positive.
+
+## Hardest Parts
 
 - **Multi-recipient presence broadcasts**: realising AFK changes must reach *both* friends and room members needed a drawn-out broadcast graph before the two-helper solution became obvious.
 - **Ping debounce timing**: per-tab `lastAcceptedPing` with a 5 s window took a few iterations to get right.
