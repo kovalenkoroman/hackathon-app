@@ -425,8 +425,8 @@
 .dangerZone {
   margin-top: 1.5rem;
   padding: 1.1rem 1.25rem;
-  background: #fff8f8;
-  border: 1px solid #f4d4d4;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
   border-radius: 10px;
 }
 
@@ -434,7 +434,7 @@
   margin: 0 0 0.25rem 0;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #c33;
+  color: var(--danger-text);
 }
 
 .dangerDesc {

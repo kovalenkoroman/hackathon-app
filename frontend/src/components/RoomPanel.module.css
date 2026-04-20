@@ -35,13 +35,13 @@
 }
 
 .visibilityBadge.public {
-  background: #eef6ff;
-  color: #2564b1;
+  background: var(--badge-public-bg);
+  color: var(--badge-public-text);
 }
 
 .visibilityBadge.private {
-  background: #f3efff;
-  color: #6b4fbd;
+  background: var(--badge-private-bg);
+  color: var(--badge-private-text);
 }
 
 .description {

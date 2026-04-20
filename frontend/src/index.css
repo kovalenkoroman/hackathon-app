@@ -52,6 +52,10 @@ html, body, #root {
   --danger-border: #f4d4d4;
   --danger-text: #c33;
   --danger-muted: #8a3a3a;
+  --badge-public-bg: #eef6ff;
+  --badge-public-text: #2564b1;
+  --badge-private-bg: #f3efff;
+  --badge-private-text: #6b4fbd;
 }
 
 .dark {
@@ -94,6 +98,10 @@ html, body, #root {
   --danger-border: rgba(220, 50, 50, 0.35);
   --danger-text: #ff8080;
   --danger-muted: #d48a8a;
+  --badge-public-bg: rgba(80, 140, 220, 0.18);
+  --badge-public-text: #8ebaff;
+  --badge-private-bg: rgba(160, 130, 230, 0.18);
+  --badge-private-text: #c8b4ff;
 }
 
 body {
