@@ -199,8 +199,8 @@
 }
 
 .dangerSection {
-  background: #fff8f8;
-  border-color: #f4d4d4;
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
   margin-top: 1.5rem;
 }
 
@@ -208,7 +208,7 @@
   margin: 0 0 0.25rem 0;
   font-size: 1.05rem;
   font-weight: 600;
-  color: #c33;
+  color: var(--danger-text);
 }
 
 .dangerList {

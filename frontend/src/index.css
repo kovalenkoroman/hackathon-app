@@ -48,6 +48,10 @@ html, body, #root {
   --chip-bg: #eef0ff;
   --chip-text: #4c5bc4;
   --chip-border: #dde1fa;
+  --danger-bg: #fff8f8;
+  --danger-border: #f4d4d4;
+  --danger-text: #c33;
+  --danger-muted: #8a3a3a;
 }
 
 .dark {
@@ -86,6 +90,10 @@ html, body, #root {
   --chip-bg: rgba(124, 142, 255, 0.18);
   --chip-text: #9ba9ff;
   --chip-border: rgba(124, 142, 255, 0.3);
+  --danger-bg: rgba(220, 50, 50, 0.1);
+  --danger-border: rgba(220, 50, 50, 0.35);
+  --danger-text: #ff8080;
+  --danger-muted: #d48a8a;
 }
 
 body {
