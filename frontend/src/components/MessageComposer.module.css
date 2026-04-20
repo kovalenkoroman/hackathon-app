@@ -2,144 +2,99 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 0.75rem;
-  border-top: 1px solid #ccc;
+  padding: 0.75rem 1rem 1rem;
   background: #fff;
+  border-top: 1px solid #ececf2;
+  flex-shrink: 0;
 }
 
-/* Input row with tools and textarea */
-.inputRow {
+/* Reply banner */
+.replyBanner {
   display: flex;
+  align-items: stretch;
   gap: 0.5rem;
-  align-items: flex-start;
+  padding: 0.45rem 0.65rem;
+  background: #f7f9ff;
+  border: 1px solid #e0e6fb;
+  border-radius: 8px;
+  font-size: 0.8rem;
 }
 
-.toolsColumn {
+.replyAccent {
+  width: 3px;
+  background: #667eea;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.replyBody {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
-.toolBtn {
-  padding: 0.4rem 0.5rem;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 2px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.toolBtn:hover:not(:disabled) {
-  background: #f0f0f0;
-}
-
-.toolBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Emoji Picker */
-.emojiPickerWrapper {
-  position: relative;
-}
-
-.emojiPicker {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  padding: 0.5rem;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.3rem;
-  margin-bottom: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-}
-
-.emojiBtn {
-  padding: 0.3rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 1.1rem;
-  border-radius: 2px;
-  transition: background 0.2s;
-}
-
-.emojiBtn:hover {
-  background: #f0f0f0;
-}
-
-/* Reply Container */
-.replyContainer {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background: #f5f5f5;
-  border-left: 3px solid #667eea;
-  border-radius: 2px;
-  flex-shrink: 0;
+  gap: 0.1rem;
 }
 
 .replyLabel {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: #667eea;
+  font-size: 0.75rem;
 }
 
 .replyPreview {
-  font-size: 0.8rem;
   color: #666;
-  font-style: italic;
-  flex: 1;
+  font-size: 0.8rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 300px;
 }
 
 .replyClose {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  color: #999;
   padding: 0;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #999;
+  border-radius: 4px;
   flex-shrink: 0;
+  align-self: center;
 }
 
 .replyClose:hover {
+  background: #ececf2;
   color: #333;
 }
 
-/* File Tag */
-.fileTag {
-  display: flex;
+/* File chip */
+.fileChip {
+  display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.3rem 0.5rem;
-  background: #e8f4f8;
-  border: 1px solid #b0dce8;
-  border-radius: 2px;
+  gap: 0.4rem;
+  padding: 0.3rem 0.55rem;
+  background: #eef0ff;
+  border: 1px solid #dde1fa;
+  border-radius: 14px;
   font-size: 0.8rem;
-  color: #333;
-  flex-shrink: 0;
+  color: #4c5bc4;
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+.fileIcon {
+  font-size: 0.85rem;
+}
+
+.fileName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 260px;
 }
 
 .fileClear {
@@ -147,36 +102,52 @@
   border: none;
   cursor: pointer;
   font-size: 1rem;
+  color: #667eea;
   padding: 0;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #999;
+  border-radius: 3px;
 }
 
 .fileClear:hover {
-  color: #333;
+  background: rgba(102, 126, 234, 0.12);
 }
 
-/* Textarea Field */
+/* Input shell */
+.inputShell {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #dcdce3;
+  border-radius: 10px;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.inputShell:focus-within {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+}
+
 .textarea {
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: none;
+  background: transparent;
   font-size: 0.95rem;
   font-family: inherit;
-  resize: vertical;
-  min-height: 80px;
+  resize: none;
+  min-height: 44px;
   max-height: 200px;
+  line-height: 1.45;
+  color: #222;
+  box-sizing: border-box;
 }
 
 .textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
 }
 
 .textarea:disabled {
@@ -184,26 +155,127 @@
   cursor: not-allowed;
 }
 
-/* Send Button */
+.textarea::placeholder {
+  color: #aaa;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.35rem 0.5rem 0.4rem;
+  border-top: 1px solid #f0f0f2;
+}
+
+.toolsLeft {
+  display: flex;
+  gap: 0.2rem;
+  align-items: center;
+}
+
+.toolsRight {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.toolBtn {
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background 0.15s;
+  color: #555;
+}
+
+.toolBtn:hover:not(:disabled) {
+  background: #f0f0f2;
+}
+
+.toolBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.hint {
+  font-size: 0.72rem;
+  color: #aaa;
+}
+
 .sendBtn {
-  padding: 0.75rem 1.5rem;
+  padding: 0.4rem 1rem;
   background: #667eea;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  white-space: nowrap;
-  align-self: flex-end;
+  font-family: inherit;
+  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: 0 1px 3px rgba(102, 126, 234, 0.3);
 }
 
 .sendBtn:hover:not(:disabled) {
   background: #5568d3;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
 }
 
 .sendBtn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
+/* Emoji picker */
+.emojiWrap {
+  position: relative;
+}
+
+.emojiPicker {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  background: white;
+  border: 1px solid #ececf2;
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.25rem;
+  box-shadow: 0 8px 24px rgba(30, 30, 60, 0.15);
+  z-index: 100;
+  width: max-content;
+}
+
+.emojiBtn {
+  padding: 0.3rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.05rem;
+  border-radius: 4px;
+  transition: background 0.15s;
+  line-height: 1;
+}
+
+.emojiBtn:hover {
+  background: #f0f0f2;
+}
+
+@media (max-width: 768px) {
+  .hint {
+    display: none;
+  }
+  .emojiPicker {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
