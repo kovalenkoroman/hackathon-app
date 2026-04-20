@@ -28,17 +28,20 @@ router.post('/upload', requireAuth, upload.single('file'), validateFileSize, asy
     // Re-fetch the enriched message (with all its attachments) and broadcast
     // a message:edit so other participants update their view.
     const message = await messageQueries.findMessageById(parseInt(messageId));
+    let enrichedMessage = null;
     if (message) {
       const [hydrated] = await messageQueries.hydrateAttachments([message]);
-      const payload = hydrated;
+      enrichedMessage = hydrated;
       if (message.room_id) {
-        await broadcast.broadcastToRoom(message.room_id, { type: 'message:edit', payload });
+        await broadcast.broadcastToRoom(message.room_id, { type: 'message:edit', payload: enrichedMessage });
       } else if (message.dialog_id) {
-        await broadcast.broadcastToDialog(message.dialog_id, { type: 'message:edit', payload });
+        await broadcast.broadcastToDialog(message.dialog_id, { type: 'message:edit', payload: enrichedMessage });
       }
     }
 
-    res.status(201).json({ data: attachment });
+    // Return the enriched message alongside the attachment so the uploader
+    // can update its local state without waiting on the WS round-trip.
+    res.status(201).json({ data: { attachment, message: enrichedMessage } });
   } catch (error) {
     console.error('Upload error:', error);
     res.status(400).json({ error: error.message });
@@ -50,13 +53,16 @@ router.get('/:attachmentId', requireAuth, async (req, res) => {
   try {
     const attachment = await filesService.getAttachment(parseInt(req.params.attachmentId), req.user.id);
 
-    // Read file from disk
     const fileData = await readFile(`/app/uploads/${attachment.filename}`);
 
-    // Set response headers
-    res.setHeader('Content-Type', attachment.mime_type);
+    // For images, render inline so <img> tags display them; for anything else,
+    // send as a download so filenames with the original name are preserved.
+    const isImage = attachment.mime_type?.startsWith('image/');
+    const disposition = isImage ? 'inline' : 'attachment';
+
+    res.setHeader('Content-Type', attachment.mime_type || 'application/octet-stream');
     res.setHeader('Content-Length', attachment.size);
-    res.setHeader('Content-Disposition', `attachment; filename="${attachment.original_name}"`);
+    res.setHeader('Content-Disposition', `${disposition}; filename="${attachment.original_name}"`);
 
     res.send(fileData);
   } catch (error) {

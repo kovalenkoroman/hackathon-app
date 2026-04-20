@@ -131,10 +131,17 @@ export default function DMChat({ user }) {
         formData.append('file', msgData.file);
         formData.append('messageId', newMessage.id);
         try {
-          await fetch('/api/v1/files/upload', {
+          const uploadRes = await fetch('/api/v1/files/upload', {
             method: 'POST',
             body: formData,
           });
+          if (uploadRes.ok) {
+            const uploadJson = await uploadRes.json();
+            if (uploadJson.data?.message) {
+              const enriched = uploadJson.data.message;
+              setMessages((prev) => prev.map((m) => (m.id === enriched.id ? { ...m, ...enriched } : m)));
+            }
+          }
         } catch (err) {
           console.error('File upload failed:', err);
           setError('Message sent, but file upload failed');

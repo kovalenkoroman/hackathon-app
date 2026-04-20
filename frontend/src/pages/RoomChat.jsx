@@ -43,7 +43,10 @@ export default function RoomChat({ user }) {
 
   useEffect(() => {
     const handleMessageNew = (payload) => {
-      setMessages(prev => [...prev, payload]);
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === payload.id)) return prev;
+        return [...prev, payload];
+      });
     };
 
     const handleMessageEdit = (payload) => {
@@ -135,13 +138,19 @@ export default function RoomChat({ user }) {
         formData.append('messageId', newMessage.id);
 
         try {
-          await fetch('/api/v1/files/upload', {
+          const res = await fetch('/api/v1/files/upload', {
             method: 'POST',
             body: formData
           });
+          if (res.ok) {
+            const json = await res.json();
+            if (json.data?.message) {
+              const enriched = json.data.message;
+              setMessages((prev) => prev.map((m) => (m.id === enriched.id ? { ...m, ...enriched } : m)));
+            }
+          }
         } catch (err) {
           console.error('File upload failed:', err);
-          // File upload failed but message was sent, so just show a warning
           setError('Message sent, but file upload failed');
         }
       }
