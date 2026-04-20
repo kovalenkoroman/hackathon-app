@@ -1,0 +1,87 @@
+- generic [ref=e211]:
+  - navigation [ref=e212]:
+    - generic [ref=e213]:
+      - img "Hackathon Chat" [ref=e214]
+      - text: Hackathon Chat
+    - generic [ref=e215]:
+      - link "Public Rooms" [ref=e216] [cursor=pointer]:
+        - /url: /catalog
+      - link "Private Rooms" [ref=e217] [cursor=pointer]:
+        - /url: /my-rooms
+      - link "Contacts" [ref=e218] [cursor=pointer]:
+        - /url: /friends
+      - link "Sessions" [ref=e219] [cursor=pointer]:
+        - /url: /sessions
+    - generic [ref=e220]:
+      - button "alice ▼" [ref=e222] [cursor=pointer]
+      - button "Sign out" [ref=e223] [cursor=pointer]
+  - generic [ref=e224]:
+    - complementary [ref=e225]:
+      - button "▶" [active] [ref=e352] [cursor=pointer]
+    - main [ref=e259]:
+      - generic [ref=e260]:
+        - generic [ref=e261]:
+          - heading "Random" [level=2] [ref=e262]
+          - paragraph [ref=e263]: Off-topic chat and fun content
+        - generic [ref=e264]:
+          - generic [ref=e266]:
+            - generic [ref=e267]:
+              - strong [ref=e268]: charlie
+              - generic [ref=e269]: 01:00
+            - generic [ref=e270]: What is everyone's favorite programming language? 🤔
+            - button "↩️ Reply" [ref=e272] [cursor=pointer]
+          - generic [ref=e274]:
+            - generic [ref=e275]:
+              - strong [ref=e276]: alice
+              - generic [ref=e277]: 01:00
+            - generic [ref=e278]: I love Python for its simplicity 🐍
+            - generic [ref=e279]:
+              - button "↩️ Reply" [ref=e280] [cursor=pointer]
+              - button "🗑️ Delete" [ref=e281] [cursor=pointer]
+          - generic [ref=e283]:
+            - generic [ref=e284]:
+              - strong [ref=e285]: bob
+              - generic [ref=e286]: 01:00
+            - generic [ref=e287]: JavaScript is great for web development 🌐
+            - button "↩️ Reply" [ref=e289] [cursor=pointer]
+          - generic [ref=e291]:
+            - generic [ref=e292]:
+              - strong [ref=e293]: diana
+              - generic [ref=e294]: 01:00
+            - generic [ref=e295]: Go is my go-to for system programs 🎯
+            - button "↩️ Reply" [ref=e297] [cursor=pointer]
+          - generic [ref=e299]:
+            - generic [ref=e300]:
+              - strong [ref=e301]: bob
+              - generic [ref=e302]: 01:00
+            - generic [ref=e303]:
+              - generic [ref=e304]: ↪ Reply to alice
+              - generic [ref=e305]: I love Python for its simplicity 🐍
+            - generic [ref=e306]: "@alice Python is indeed elegant! 😍"
+            - button "↩️ Reply" [ref=e308] [cursor=pointer]
+        - generic [ref=e309]:
+          - generic [ref=e310]:
+            - generic [ref=e311]:
+              - button "😀" [ref=e313] [cursor=pointer]
+              - button "📎" [ref=e314] [cursor=pointer]
+            - textbox "Type your message... (Ctrl+Enter to send)" [ref=e315]
+          - button "Send" [disabled] [ref=e316]
+    - complementary [ref=e317]:
+      - generic [ref=e319]:
+        - heading "Room info" [level=2] [ref=e320]
+        - generic [ref=e321]:
+          - generic [ref=e322]:
+            - generic [ref=e323]: "Type:"
+            - generic [ref=e324]: Public
+          - generic [ref=e325]:
+            - generic [ref=e326]: "Owner:"
+            - generic [ref=e327]: charlie
+        - generic [ref=e328]:
+          - heading "Members (3)" [level=3] [ref=e329]
+          - generic [ref=e330]:
+            - generic [ref=e331]: alice
+            - generic [ref=e332]: bob
+            - generic [ref=e333]: diana
+        - generic [ref=e334]:
+          - button "📨 Invite user" [ref=e335] [cursor=pointer]
+          - button "👋 Leave room" [ref=e336] [cursor=pointer]

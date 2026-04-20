@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, matchPath } from 'react-router-dom';
 import RoomPanel from './RoomPanel';
 import ManageRoomModal from './ManageRoomModal';
 import { RoomContext } from '../RoomContext';
@@ -10,6 +10,11 @@ import styles from './MainLayout.module.css';
 
 export default function MainLayout({ user, onLogout, wsState, presence, children }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const activeRoomMatch = matchPath('/rooms/:roomId', location.pathname) || matchPath('/rooms/:roomId/*', location.pathname);
+  const activeDmMatch = matchPath('/dm/:userId', location.pathname);
+  const activeRoomId = activeRoomMatch ? parseInt(activeRoomMatch.params.roomId) : null;
+  const activeDmUserId = activeDmMatch ? parseInt(activeDmMatch.params.userId) : null;
   const { roomInfo, roomMembers, setRoomInfo, setRoomMembers } = useContext(RoomContext);
   const { getUnreadCount } = useUnreads();
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
@@ -132,123 +137,119 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
       <div className={styles.mainContent}>
         {/* Left Sidebar - Rooms & Contacts */}
         <aside className={`${styles.leftSidebar} ${!leftSidebarOpen ? styles.collapsed : ''}`}>
-          {leftSidebarOpen && (
-            <div className={styles.sidebarContent}>
-              {/* Search bar */}
-              <div className={styles.searchBar}>
-                <input
-                  type="text"
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={styles.searchInput}
-                />
-              </div>
-
-              {/* Rooms Section */}
-              <div className={styles.sidebarSection}>
-                <h3 className={styles.sectionTitle}>ROOMS</h3>
-                <div className={styles.roomsSection}>
-                  <div className={styles.categoryHeader}>▼ Public Rooms</div>
-                  <div className={styles.roomList} id="room-list">
-                    {loading ? (
-                      <div style={{ fontSize: '0.8rem', color: '#999', padding: '0.5rem' }}>Loading...</div>
-                    ) : publicRooms.length > 0 ? (
-                      publicRooms.map((room) => {
-                        const unreadCount = getUnreadCount(room.id, 'room');
-                        return (
-                          <div
-                            key={room.id}
-                            onClick={() => handleRoomClick(room.id)}
-                            className={styles.roomItem}
-                            title={room.name}
-                          >
-                            {room.name}
-                            {unreadCount > 0 && (
-                              <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: '#ff4444', color: 'white', borderRadius: '10px', padding: '0.1rem 0.4rem' }}>
-                                {unreadCount}
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <div style={{ fontSize: '0.8rem', color: '#999', padding: '0.5rem' }}>No public rooms</div>
-                    )}
-                  </div>
-                  <div className={styles.categoryHeader}>▼ Private Rooms</div>
-                  <div className={styles.roomList}>
-                    {privateRooms.length > 0 ? (
-                      privateRooms.map((room) => {
-                        const unreadCount = getUnreadCount(room.id, 'room');
-                        return (
-                          <div
-                            key={room.id}
-                            onClick={() => handleRoomClick(room.id)}
-                            className={styles.roomItem}
-                            title={room.name}
-                          >
-                            {room.name}
-                            {unreadCount > 0 && (
-                              <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: '#ff4444', color: 'white', borderRadius: '10px', padding: '0.1rem 0.4rem' }}>
-                                {unreadCount}
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <div style={{ fontSize: '0.8rem', color: '#999', padding: '0.5rem' }}>No private rooms</div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Contacts Section */}
-              <div className={styles.sidebarSection}>
-                <h3 className={styles.sectionTitle}>CONTACTS</h3>
-                <div className={styles.contactList} id="contact-list">
-                  {contacts.length > 0 ? (
-                    contacts.map((contact) => {
-                      const contactId = contact.friend_id || contact.id;
-                      const contactStatus = presence[contactId] || 'offline';
-                      const unreadCount = getUnreadCount(contactId, 'dialog');
-                      return (
-                        <div
-                          key={contactId}
-                          onClick={() => navigate(`/dm/${contactId}`)}
-                          className={styles.contactItem}
-                          title={contact.username}
-                        >
-                          <span style={{ marginRight: '0.5rem' }}>{getPresenceIcon(contactStatus)}</span>
-                          {contact.username}
-                          {unreadCount > 0 && (
-                            <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: '#ff4444', color: 'white', borderRadius: '10px', padding: '0.1rem 0.4rem' }}>
-                              {unreadCount}
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div style={{ fontSize: '0.8rem', color: '#999', padding: '0.5rem' }}>No contacts</div>
-                  )}
-                </div>
-              </div>
-
-              {/* Create Room Button */}
-              <button className={styles.createRoomBtn} onClick={() => navigate('/catalog?create=true')}>
-                Create room
-              </button>
-            </div>
-          )}
           <button
             className={styles.toggleBtn}
             onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
-            title="Toggle sidebar"
+            title={leftSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
           >
             {leftSidebarOpen ? '◀' : '▶'}
           </button>
+          {leftSidebarOpen && (() => {
+            const q = searchQuery.trim().toLowerCase();
+            const filterByName = (item) => !q || item.name?.toLowerCase().includes(q);
+            const filterByUsername = (item) => !q || item.username?.toLowerCase().includes(q);
+            const filteredPublic = publicRooms.filter(filterByName);
+            const filteredPrivate = privateRooms.filter(filterByName);
+            const filteredContacts = contacts.filter(filterByUsername);
+
+            return (
+              <div className={styles.sidebarContent}>
+                <div className={styles.searchBar}>
+                  <input
+                    type="text"
+                    placeholder="Search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={styles.searchInput}
+                  />
+                </div>
+
+                <div className={styles.sidebarSection}>
+                  <h3 className={styles.sectionTitle}>Rooms</h3>
+                  <div className={styles.roomsSection}>
+                    <div className={styles.categoryHeader}>Public</div>
+                    <div className={styles.roomList} id="room-list">
+                      {loading ? (
+                        <div className={styles.mutedNote}>Loading...</div>
+                      ) : filteredPublic.length > 0 ? (
+                        filteredPublic.map((room) => {
+                          const unreadCount = getUnreadCount(room.id, 'room');
+                          const isActive = activeRoomId === room.id;
+                          return (
+                            <div
+                              key={room.id}
+                              onClick={() => handleRoomClick(room.id)}
+                              className={`${styles.roomItem} ${isActive ? styles.active : ''}`}
+                              title={room.name}
+                            >
+                              <span className={styles.itemName}>{room.name}</span>
+                              {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className={styles.mutedNote}>{q ? 'No matches' : 'No public rooms'}</div>
+                      )}
+                    </div>
+                    <div className={styles.categoryHeader}>Private</div>
+                    <div className={styles.roomList}>
+                      {filteredPrivate.length > 0 ? (
+                        filteredPrivate.map((room) => {
+                          const unreadCount = getUnreadCount(room.id, 'room');
+                          const isActive = activeRoomId === room.id;
+                          return (
+                            <div
+                              key={room.id}
+                              onClick={() => handleRoomClick(room.id)}
+                              className={`${styles.roomItem} ${isActive ? styles.active : ''}`}
+                              title={room.name}
+                            >
+                              <span className={styles.itemName}>{room.name}</span>
+                              {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className={styles.mutedNote}>{q ? 'No matches' : 'No private rooms'}</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.sidebarSection}>
+                  <h3 className={styles.sectionTitle}>Contacts</h3>
+                  <div className={styles.contactList} id="contact-list">
+                    {filteredContacts.length > 0 ? (
+                      filteredContacts.map((contact) => {
+                        const contactId = contact.friend_id || contact.id;
+                        const contactStatus = presence[contactId] || 'offline';
+                        const unreadCount = getUnreadCount(contactId, 'dialog');
+                        const isActive = activeDmUserId === contactId;
+                        return (
+                          <div
+                            key={contactId}
+                            onClick={() => navigate(`/dm/${contactId}`)}
+                            className={`${styles.contactItem} ${isActive ? styles.active : ''}`}
+                            title={contact.username}
+                          >
+                            <span className={styles.presenceDot}>{getPresenceIcon(contactStatus)}</span>
+                            <span className={styles.itemName}>{contact.username}</span>
+                            {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className={styles.mutedNote}>{q ? 'No matches' : 'No contacts'}</div>
+                    )}
+                  </div>
+                </div>
+
+                <button className={styles.createRoomBtn} onClick={() => navigate('/catalog?create=true')}>
+                  Create room
+                </button>
+              </div>
+            );
+          })()}
         </aside>
 
         {/* Main Chat Area */}
