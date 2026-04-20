@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ChangePassword from './pages/ChangePassword';
+import DeleteAccount from './pages/DeleteAccount';
 import ResetPasswordConfirm from './pages/ResetPasswordConfirm';
 import RoomCatalog from './pages/RoomCatalog';
 import MyRooms from './pages/MyRooms';
@@ -120,7 +121,14 @@ function AppContent() {
       <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
       <Route path="/forgot-password" element={user ? <Navigate to="/" /> : <ForgotPassword />} />
       <Route path="/reset-password" element={user ? <Navigate to="/" /> : <ResetPasswordConfirm />} />
-      <Route path="/change-password" element={user ? <ChangePassword /> : <Navigate to="/login" />} />
+      <Route
+        path="/change-password"
+        element={user ? <ProtectedLayout><ChangePassword /></ProtectedLayout> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/delete-account"
+        element={user ? <ProtectedLayout><DeleteAccount user={user} /></ProtectedLayout> : <Navigate to="/login" />}
+      />
       <Route
         path="/catalog"
         element={user ? <ProtectedLayout><RoomCatalog /></ProtectedLayout> : <Navigate to="/login" />}

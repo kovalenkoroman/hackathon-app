@@ -128,14 +128,36 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
             </button>
             {profileDropdownOpen && (
               <div className={styles.dropdownMenu}>
-                <a href="/change-password" className={styles.dropdownItem}>Change Password</a>
-                <a href="#" className={styles.dropdownItem} onClick={(e) => {
-                  e.preventDefault();
-                  if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
-                    // TODO: Implement account deletion
-                    alert('Account deletion coming soon');
-                  }
-                }}>Delete Account</a>
+                <button
+                  type="button"
+                  className={styles.dropdownItem}
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    navigate('/sessions');
+                  }}
+                >
+                  Sessions
+                </button>
+                <button
+                  type="button"
+                  className={styles.dropdownItem}
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    navigate('/change-password');
+                  }}
+                >
+                  Change password
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.dropdownItem} ${styles.dropdownDanger}`}
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    navigate('/delete-account');
+                  }}
+                >
+                  Delete account…
+                </button>
               </div>
             )}
           </div>

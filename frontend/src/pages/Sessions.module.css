@@ -9,7 +9,15 @@
 }
 
 .pageHeader {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.pageHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .pageTitle {
@@ -212,6 +220,7 @@
 }
 
 .dangerBtn {
+  display: inline-block;
   padding: 0.55rem 1.1rem;
   background: #d32f2f;
   color: white;
@@ -221,6 +230,7 @@
   font-size: 0.9rem;
   font-weight: 600;
   font-family: inherit;
+  text-decoration: none;
   transition: background 0.15s;
 }
 

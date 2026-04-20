@@ -117,6 +117,14 @@
   background-color: #f5f5f5;
 }
 
+.dropdownDanger {
+  color: #c33;
+}
+
+.dropdownDanger:hover {
+  background-color: #fef2f2;
+}
+
 .dropdownItem:first-child {
   border-radius: 4px 4px 0 0;
 }
