@@ -16,11 +16,12 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
   const activeRoomId = activeRoomMatch ? parseInt(activeRoomMatch.params.roomId) : null;
   const activeDmUserId = activeDmMatch ? parseInt(activeDmMatch.params.userId) : null;
 
-  // Req 4.1.1: when entering a room, compact the sidebar in accordion style.
-  // We auto-collapse the opposite section so the user focuses on where they are.
+  // Req 4.1.1: "After entering a room, the room list becomes compacted."
+  // Collapse the list the user just navigated *from* — once you're in a room,
+  // the rooms list is less relevant, and symmetrically for DMs with contacts.
   useEffect(() => {
-    if (activeRoomId) setContactsOpen(false);
-    else if (activeDmUserId) setRoomsOpen(false);
+    if (activeRoomId) setRoomsOpen(false);
+    else if (activeDmUserId) setContactsOpen(false);
   }, [activeRoomId, activeDmUserId]);
   const { roomInfo, roomMembers, setRoomInfo, setRoomMembers } = useContext(RoomContext);
   const { getUnreadCount } = useUnreads();
