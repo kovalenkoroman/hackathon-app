@@ -1,0 +1,17 @@
+.dot {
+  font-size: 0.7rem;
+  line-height: 1;
+  display: inline-block;
+}
+
+.online {
+  color: #22c55e;
+}
+
+.afk {
+  color: #f59e0b;
+}
+
+.offline {
+  color: var(--sidebar-text-faint, #94a3b8);
+}

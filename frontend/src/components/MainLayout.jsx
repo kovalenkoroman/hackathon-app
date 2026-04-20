@@ -4,6 +4,7 @@ import { Hash, Lock, Plus, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import RoomPanel from './RoomPanel';
 import ManageRoomModal from './ManageRoomModal';
+import PresenceDot from './PresenceDot';
 import { RoomContext } from '../RoomContext';
 import * as roomsApi from '../api/rooms';
 import * as friendsApi from '../api/friends';
@@ -74,19 +75,6 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
       setContacts(data);
     } catch (error) {
       console.error('Failed to fetch contacts:', error);
-    }
-  };
-
-  const getPresenceIcon = (status) => {
-    switch (status) {
-      case 'online':
-        return '●';
-      case 'afk':
-        return '◐';
-      case 'offline':
-        return '○';
-      default:
-        return '○';
     }
   };
 
@@ -305,7 +293,7 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                               className={`${styles.contactItem} ${isActive ? styles.active : ''}`}
                               title={contact.username}
                             >
-                              <span className={styles.presenceDot}>{getPresenceIcon(contactStatus)}</span>
+                              <PresenceDot status={contactStatus} />
                               <span className={styles.itemName}>{contact.username}</span>
                               {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
                             </div>
@@ -346,6 +334,7 @@ export default function MainLayout({ user, onLogout, wsState, presence, children
                 room={roomInfo}
                 members={roomMembers}
                 user={user}
+                presence={presence}
                 onInvite={() => {}}
                 onManage={() => setShowManageModal(true)}
                 onBan={() => {}}

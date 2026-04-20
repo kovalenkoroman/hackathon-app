@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Send, Settings, LogOut, Globe, Lock, X } from 'lucide-react';
 import styles from './RoomPanel.module.css';
+import PresenceDot from './PresenceDot';
 
-export default function RoomPanel({ room, members, user, onInvite, onManage, onBan, onRemove, onPromote, onDemote, onLeave }) {
+export default function RoomPanel({ room, members, user, presence = {}, onInvite, onManage, onBan, onRemove, onPromote, onDemote, onLeave }) {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteLink, setInviteLink] = useState('');
   const [copied, setCopied] = useState(false);
@@ -101,9 +102,13 @@ export default function RoomPanel({ room, members, user, onInvite, onManage, onB
     const isFriend = friendIds.has(m.user_id);
     const requested = pendingRequestIds.has(m.user_id);
     const canAddFriend = !isSelf && !isFriend;
+    const status = m.user_id === user?.id ? 'online' : (presence[m.user_id] || 'offline');
     return (
       <div key={m.user_id} className={styles.memberRow}>
-        <div className={styles.memberAvatar}>{getAvatar(m.username)}</div>
+        <div className={styles.memberAvatar}>
+          {getAvatar(m.username)}
+          <span className={styles.avatarPresence}><PresenceDot status={status} /></span>
+        </div>
         <span className={styles.memberName}>{m.username}</span>
         {canAddFriend && !requested && (
           <button
